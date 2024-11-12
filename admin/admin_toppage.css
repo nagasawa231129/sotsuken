@@ -1,0 +1,70 @@
+/* 全体のスタイル */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4; /* 背景色 */
+    margin: 0;
+}
+header{
+    width: auto;
+    height: 100px;
+    background-color:blue;/*背景色*/
+	/* position: sticky;一定の位置に来たら固定 */
+}
+.side{
+    text-align: left;
+}
+.logo{
+    width: 200px;
+    height: 100px;
+  }
+/* ハンバーガーメニュー */
+#s-navi {
+    position: relative;
+}
+
+#nav-input {
+    display: none;
+}
+
+#nav-open {
+    cursor: pointer;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 30px;
+}
+
+#nav-content {
+    display: none;
+    position: absolute;
+    top: 60px;
+    right: 20px;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    z-index: 100;
+}
+
+#nav-input:checked ~ #nav-content {
+    display: block;
+}
+
+#nav-content ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+#nav-content li {
+    padding: 10px;
+}
+
+#nav-content a {
+    text-decoration: none;
+    color: black;
+}
+/* ヘッダー */
+h2 {
+    color: #333; /* テキスト色 */
+    text-align: center;
+}
