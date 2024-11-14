@@ -1,9 +1,13 @@
 <?php
-include "../../../db_open.php";
-include "../../head.php";
-include "../../header.php";
-echo "<link rel='stylesheet' href='../header.css'>";
-echo "<link rel='stylesheet' href='category.css'>";
+include "../../../../db_open.php";
+include "../../../head.php";
+include "../../../header.php";
+echo "<link rel='stylesheet' href='../../header.css'>";
+echo "<link rel='stylesheet' href='../category.css'>";
+
+$sql = "SELECT * FROM category";  // categoryテーブルのすべてのカテゴリーを取得
+$result = $dbh->prepare($sql);
+$result->execute();
 ?>
 
 <!DOCTYPE html>
@@ -17,11 +21,23 @@ echo "<link rel='stylesheet' href='category.css'>";
 
         <body>
             <nav class="tabs">
-                <a href="category.php" class="tab-button active" data-target="all">ALL</a>
-                <a href="men-category.php" class="tab-button" data-target="men">メンズ</a>
-                <a href="woman-category.php" class="tab-button" data-target="woman">レディース</a>
+                <a href="../category.php" class="tab-button active" data-target="all">ALL</a>
+                <a href="../men-category/men-category.php" class="tab-button" data-target="men">メンズ</a>
+                <a href="../woman-category/woman-category.php" class="tab-button" data-target="woman">レディース</a>
                 <a href="kids-category.php" class="tab-button" data-target="kids">キッズ</a>
             </nav>
+
+            <div class="category-list">
+            <h2>カテゴリー一覧</h2>
+            <ul>
+                <?php
+                // PDOのfetch()メソッドを使ってデータを表示
+                while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                    echo "<li><a href='#'>" . htmlspecialchars($row['category_article']) . "</a></li>";
+                }
+                ?>
+            </ul>
+        </div>
 
             <script>
                 // タブボタンのクリックイベント

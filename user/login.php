@@ -2,8 +2,7 @@
 include "../../db_open.php";
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
-}
-$message = ''; // エラーメッセージを初期化
+}$message = ''; // エラーメッセージを初期化
 ?>
 
 <head>
@@ -15,34 +14,34 @@ if ($_SERVER["REQUEST_METHOD"] != "POST") {
   <div class="container">
     <h2 class="title">ログイン</h2> <!-- タイトルがフォームの上に表示される -->
     <form method="POST">
-        <label for="mail">メールアドレス：</label>
-        <input type="email" id="mail" name="mail" required>
+        <label for="Mail">メールアドレス：</label>
+        <input type="text" id="Mail" name="Mail" required>
         
-        <label for="pass">パスワード：</label>
-        <input type="password" id="pass" name="pass" required>
+        <label for="Pass">パスワード：</label>
+        <input type="password" id="Pass" name="Pass" required>
         
         <input type="submit" value="ログイン">
     </form>
-    <a href="regist.php">新規登録はこちら</a>
+    <a href="register.php">新規登録はこちら</a>
     <a href="password_reset.php">パスワードを忘れた方はこちら</a>
 </div>
 
 ___EOF___;
 } else {
-    $mail = $_POST["mail"];
-    $pass = $_POST["pass"];
+    $mail = $_POST["Mail"];
+    $pass = $_POST["Pass"];
     if (!empty($mail) && !empty($pass)) {
         try {
             // メールアドレスに基づいてユーザーを検索
-            $stmt = $dbh->prepare("SELECT * FROM user WHERE mail = :mail");
-            $stmt->bindParam(':mail', $mail);
+            $stmt = $dbh->prepare("SELECT * FROM stuser WHERE Mail = :Mail");
+            $stmt->bindParam(':Mail', $mail);
             $stmt->execute();
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
-            if ($user && password_verify($pass, $user['pass'])) {
+            if ($user && password_verify($pass, $user['Pass'])) {
                 // ログイン成功
                 $_SESSION['login'] = true;
-                $_SESSION['id'] = $user['user_id']; // ユーザーIDをセッションに保存
-                header('Location: toppage.php'); // トップページにリダイレクト
+                $_SESSION['id'] = $user['StUser_Id']; // ユーザーIDをセッションに保存
+                header('Location: top.php'); // トップページにリダイレクト
                 exit();
             } else {
                 // ログイン失敗
@@ -57,13 +56,14 @@ ___EOF___;
     // フォームを再表示して、エラーメッセージを表示
     echo <<<___EOF___
     <div class="container">
-    <h2 class="title">ログイン</h2>
+    <h2 class="title">ログイン</h2> <!-- タイトルがフォームの上に表示される -->
     <form method="POST">
-        <label for="mail">メールアドレス：</label>
-        <input type="email" id="mail" name="mail" required>
+    $message
+        <label for="Mail">メールアドレス：</label>
+        <input type="text" id="Mail" name="Mail" required>
         
-        <label for="pass">パスワード：</label>
-        <input type="password" id="pass" name="pass" required>
+        <label for="Pass">パスワード：</label>
+        <input type="password" id="Pass" name="Pass" required>
         
         <input type="submit" value="ログイン">
     </form>

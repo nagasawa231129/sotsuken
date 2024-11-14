@@ -1,5 +1,9 @@
 <?php
-include "../../db_open.php";
+include "../../db_open.php"; // PDO接続のファイルをインクルード
+include "../head.php";
+include "../header.php";
+echo "<link rel='stylesheet' href='header.css'>";
+echo "<link rel='stylesheet' href='./category.css'>";
 
 // ログインしていないときにエラーが出ない処理
 if (isset($_SESSION['id'])) {
