@@ -1,0 +1,102 @@
+/* ヘッダー全体のレイアウト */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    width: 100%;
+    box-sizing: border-box;
+    flex-wrap: nowrap;
+}
+
+/* 検索フォームのスタイル */
+.search-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1; /* 左右で幅を調整 */
+}
+
+/* 検索バーのスタイル */
+.search-bar {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    align-items: center;
+}
+
+/* 「卒研TOWN」のスタイル */
+.site-name {
+    margin-right: 10px; /* 検索バーとの間隔 */
+    font-size: 18px;
+    color: #333;
+    font-weight: bold;
+    white-space: nowrap; /* 改行しないように設定 */
+}
+
+/* 入力フィールドのスタイル */
+#search-input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 25px;
+    border: 1px solid #ccc;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+
+#search-input:focus {
+    border-color: #007bff;
+}
+
+.search-bar input::placeholder {
+    color: #bbb;
+    font-style: italic;
+}
+
+/* アイコン部分のスタイル */
+.icon {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 15px;
+}
+
+/* ログイン、通知、カート、フォローのリンクのスタイル */
+header a {
+    text-decoration: none;
+    font-size: 16px;
+    color: #333;
+    transition: color 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    padding: 10px;
+    white-space: nowrap;
+}
+
+header a:hover {
+    color: #007bff;
+}
+
+header a:active {
+    color: #0056b3;
+}
+
+header a:focus {
+    outline: none;
+    color: #0056b3;
+}
+
+/* アイコンとテキストの間隔 */
+header a[href="notification.php"]::after,
+header a[href="cart.php"]::after,
+header a[href="favorite.php"]::after {
+    margin-left: 5px;
+}
+
+/* ハートアイコンのスタイル */
+header a[href="favorite.php"]::after {
+            font-size: 20px;
+}
