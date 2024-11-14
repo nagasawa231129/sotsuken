@@ -165,17 +165,17 @@
         }
     </script>
 
-    <div class="search-container">
-        <!-- 常時表示される検索フォーム -->
-        <div class="search-bar">
-            <a href="toppage.php" class="site-name">卒研TOWN</a>
-            <input type="text" id="search-input" placeholder="すべてのアイテムから探す" onkeydown="if(event.key === 'Enter') performSearch()">
-        </div>
+<div class="search-container">
+    <!-- 「卒研TOWN」を左側に移動 -->
+    <div class="search-bar">
+        <span class="site-name">卒研TOWN</span>
+        <input type="text" id="search-input" placeholder="すべてのアイテムから探す" onkeydown="if(event.key === 'Enter') performSearch()">
     </div>
+</div>
     <div class="icon">
-        <a href="login.php">ログイン</a>
-        <a href="notification.php">🔔</a>
-        <a href="cart.php">カート</a>
-        <a href="favorite.php">♡</a>
+        <a href="./user/login.php">ログイン</a>
+        <a href="./user/notification.php">🔔</a>
+        <a href="./user/cart.php">カート</a>
+        <a href="./user/favorite.php">♡</a>
     </div>
 </header>

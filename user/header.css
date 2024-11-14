@@ -1,12 +1,12 @@
 /* ヘッダー全体のレイアウト */
 header {
     display: flex;
-    justify-content: space-between; /* 検索バーとアイコン部分を両端に配置 */
-    align-items: center; /* 縦方向に中央揃え */
-    padding: 10px 20px; /* ヘッダーの上下の余白を設定 */
-    width: 100%; /* 幅を100%に設定 */
-    box-sizing: border-box; /* 幅をパディングも含めて指定 */
-    flex-wrap: nowrap; /* 要素を折り返さないように設定 */
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    width: 100%;
+    box-sizing: border-box;
+    flex-wrap: nowrap;
 }
 
 /* 検索フォームのスタイル */
@@ -14,14 +14,25 @@ header {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100%; /* 検索バーが中央に配置されるように */
+    flex: 1; /* 左右で幅を調整 */
 }
 
 /* 検索バーのスタイル */
 .search-bar {
     position: relative;
-    width: 100%; /* 幅を100%に */
-    max-width: 600px; /* 最大幅を600pxに設定 */
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    align-items: center;
+}
+
+/* 「卒研TOWN」のスタイル */
+.site-name {
+    margin-right: 10px; /* 検索バーとの間隔 */
+    font-size: 18px;
+    color: #333;
+    font-weight: bold;
+    white-space: nowrap; /* 改行しないように設定 */
 }
 
 /* 入力フィールドのスタイル */
@@ -35,8 +46,9 @@ header {
     transition: border-color 0.3s ease;
 }
 
+
 #search-input:focus {
-    border-color: #007bff; /* フォーカス時の色 */
+    border-color: #007bff;
 }
 
 .search-bar input::placeholder {
@@ -46,10 +58,10 @@ header {
 
 /* アイコン部分のスタイル */
 .icon {
-    display: flex; /* フレックスボックスで横並び */
-    justify-content: flex-end; /* アイコンを右寄せに */
-    align-items: center; /* アイコンを縦方向に中央揃え */
-    gap: 15px; /* アイコンとリンクの間隔 */
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 15px;
 }
 
 /* ログイン、通知、カート、フォローのリンクのスタイル */
@@ -58,18 +70,18 @@ header a {
     font-size: 16px;
     color: #333;
     transition: color 0.3s ease;
-    display: inline-flex; /* インラインフレックスに変更 */
-    align-items: center; /* アイコンとテキストを縦に中央揃え */
+    display: inline-flex;
+    align-items: center;
     padding: 10px;
-    white-space: nowrap; /* テキストの折り返しを防止 */
+    white-space: nowrap;
 }
 
 header a:hover {
-    color: #007bff; /* ホバー時の色 */
+    color: #007bff;
 }
 
 header a:active {
-    color: #0056b3; /* クリック時の色 */
+    color: #0056b3;
 }
 
 header a:focus {
@@ -81,11 +93,10 @@ header a:focus {
 header a[href="notification.php"]::after,
 header a[href="cart.php"]::after,
 header a[href="favorite.php"]::after {
-    margin-left: 5px; /* アイコンとテキストの間にスペース */
+    margin-left: 5px;
 }
 
 /* ハートアイコンのスタイル */
 header a[href="favorite.php"]::after {
-    content: "♡"; /* ハートアイコン */
-    font-size: 20px; /* ハートアイコンのサイズ調整 */
+            font-size: 20px;
 }
