@@ -24,12 +24,7 @@ foreach ($brands as $brand) {
 
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ブランド検索</title>
     <link rel="stylesheet" href="brand.css">
-</head>
 <body>
     <div class="container">
         <header>
@@ -74,4 +69,5 @@ foreach ($brands as $brand) {
 
     <script src="brand.js"></script>
 </body>
+
 </html>

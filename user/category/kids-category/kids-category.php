@@ -18,8 +18,8 @@ echo "<link rel='stylesheet' href='category.css'>";
         <body>
             <nav class="tabs">
                 <a href="category.php" class="tab-button active" data-target="all">ALL</a>
-                <a href="./men-category/men-category.php" class="tab-button" data-target="men">メンズ</a>
-                <a href="./woman-category/woman-category.php" class="tab-button" data-target="woman">レディース</a>
+                <a href="men-category.php" class="tab-button" data-target="men">メンズ</a>
+                <a href="woman-category.php" class="tab-button" data-target="woman">レディース</a>
                 <a href="kids-category.php" class="tab-button" data-target="kids">キッズ</a>
             </nav>
 
