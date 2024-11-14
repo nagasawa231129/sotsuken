@@ -1,0 +1,91 @@
+/* ヘッダー全体のレイアウト */
+header {
+    display: flex;
+    justify-content: space-between; /* 検索バーとアイコン部分を両端に配置 */
+    align-items: center; /* 縦方向に中央揃え */
+    padding: 10px 20px; /* ヘッダーの上下の余白を設定 */
+    width: 100%; /* 幅を100%に設定 */
+    box-sizing: border-box; /* 幅をパディングも含めて指定 */
+    flex-wrap: nowrap; /* 要素を折り返さないように設定 */
+}
+
+/* 検索フォームのスタイル */
+.search-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%; /* 検索バーが中央に配置されるように */
+}
+
+/* 検索バーのスタイル */
+.search-bar {
+    position: relative;
+    width: 100%; /* 幅を100%に */
+    max-width: 600px; /* 最大幅を600pxに設定 */
+}
+
+/* 入力フィールドのスタイル */
+#search-input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 25px;
+    border: 1px solid #ccc;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+#search-input:focus {
+    border-color: #007bff; /* フォーカス時の色 */
+}
+
+.search-bar input::placeholder {
+    color: #bbb;
+    font-style: italic;
+}
+
+/* アイコン部分のスタイル */
+.icon {
+    display: flex; /* フレックスボックスで横並び */
+    justify-content: flex-end; /* アイコンを右寄せに */
+    align-items: center; /* アイコンを縦方向に中央揃え */
+    gap: 15px; /* アイコンとリンクの間隔 */
+}
+
+/* ログイン、通知、カート、フォローのリンクのスタイル */
+header a {
+    text-decoration: none;
+    font-size: 16px;
+    color: #333;
+    transition: color 0.3s ease;
+    display: inline-flex; /* インラインフレックスに変更 */
+    align-items: center; /* アイコンとテキストを縦に中央揃え */
+    padding: 10px;
+    white-space: nowrap; /* テキストの折り返しを防止 */
+}
+
+header a:hover {
+    color: #007bff; /* ホバー時の色 */
+}
+
+header a:active {
+    color: #0056b3; /* クリック時の色 */
+}
+
+header a:focus {
+    outline: none;
+    color: #0056b3;
+}
+
+/* アイコンとテキストの間隔 */
+header a[href="notification.php"]::after,
+header a[href="cart.php"]::after,
+header a[href="favorite.php"]::after {
+    margin-left: 5px; /* アイコンとテキストの間にスペース */
+}
+
+/* ハートアイコンのスタイル */
+header a[href="favorite.php"]::after {
+    content: "♡"; /* ハートアイコン */
+    font-size: 20px; /* ハートアイコンのサイズ調整 */
+}

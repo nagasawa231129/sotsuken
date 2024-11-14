@@ -12,11 +12,10 @@ if (isset($_SESSION['id'])) {
 <!DOCTYPE html>
 <?php
 include "../header.php";
-?>
-<?php
 include "../head.php";
 ?>
 <link rel="stylesheet" href="top.css">
+<link rel="stylesheet" href="header.css">
 
 <?php
 $itemsPerPage = 85;
