@@ -2,7 +2,8 @@
 include "../../db_open.php";
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
-}$message = ''; // エラーメッセージを初期化
+}
+$message = ''; // エラーメッセージを初期化
 ?>
 
 <head>
@@ -22,7 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] != "POST") {
         
         <input type="submit" value="ログイン">
     </form>
-    <a href="register.php">新規登録はこちら</a>
+    <a href="regist.php">新規登録はこちら</a>
     <a href="password_reset.php">パスワードを忘れた方はこちら</a>
 </div>
 
@@ -67,7 +68,7 @@ ___EOF___;
         
         <input type="submit" value="ログイン">
     </form>
-    <a href="register.php">新規登録はこちら</a>
+    <a href="regist.php">新規登録はこちら</a>
         <a href="password_reset.php">パスワードを忘れた方はこちら</a>
 </div>
 
