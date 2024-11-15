@@ -28,8 +28,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                 // OTP（ワンタイムパスワード）を生成
                 $otp = rand(100000, 999999); // 6桁のランダムな数値
-                $stmt = $dbh->prepare('UPDATE pre_user SET otp = :otp WHERE mail = :mail');
-                $stmt->execute(['otp' => $otp, 'mail' => $mail]);
+                $otp_timestamp = date("Y-m-d H:i:s", strtotime("+1 hour")); // 1時間後のタイムスタンプ
+                $stmt = $dbh->prepare('UPDATE pre_user SET otp = :otp, otp_timestamp = :otp_timestamp  WHERE mail = :mail');
+                $stmt->execute(['otp' => $otp, 'otp_timestamp' => $otp_timestamp, 'mail' => $mail]);
 
                 // OTPをメールで送信
                 $subject = "新規登録のための認証コード";
@@ -79,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <form action="regist.php" method="POST" onsubmit="validateForm(event)">
             <!-- メールアドレス入力フィールド -->
             <label for="mail">メールアドレス:</label>
-            <input type="email" id="mail" name="mail" maxlength="100" required pattern="^[\w.%+-]+@[A-Za-z0-9.-]+\.[A-Z]{2,}$" title="有効なメールアドレスを入力してください。">
+            <input type="email" id="mail" name="mail" maxlength="50" required pattern="^[\w.%+-]+@[A-Za-z0-9.-]+\.[A-Z]{2,}$" title="有効なメールアドレスを入力してください。">
 
             <!-- 利用規約同意チェックボックス -->
             <div class="terms-container">

@@ -5,7 +5,7 @@ if (session_status() == PHP_SESSION_NONE) {
 }
 $message = "";
 
-// OTP 再送信処理
+// OTP再送信処理
 if (isset($_POST['resend_otp'])) {
     $mail = $_SESSION['mail'] ?? ''; // セッションからメールアドレスを取得
     if ($mail) {
@@ -17,8 +17,7 @@ if (isset($_POST['resend_otp'])) {
 
         // OTPをメールで送信
         $subject = "新規登録のための認証コード";
-        $messageBody = "有効期限は1時間です。
-        以下のコードを入力して認証してください。\n\n" . $otp;
+        $messageBody = "有効期限は1時間です。\n以下のコードを入力して認証してください。\n\n" . $otp;
         $headers = "From: sotsuken@st.yoshida-g.ac.jp";
 
         if (mb_send_mail($mail, $subject, $messageBody, $headers)) {
@@ -32,51 +31,58 @@ if (isset($_POST['resend_otp'])) {
 }
 
 // OTP確認処理
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['veirfy_otp'])) {
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['verify_otp'])) {  // 修正された名前
     $input_otp = (int)$_POST['otp'] ?? '';
     $mail = $_SESSION['mail'] ?? '';
 
-    // pre_userテーブルからOTPを取得
-    $stmt = $dbh->prepare('SELECT otp FROM pre_user WHERE mail = :mail');
+    // pre_userテーブルからOTPとその発行時刻を取得
+    $stmt = $dbh->prepare('SELECT otp, otp_timestamp FROM pre_user WHERE mail = :mail');
     $stmt->execute(['mail' => $mail]);
-    $stored_otp = $stmt->fetchColumn();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    $stored_otp = (int)$stored_otp;
+    if ($result) {
+        $stored_otp = (int)$result['otp'];
+        $otp_timestamp = strtotime($result['otp_timestamp']); // タイムスタンプをPHPの時間に変換
 
-    if ($input_otp === $stored_otp) {
-    //     // OTPが正しい場合、pre_userテーブルからメールを取得し、userテーブルに登録
-        $stmt = $dbh->prepare('SELECT mail FROM pre_user WHERE mail = :mail');
-        $stmt->execute(['mail' => $mail]);
-        $pre_user_mail = $stmt->fetchColumn();
-
-        if ($pre_user_mail) {
-            // pre_userから取得したメールをuserテーブルに登録
-            $stmt = $dbh->prepare('INSERT INTO user (mail, otp) VALUES (:mail, :otp)');
-            $stmt->execute(['mail' => $pre_user_mail, 'otp' => $input_otp]);
-
-            // pre_userテーブルから該当するレコードを削除
-            $stmt = $dbh->prepare('DELETE FROM pre_user WHERE mail = :mail');
+        // OTPの有効期限を1時間に設定
+        if (time() - $otp_timestamp > 3600) {
+            $message = "<p class='error'>ワンタイムパスワードが期限切れです。再送信を行ってください。</p>";
+        } elseif ($input_otp === $stored_otp) {
+            // OTPが一致した場合、pre_userテーブルからメールを取得し、userテーブルに登録
+            $stmt = $dbh->prepare('SELECT mail FROM pre_user WHERE mail = :mail');
             $stmt->execute(['mail' => $mail]);
+            $pre_user_mail = $stmt->fetchColumn();
 
-            // ユーザー情報をセッションに保存
-            $stmt = $dbh->prepare("SELECT * FROM user WHERE mail = :mail");
-            $stmt->execute(['mail' => $pre_user_mail]);
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($pre_user_mail) {
+                // pre_userから取得したメールをuserテーブルに登録
+                $stmt = $dbh->prepare('INSERT INTO user (mail, otp) VALUES (:mail, :otp)');
+                $stmt->execute(['mail' => $pre_user_mail, 'otp' => $input_otp]);
 
-            if ($user) {
-                $_SESSION['login'] = true;
-                $_SESSION['id'] = $user['user_Id']; // ユーザーIDをセッションに保存
-                header('Location: next_regist.php'); // 次のページへリダイレクト
-                exit();
+                // pre_userテーブルから該当するレコードを削除
+                $stmt = $dbh->prepare('DELETE FROM pre_user WHERE mail = :mail');
+                $stmt->execute(['mail' => $mail]);
+
+                // ユーザー情報をセッションに保存
+                $stmt = $dbh->prepare("SELECT * FROM user WHERE mail = :mail");
+                $stmt->execute(['mail' => $pre_user_mail]);
+                $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if ($user) {
+                    $_SESSION['login'] = true;
+                    $_SESSION['id'] = $user['user_Id']; // ユーザーIDをセッションに保存
+                    header('Location: next_regist.php'); // 次のページへリダイレクト
+                    exit();
+                } else {
+                    $message = "<p class='error'>ユーザーが見つかりません。</p>";
+                }
             } else {
-                $message = "<p class='error'>ユーザーが見つかりません。</p>";
+                $message = "<p class='error'>pre_userテーブルに該当するメールが見つかりません。</p>";
             }
         } else {
-            $message = "<p class='error'>pre_userテーブルに該当するメールが見つかりません。</p>";
+            $message = "<p class='error'>ワンタイムパスワードが無効です。再度お試しください。</p>";
         }
     } else {
-        echo "OTPが一致しません。<br>";
-        $message = "<p class='error'>OTPが無効です。再度お試しください。</p>";
+        $message = "<p class='error'>指定されたメールアドレスに対するワンタイムパスワードが見つかりません。</p>";
     }
 }
 ?>
@@ -94,14 +100,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['veirfy_otp'])) {
         <h1>ワンタイムパスワード確認</h1>
         <?php echo $message; ?>
         <form action="otp.php" method="POST">
-            <label for="otp">OTP:</label>
+            <label for="otp">ワンタイムパスワード:</label>
             <input type="text" id="otp" name="otp" required>
-            <input type="submit" name="veirfy_otp" value="確認">
+            <input type="submit" name="verify_otp" value="確認">  <!-- 修正された名前 -->
         </form>
 
         <!-- OTP再送信ボタン -->
         <form action="otp.php" method="POST">
-            <input type="submit" name="resend_otp" value="OTPを再送信">
+            <input type="submit" name="resend_otp" value="ワンタイムパスワードを再送信">
         </form>
 
         <a href="login.php">すでにアカウントをお持ちの場合はこちらをクリックしてください</a>
