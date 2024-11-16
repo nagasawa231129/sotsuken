@@ -1,0 +1,37 @@
+.sidebar {
+    width: 200px;
+    padding: 10px;
+}
+
+.sidebar h2 {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.sidebar ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.sidebar li {
+    margin-bottom: 5px;
+}
+
+.subcategory-list {
+    display: none; /* デフォルトで非表示 */
+    margin-left: 15px; /* インデント */
+}
+
+.category-item:hover .subcategory-list {
+    display: block; /* ホバー時に表示 */
+}
+
+.subcategory-list li a {
+    font-size: 14px;
+    color: #555;
+    text-decoration: none;
+}
+
+.subcategory-list li a:hover {
+    color: #000;
+}
