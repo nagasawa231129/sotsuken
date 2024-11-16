@@ -1,3 +1,7 @@
+<?php
+session_start();
+$user_name = isset($_SESSION['login']) ? $_SESSION['name'] : 'ゲスト';
+?>
 <header>
     <link rel="stylesheet" href="./user/header.css">
     <script>
@@ -168,7 +172,7 @@
 <div class="search-container">
     <!-- 「卒研TOWN」を左側に移動 -->
     <div class="search-bar">
-    <a class="site-name" href="/sotsuken//sotsuken/user/toppage.php">卒研TOWN</a>
+    <a class="site-name" href="/sotsuken/sotsuken/user/toppage.php">卒研TOWN</a>
     <input type="text" id="search-input" placeholder="すべてのアイテムから探す" onkeydown="if(event.key === 'Enter') performSearch()">
     </div>
 </div>
@@ -177,5 +181,6 @@
         <a href="/sotsuken/sotsuken/user/notification.php">🔔</a>
         <a href="/sotsuken/sotsuken/user/cart.php">カート</a>
         <a href="/sotsuken/sotsuken/user/favorite.php">♡</a>
+        <span><?php echo $user_name; ?></span>
     </div>
 </header>
