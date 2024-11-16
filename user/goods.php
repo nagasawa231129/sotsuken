@@ -22,10 +22,15 @@ include "../head.php";
 $shop_id = isset($_GET['shop_id']) ? $_GET['shop_id'] : '';
 if ($shop_id) {
     // 商品情報とブランド情報を取得
-    $sql = "SELECT shop.*, brand.brand_name FROM shop
-        LEFT OUTER JOIN brand ON brand.brand_id = shop.brand_id
-        WHERE shop.shop_id = :shop_id";
+    // $sql = "SELECT shop.*, brand.brand_name FROM shop
+    //     LEFT OUTER JOIN brand ON brand.brand_id = shop.brand_id
+    //     WHERE shop.shop_id = :shop_id";
     
+    $sql = "SELECT shop.*, brand.brand_name, sale.sale FROM shop
+    LEFT OUTER JOIN brand ON brand.brand_id = shop.brand_id
+    LEFT OUTER JOIN sale ON sale.sale_id = shop.sale_id
+    WHERE shop.shop_id = :shop_id";
+
     $stmt = $dbh->prepare($sql);
     $stmt->bindParam(':shop_id', $shop_id);
     $stmt->execute();
@@ -40,6 +45,24 @@ if ($shop_id) {
 
         // 商品情報の他の部分を表示
         echo "<p>値段：{$goodsResult['price']}</p>";
+
+// 商品価格がセール中の場合、セール価格を計算
+if ($goodsResult['sale_id']) {
+    $sale_id = $goodsResult['sale_id'];
+    // saleテーブルから割引率を取得
+    $sql_sale = "SELECT sale FROM sale WHERE sale_id = :sale_id";
+    $stmt_sale = $dbh->prepare($sql_sale);
+    $stmt_sale->bindParam(':sale_id', $sale_id);
+    $stmt_sale->execute();
+    $sale = $stmt_sale->fetch(PDO::FETCH_ASSOC);
+
+    if ($sale) {
+        $discounted_price = $goodsResult['price'] * (1 - $sale['sale'] / 100);
+        echo "<p>割引後価格：{$discounted_price}円</p>";
+    }
+}
+
+
         echo "<p>商品説明：{$goodsResult['explanation']}</p>";
 
         // 商品に紐づくすべての画像を取得
