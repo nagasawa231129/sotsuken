@@ -29,6 +29,8 @@ if ($_SERVER["REQUEST_METHOD"] != "POST") {
     <a href="password_reset.php">パスワードを忘れた方はこちら</a>
 </div>
 ___EOF___;
+echo "<a href='twitter_login.php'>Twitterでログイン</a>";
+echo "<a href='line_login.php'>Lineでログイン</a>";
 } else {
 
     $mail = $_POST["Mail"];
