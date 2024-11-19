@@ -105,6 +105,9 @@ $totalPages = ceil($totalItems / $itemsPerPage);
         <li class="category-item">
             <a href="./category/skirt.php">スカート</a>
             <ul class="subcategory-list">
+                <li><a href="./category/skirt/mini-skirt.php">ミニスカート</a></li>
+                <li><a href="./category/skirt/midi-skirt.php">ミディスカート</a></li>
+                <li><a href="./category/skirt/long-skirt.php">ロングカート</a></li>
                 <li><a href="./category/skirt/denim-skirt.php">デニムスカート</a></li>
             </ul>
         </li>
@@ -152,26 +155,37 @@ if ($stmt->rowCount() > 0) {
     while ($rec = $stmt->fetch()) {
         // BLOB型の画像データをBase64エンコードして表示
         $imgBlob = $rec['img'];
-        $mimeType = 'image/png'; // MIMEタイプはデフォルトを設定しておく（例としてPNG）
+        $mimeType = 'image/png'; // MIMEタイプはデフォルトを設定（例としてPNG）
 
-        // MIMEタイプを動的に取得する例
+        // MIMEタイプを動的に取得
         $finfo = new finfo(FILEINFO_MIME_TYPE);
         $mimeType = $finfo->buffer($imgBlob); // BLOBデータからMIMEタイプを取得
 
         // Base64にエンコード
         $encodedImg = base64_encode($imgBlob);
 
-        // 商品情報を表示
-        echo "<div>";
-        echo "<a href='goods.php?shop_id={$rec['shop_id']}'><img src='data:{$mimeType};base64,{$encodedImg}' alt='goods img' height=100px width=100px></a>";
-        echo "<p>ブランド：{$rec['brand_name']}</p>"; // brand_nameを表示
-        echo "<a href='goods.php?shop_id={$rec['shop_id']}'>商品名：{$rec['goods']}</a>";
-        echo "<p>値段：{$rec['price']}</p>";
+        // 商品詳細ページへのリンク生成
+        $productLink = "goods.php?shop_id={$rec['shop_id']}";
 
-        // 商品価格がセール中の場合、セール価格を計算
+        // 商品情報を全体リンクで表示
+        echo "<a href='{$productLink}' style='text-decoration: none; color: inherit;'>";
+        echo "<div style='border: 1px solid #ccc; padding: 10px; margin: 10px; max-width: 300px;'>";
+
+        // 画像表示
+        echo "<img src='data:{$mimeType};base64,{$encodedImg}' alt='goods img' style='height: 100px; width: 100px; object-fit: cover; display: block; margin: 0 auto;'>";
+
+        // ブランド名
+        echo "<p style='text-align: center;'>ブランド：{$rec['brand_name']}</p>";
+
+        // 商品名
+        echo "<p style='text-align: center; font-weight: bold;'>商品名：{$rec['goods']}</p>";
+
+        // 価格
+        echo "<p style='text-align: center;'>値段：{$rec['price']}円</p>";
+
+        // 割引計算と表示
         if ($rec['sale_id']) {
             $sale_id = $rec['sale_id'];
-            // saleテーブルから割引率を取得
             $sql_sale = "SELECT sale FROM sale WHERE sale_id = :sale_id";
             $stmt_sale = $dbh->prepare($sql_sale);
             $stmt_sale->bindParam(':sale_id', $sale_id);
@@ -180,17 +194,20 @@ if ($stmt->rowCount() > 0) {
 
             if ($sale) {
                 $discounted_price = $rec['price'] * (1 - $sale['sale'] / 100);
-                echo "<p>割引後価格：{$discounted_price}円</p>";
+                echo "<p style='text-align: center; color: red;'>割引後価格：{$discounted_price}円</p>";
             }
         }
 
-        echo "<p>商品説明：{$rec['explanation']}</p>";
+        // 商品説明
+        echo "<p style='text-align: center;'>商品説明：{$rec['explanation']}</p>";
+
         echo "</div>";
-        echo "<br>";
+        echo "</a>";
     }
 } else {
     echo "<p>商品が見つかりません。</p>";
 }
+
 
 ?>
 
