@@ -34,6 +34,8 @@ td {
     text-align: left;
     border-bottom: 1px solid #ddd;
     font-size: 14px;
+    height: 50px; /* セルの高さを指定 */
+    vertical-align: middle; /* セル内の要素を中央揃え */
 }
 
 /* テーブル行のホバー */
@@ -43,11 +45,13 @@ tr:hover {
 
 /* フォーム要素のスタイル */
 input[type="text"], input[type="number"], select {
-    width: 90%;
+    width: 100%; /* 幅を100%に設定 */
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 14px;
+    height: 40px; /* 入力フィールドの高さを指定 */
+    line-height: 20px; /* テキストの中央揃え */
 }
 
 /* 更新ボタン */
@@ -77,4 +81,19 @@ input[type="text"], input[type="number"], select {
     color: #dc3545;
     font-size: 14px;
     margin-bottom: 20px;
+}
+
+/* 価格入力のスタイル */
+.price-input {
+    width: 100px; /* 必要な幅を設定 */
+    box-sizing: border-box; /* パディングやボーダーも幅に含める */
+    height: 40px; /* 入力フィールドの高さを指定 */
+}
+
+/* ブランドセレクトボックスの位置調整 */
+
+
+/* テーブル内のセル内の要素の中央揃え */
+td {
+    vertical-align: middle; /* セル内の要素を中央に揃える */
 }
