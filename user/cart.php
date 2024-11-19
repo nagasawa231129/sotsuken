@@ -1,149 +1,104 @@
-<?php
-include '../../db_open.php';  // db_open.phpをインクルードして、$connを利用できるようにする
 
-// データベース接続が成功しているか確認（デバッグ用）
-if ($conn) {
-    // 接続が成功した場合、データベースからshop.idを取得
-    $sql = "SELECT shop_id FROM cart LIMIT 1";
-    $result = $conn->query($sql);
-    
-    // クエリが失敗した場合
-    if ($result === false) {
-        $errorInfo = $conn->errorInfo();  // PDO::errorInfo()で詳細エラーを取得
-        $shopId = 'クエリ失敗: ' . $errorInfo[2];  // エラーメッセージを表示
-    } else {
-        // クエリが成功した場合、1行目のデータを取得
-        $row = $result->fetch(PDO::FETCH_ASSOC);
-        if ($row) {
-            $shopId = $row['shop_id'];  // 取得したshop.idを設定
-        } else {
-            $shopId = 'データなし';  // 結果が空の場合
-        }
-    }
-} else {
-    $shopId = '接続失敗';  // 接続が失敗した場合
-}
-
-// データベース接続を閉じる
-$conn = null;
-?>
 
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>決済用バーコード生成</title>
-    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js"></script>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f9;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="style.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>ショッピングカート</title>
+        <script>
+            // AJAXで個数の増減を処理する関数
+            function updateQuantity(shopId, newQuantity) {
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', 'update_quantity.php', true);
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState == 4 && xhr.status == 200) {
+                        // サーバーからの応答を受け取った後の処理
+                        if (xhr.responseText === 'success') {
+                            // 新しい個数を表示（成功した場合）
+                            document.getElementById('quantity_' + shopId).innerText = newQuantity;
+                        } else {
+                            alert('個数の更新に失敗しました。' + xhr.responseText);
+                            echo 
+                        }
+                    }
+                };
+                xhr.send('shop_id=' + shopId + '&quantity=' + newQuantity);
+            }
 
-        .container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            width: 90%;
-            max-width: 400px;
-        }
+            // 増加ボタンをクリックした時の処理
+            function increaseQuantity(shopId, currentQuantity) {
+                var newQuantity = currentQuantity + 1;
+                console.log('Sending shopId: ' + shopId + ' and newQuantity: ' + newQuantity);
+                updateQuantity(shopId, newQuantity);
+            }
 
-        h1 {
-            font-size: 24px;
-            margin-bottom: 20px;
-            color: #333;
-        }
-
-        #payButton {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-bottom: 20px;
-            transition: background-color 0.3s ease;
-        }
-
-        #payButton:hover {
-            background-color: #218838;
-        }
-
-        #barcodeContainer {
-            width: 100%;
-            height: 100px;
-            margin-top: 20px;
-        }
-
-        .barcode-info {
-            font-size: 16px;
-            color: #555;
-            margin-top: 10px;
-        }
-
-        .info-text {
-            color: #007bff;
-            font-weight: bold;
-        }
-
-        #paymentCompleteButton{
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-top: 20px;
-            display: none;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>決済用バーコード生成</h1>
-        <button id="payButton">バーコードを表示</button>
+            // 減少ボタンをクリックした時の処理
+            function decreaseQuantity(shopId, currentQuantity) {
+                if (currentQuantity > 1) { // 個数が1以下にはならないように制限
+                    var newQuantity = currentQuantity - 1;
+                    updateQuantity(shopId, newQuantity);
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <div class="container">
+            <h1>カートの中身</h1>
         
-        <!-- shop.idを表示するためのdiv -->
-        <!-- <p class="barcode-info">取得したshop.id: <span class="info-text"><?php echo htmlspecialchars($shopId, ENT_QUOTES, 'UTF-8'); ?></span></p> -->
+            <?php
+include '../../db_open.php';
 
-        <!-- バーコードを表示するためのSVG要素 -->
-        <svg id="barcodeContainer"></svg>
-        
-        <button id="paymentCompleteButton">決済完了</button>
-        
-    </div>
+$sumPrice = 0;
 
-    <script>
-        document.getElementById('payButton').addEventListener('click', function() {
-            // PHPから取得したshop.idの値をJavaScriptに渡す
-            const paymentData = '123456789-' + '<?php echo $shopId; ?>'; // バーコードにするデータ
-            const barcodeContainer = document.getElementById('barcodeContainer');
-            barcodeContainer.innerHTML = ''; // 前のバーコードを消去
+if($conn){
+    $sql = "SELECT DISTINCT shop_id FROM cart";
+    $result = $conn->query($sql);
 
-            // JsBarcodeを使用してバーコードを生成
-            JsBarcode(barcodeContainer, paymentData, {
-                format: 'CODE128',
-                displayValue: true,  // バーコードの値も表示
-                width: 2,           // バーコードの線の幅
-                height: 60,         // バーコードの高さ
-                margin: 10          // バーコードの周りの余白
-            });
+    if($result === false){
+        $errorInfo = $conn->errorInfo();
+        $shopId = 'クエリ失敗' . $errorInfo[2];
+    }else{
+        while($row = $result->fetch(PDO::FETCH_ASSOC)){
+            $shopId = $row['shop_id'];
 
-            document.getElementById('paymentCompleteButton').style.display = 'block';
-        });
-        
-    </script>
+            // 3. shopテーブルから対応するgoodsとpriceを取得
+            $sqlGoods = "SELECT goods, price, quantity FROM shop WHERE shop_id = :shop_id";
+            $stmt = $conn->prepare($sqlGoods);
+            $stmt->bindParam(':shop_id', $shopId, PDO::PARAM_INT);
+            $stmt->execute();
+
+            if($stmt->rowCount() > 0){
+                $goodsRow = $stmt->fetch(PDO::FETCH_ASSOC);
+                $goods = $goodsRow['goods'];
+                $price = $goodsRow['price'];
+                $quantity = $goodsRow['quantity'];
+                $sumPrice = $sumPrice + $price;
+                // 商品情報を表示
+                echo "<p>shop_id: $shopId 商品名: <span class='info-text'>" . htmlspecialchars($goods, ENT_QUOTES, 'UTF-8') . "</span><br>価格: <span class='info-text'>" . htmlspecialchars($price, ENT_QUOTES, 'UTF-8') . "円</span></p>";
+                echo "<button onClick='decreaseQuantity($shopId,$quantity)'>-</button>";
+                echo "<button onClick='increaseQuantity($shopId,$quantity)'>+</button>";
+                
+            } else {
+                // 商品が見つからなかった場合
+                echo "<p>shop_id: $shopId に該当する商品はありません</p>";
+            }
+        }
     
-</body>
+    }
+}else {
+    $shopId = '接続失敗';  // 接続が失敗した場合
+}
+
+$conn = null;
+?>
+        <p>合計金額: <span class="info-text"><?php echo htmlspecialchars($sumPrice, ENT_QUOTES, 'UTF-8'); ?>円</span></p>
+        </div>
+    </body>
 </html>
+
+
+
+
