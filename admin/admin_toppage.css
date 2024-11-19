@@ -1,70 +1,87 @@
-/* 全体のスタイル */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4; /* 背景色 */
-    margin: 0;
-}
-header{
-    width: auto;
-    height: 100px;
-    background-color:blue;/*背景色*/
-	/* position: sticky;一定の位置に来たら固定 */
-}
-.side{
-    text-align: left;
-}
-.logo{
-    width: 200px;
-    height: 100px;
-  }
-/* ハンバーガーメニュー */
-#s-navi {
-    position: relative;
-}
-
-#nav-input {
-    display: none;
-}
-
-#nav-open {
-    cursor: pointer;
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    font-size: 30px;
-}
-
-#nav-content {
-    display: none;
-    position: absolute;
-    top: 60px;
-    right: 20px;
-    background-color: white;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    z-index: 100;
-}
-
-#nav-input:checked ~ #nav-content {
-    display: block;
-}
-
-#nav-content ul {
-    list-style: none;
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f6f8;
     margin: 0;
     padding: 0;
-}
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    color: #333;
+  }
 
-#nav-content li {
-    padding: 10px;
-}
-
-#nav-content a {
-    text-decoration: none;
-    color: black;
-}
-/* ヘッダー */
-h2 {
-    color: #333; /* テキスト色 */
+  /* コンテナ */
+  .admin-container {
+    width: 100%;
+    max-width: 500px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    padding: 30px 20px;
     text-align: center;
-}
+  }
+
+  /* タイトル */
+  .admin-container h1 {
+    font-size: 1.8em;
+    color: #333;
+    margin-bottom: 20px;
+    font-weight: 600;
+  }
+
+  /* 管理ボタンのスタイル */
+  .admin-button {
+    position: relative;
+    display: block;
+    width: 100%;
+    margin: 12px 0;
+    padding: 15px 0;
+    background-color: #007bff;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: 500;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    text-decoration: none;
+  }
+
+  /* 通知バッジのスタイル */
+  .notification-badge {
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    background-color: #ff3b30;
+    color: #ffffff;
+    border-radius: 50%;
+    padding: 4px 8px;
+    font-size: 0.8em;
+    font-weight: bold;
+  }
+
+  /* ホバースタイルとアクセシビリティ対応 */
+  .admin-button:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+  }
+
+  .admin-button:active {
+    background-color: #004494;
+    transform: translateY(0);
+  }
+
+  /* メディアクエリ */
+  @media (max-width: 768px) {
+    .admin-container {
+      padding: 20px 15px;
+    }
+    .admin-container h1 {
+      font-size: 1.5em;
+    }
+    .admin-button {
+      font-size: 1em;
+      padding: 12px 0;
+    }
+  }
