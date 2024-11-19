@@ -31,7 +31,7 @@
             // 増加ボタンをクリックした時の処理
             function increaseQuantity(shopId, currentQuantity) {
                 var newQuantity = currentQuantity + 1;
-                console.log('Sending shopId: ' + shopId + ' and newQuantity: ' + newQuantity);
+                
                 updateQuantity(shopId, newQuantity);
             }
 
@@ -54,7 +54,7 @@ include '../../db_open.php';
 $sumPrice = 0;
 
 if($conn){
-    $sql = "SELECT DISTINCT shop_id FROM cart";
+    $sql = "SELECT DISTINCT shop_id,quantity FROM cart";
     $result = $conn->query($sql);
 
     if($result === false){
@@ -63,9 +63,10 @@ if($conn){
     }else{
         while($row = $result->fetch(PDO::FETCH_ASSOC)){
             $shopId = $row['shop_id'];
+            $quantity = $row['quantity'];
 
             // 3. shopテーブルから対応するgoodsとpriceを取得
-            $sqlGoods = "SELECT goods, price, quantity FROM shop WHERE shop_id = :shop_id";
+            $sqlGoods = "SELECT goods, price FROM shop WHERE shop_id = :shop_id";
             $stmt = $conn->prepare($sqlGoods);
             $stmt->bindParam(':shop_id', $shopId, PDO::PARAM_INT);
             $stmt->execute();
@@ -74,7 +75,6 @@ if($conn){
                 $goodsRow = $stmt->fetch(PDO::FETCH_ASSOC);
                 $goods = $goodsRow['goods'];
                 $price = $goodsRow['price'];
-                $quantity = $goodsRow['quantity'];
                 $sumPrice = $sumPrice + $price;
                 // 商品情報を表示
                 echo "<p>shop_id: $shopId 商品名: <span class='info-text'>" . htmlspecialchars($goods, ENT_QUOTES, 'UTF-8') . "</span><br>価格: <span class='info-text'>" . htmlspecialchars($price, ENT_QUOTES, 'UTF-8') . "円</span></p>";
