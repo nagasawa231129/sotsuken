@@ -33,7 +33,7 @@ $result->execute();
                 <?php
                 // PDOのfetch()メソッドを使ってデータを表示
                 while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                    echo "<li><a href='#'>" . htmlspecialchars($row['category_article']) . "</a></li>";
+                    echo "<li><a href='#'>" . htmlspecialchars($row['category_name']) . "</a></li>";
                 }
                 ?>
             </ul>
