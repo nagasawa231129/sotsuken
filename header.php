@@ -169,18 +169,25 @@ $user_name = isset($_SESSION['login']) ? $_SESSION['name'] : 'ゲスト';
         }
     </script>
 
-<div class="search-container">
-    <!-- 「卒研TOWN」を左側に移動 -->
-    <div class="search-bar">
-    <a class="site-name" href="/sotsuken/sotsuken/user/toppage.php">卒研TOWN</a>
-    <input type="text" id="search-input" placeholder="すべてのアイテムから探す" onkeydown="if(event.key === 'Enter') performSearch()">
+    <div class="search-container">
+        <!-- 「卒研TOWN」を左側に移動 -->
+        <div class="search-bar">
+            <a class="site-name" href="/sotsuken/sotsuken/user/toppage.php">卒研TOWN</a>
+            <input type="text" id="search-input" placeholder="すべてのアイテムから探す" onkeydown="if(event.key === 'Enter') performSearch()">
+        </div>
     </div>
-</div>
     <div class="icon">
         <a href="/sotsuken/sotsuken/user/login.php">ログイン</a>
         <a href="/sotsuken/sotsuken/user/notification.php">🔔</a>
         <a href="/sotsuken/sotsuken/user/cart.php">カート</a>
         <a href="/sotsuken/sotsuken/user/favorite.php">♡</a>
-        <span><?php echo $user_name; ?></span>
+        <div class="user-menu">
+            <span class="user-name"><?php echo htmlspecialchars($user_name); ?></span>
+            <div class="dropdown-menu">
+                <a href="/sotsuken/sotsuken/user/account.php">登録情報</a>
+                <a href="/sotsuken/sotsuken/user/orders.php">注文履歴・発送状況</a>
+                <a href="/sotsuken/sotsuken/user/logout.php">ログアウト</a>
+            </div>
+        </div>
     </div>
 </header>
