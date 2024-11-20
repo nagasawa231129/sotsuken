@@ -3,7 +3,7 @@
 <?php
 // データベース接続
 include './../../db_open.php';
-
+include 'function.php';
 // すべての商品情報を取得
 $sql = "SELECT 
             shop.shop_id,
@@ -35,166 +35,148 @@ $stmt = $dbh->query($sql);
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // 更新処理
     if (isset($_POST['update'])) {
-        $shop_id = $_POST['shop_id'];
-        $brand = $_POST['brand'];
-        $goods = $_POST['goods'];
-        $price = $_POST['price'];
-        $size = $_POST['size'];
-        $color = $_POST['color'];
-        $category = $_POST['category'];
-        $subcategory = $_POST['subcategory'];
-        $gender = $_POST['gender'];
-
-        // 更新処理
-        $update_sql = "UPDATE shop SET 
-                        brand_id = ?, 
-                        goods = ?, 
-                        price = ?, 
-                        size = ?, 
-                        color = ?, 
-                        category_id = ?, 
-                        subcategory_id = ?, 
-                        gender = ? 
-                        WHERE shop_id = ?";
-        $stmt_update = $dbh->prepare($update_sql);
-        $stmt_update->execute([$brand, $goods, $price, $size, $color, $category, $subcategory, $gender, $shop_id]);
-
-        // 更新後リロード
-        header("Location: " . $_SERVER['PHP_SELF']);
-        exit();
+        update();
     }
-
     // 削除処理
     if (isset($_POST['delete'])) {
-        $shop_id = $_POST['shop_id'];
-
-        // 削除処理
-        $delete_sql = "DELETE FROM shop WHERE shop_id = ?";
-        $stmt_delete = $dbh->prepare($delete_sql);
-        $stmt_delete->execute([$shop_id]);
-
-        // 削除後リロード
-        header("Location: " . $_SERVER['PHP_SELF']);
-        exit();
+       delete();
     }
 
     // 追加処理
     if (isset($_POST['add_new'])) {
-        $brand = $_POST['brand'];
-        $goods = $_POST['goods'];
-        $price = $_POST['price'];
-        $size = $_POST['size'];
-        $color = $_POST['color'];
-        $category = $_POST['category'];
-        $subcategory = $_POST['subcategory'];
-        $gender = $_POST['gender'];
-
-        // 追加処理
-        $insert_sql = "INSERT INTO shop (brand_id, goods, price, size, color, category_id, subcategory_id, gender) 
-                       VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        $stmt_insert = $dbh->prepare($insert_sql);
-        $stmt_insert->execute([$brand, $goods, $price, $size, $color, $category, $subcategory, $gender]);
-
-        // 追加後リロード
-        header("Location: " . $_SERVER['PHP_SELF']);
-        exit();
+       insert();
     }
 }
 ?>
-    <button id="addNewButton" onclick="toggleAddForm()">新しい商品を追加</button>
-    <div id="addFormContainer" style="display:none; margin-top: 20px;">
-        <form method="post" action="">
-            <table>
-                <tr>
-                    <td>ブランド</td>
-                    <td>
-                        <select name="brand" required>
-                            <?php
-                            $brand_sql = "SELECT brand_id, brand_name FROM brand";
-                            foreach ($dbh->query($brand_sql) as $brand_option) {
-                                echo "<option value='{$brand_option['brand_id']}'>{$brand_option['brand_name']}</option>";
-                            }
-                            ?>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td>商品名</td>
-                    <td><input type="text" name="goods" required></td>
-                </tr>
-                <tr>
-                    <td>価格</td>
-                    <td><input type="number" name="price" required></td>
-                </tr>
-                <tr>
-                    <td>サイズ</td>
-                    <td>
-                        <select name="size" required>
-                            <?php
-                            $size_sql = "SELECT size_id, size FROM size";
-                            foreach ($dbh->query($size_sql) as $size_option) {
-                                echo "<option value='{$size_option['size_id']}'>{$size_option['size']}</option>";
-                            }
-                            ?>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td>色</td>
-                    <td>
-                        <select name="color" required>
-                            <?php
-                            $color_sql = "SELECT color_id, ja_color FROM color";
-                            foreach ($dbh->query($color_sql) as $color_option) {
-                                echo "<option value='{$color_option['color_id']}'>{$color_option['ja_color']}</option>";
-                            }
-                            ?>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td>カテゴリ</td>
-                    <td>
-                        <select name="category" required>
-                            <?php
-                            $category_sql = "SELECT category_id, category_name FROM category";
-                            foreach ($dbh->query($category_sql) as $category_option) {
-                                echo "<option value='{$category_option['category_id']}'>{$category_option['category_name']}</option>";
-                            }
-                            ?>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td>サブカテゴリー</td>
-                    <td>
-                        <select name="subcategory" required>
-                            <?php
-                            $subcategory_sql = "SELECT subcategory_id, subcategory_name FROM subcategory";
-                            foreach ($dbh->query($subcategory_sql) as $subcategory_option) {
-                                echo "<option value='{$subcategory_option['subcategory_id']}'>{$subcategory_option['subcategory_name']}</option>";
-                            }
-                            ?>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td>性別</td>
-                    <td>
-                        <select name="gender" required>
-                            <?php
-                            $gender_sql = "SELECT gender_id, gender FROM gender";
-                            foreach ($dbh->query($gender_sql) as $gender_option) {
-                                echo "<option value='{$gender_option['gender_id']}'>{$gender_option['gender']}</option>";
-                            }
-                            ?>
-                        </select>
-                    </td>
-                </tr>
-            </table>
-            <button type="submit" name="add_new">追加</button>
-        </form>
-    </div>
+<button id="addNewButton" onclick="toggleAddForm()">新しい商品を追加</button>
+<div id="addFormContainer" style="display:none; margin-top: 20px;">
+    <form method="post" action="">
+        <table>
+            <tr>
+                <td>ブランド</td>
+                <td>
+                    <select name="brand" required>
+                        <?php
+                        $brand_sql = "SELECT brand_id, brand_name FROM brand";
+                        foreach ($dbh->query($brand_sql) as $brand_option) {
+                            echo "<option value='{$brand_option['brand_id']}'>{$brand_option['brand_name']}</option>";
+                        }
+                        ?>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>商品名</td>
+                <td><input type="text" name="goods" required></td>
+            </tr>
+            <tr>
+                <td>価格</td>
+                <td><input type="number" name="price" required></td>
+            </tr>
+            <tr>
+                <td>サイズ</td>
+                <td>
+                    <select name="size" required>
+                        <?php
+                        $size_sql = "SELECT size_id, size FROM size";
+                        foreach ($dbh->query($size_sql) as $size_option) {
+                            echo "<option value='{$size_option['size_id']}'>{$size_option['size']}</option>";
+                        }
+                        ?>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>色</td>
+                <td>
+                    <select name="color" required>
+                        <?php
+                        $color_sql = "SELECT color_id, ja_color FROM color";
+                        foreach ($dbh->query($color_sql) as $color_option) {
+                            echo "<option value='{$color_option['color_id']}'>{$color_option['ja_color']}</option>";
+                        }
+                        ?>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+    <td>カテゴリ</td>
+    <td>
+        <select name="category" id="category" onchange="updateSubcategory()" required>
+            <option value="">カテゴリを選択</option>
+            <?php
+            $category_sql = "SELECT category_id, category_name FROM category";
+            foreach ($dbh->query($category_sql) as $category_option) {
+                echo "<option value='{$category_option['category_id']}'>{$category_option['category_name']}</option>";
+            }
+            ?>
+        </select>
+    </td>
+</tr>
+
+<tr>
+    <td>サブカテゴリー</td>
+    <td>
+        <select name="subcategory" id="subcategory" required>
+            <option value="">サブカテゴリーを選択</option>
+        </select>
+    </td>
+</tr>
+
+<script>
+  
+  function updateSubcategory() {
+    const category_id = document.getElementById('category').value;
+    const subcategorySelect = document.getElementById('subcategory');
+
+    if (category_id) {
+        // サーバーにリクエストを送信
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', 'get_subcategories.php?category_id=' + category_id, true);
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                const subcategories = JSON.parse(xhr.responseText);
+
+                // サブカテゴリの選択肢を更新
+                subcategorySelect.innerHTML = '<option value="">サブカテゴリを選択</option>'; // 初期化
+                subcategories.forEach(function (subcategory) {
+                    const option = document.createElement('option');
+                    option.value = subcategory.subcategory_id;
+                    option.textContent = subcategory.subcategory_name;
+                    subcategorySelect.appendChild(option);
+                });
+            } else {
+                console.error('サブカテゴリの取得に失敗しました');
+            }
+        };
+        xhr.send();
+    } else {
+        // カテゴリ未選択の場合、サブカテゴリを初期化
+        subcategorySelect.innerHTML = '<option value="">サブカテゴリを選択</option>';
+    }
+}
+
+
+
+
+</script>
+            <tr>
+                <td>性別</td>
+                <td>
+                    <select name="gender" required>
+                        <?php
+                        $gender_sql = "SELECT gender_id, gender FROM gender";
+                        foreach ($dbh->query($gender_sql) as $gender_option) {
+                            echo "<option value='{$gender_option['gender_id']}'>{$gender_option['gender']}</option>";
+                        }
+                        ?>
+                    </select>
+                </td>
+            </tr>
+        </table>
+        <button type="submit" name="add_new">追加</button>
+    </form>
+</div>
 <div class="form-container">
     <!-- 商品情報一覧 -->
     <table>
@@ -203,6 +185,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <th>ブランド</th>
                 <th>商品名</th>
                 <th>価格</th>
+                <th>セール</th>
                 <th>サイズ</th>
                 <th>色</th>
                 <th>カテゴリ</th>
@@ -231,6 +214,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             </td>
                             <td><input type="text" name="goods" value="<?= htmlspecialchars($product['goods']) ?>" required></td>
                             <td><input type="number" name="price" value="<?= htmlspecialchars($product['price']) ?>" required></td>
+                            <td>
+                                <select name="sale" required>
+                                    <?php
+                                    $sale_sql = "SELECT sale_id,sale FROM sale";
+                                    foreach ($dbh->query($sale_sql) as $sale_option) {
+                                        $selected = ($product['sale_id'] == $size_option['sale_id']) ? 'selected' : '';
+                                        echo "<option value='{$sale_option['sale_id']}' {$selected}>{$sale_option['sale']}%</option>";
+                                    }
+                                    ?>
+                                </select>
+                            </td>
                             <td>
                                 <select name="size" required>
                                     <?php
@@ -305,12 +299,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     <!-- 新規追加フォーム -->
 
-    
+
 </div>
 
 <script>
-function toggleAddForm() {
-    const form = document.getElementById('addFormContainer');
-    form.style.display = form.style.display === 'none' ? 'block' : 'none';
-}
+    function toggleAddForm() {
+        const form = document.getElementById('addFormContainer');
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    }
 </script>
