@@ -8,8 +8,8 @@ $newQuantity = isset($_POST['quantity']) ? (int)$_POST['quantity'] : 0;
 
 // 変数が正しいかチェック
 if ($shopId > 0 && $newQuantity > 0) {
-    // 個数を更新するSQL
     try {
+        // カート内の商品数量を更新する
         $sql = "UPDATE cart SET quantity = :quantity WHERE shop_id = :shop_id";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':quantity', $newQuantity, PDO::PARAM_INT);
@@ -20,7 +20,7 @@ if ($shopId > 0 && $newQuantity > 0) {
             echo 'success';
         } else {
             // 更新失敗
-            echo 'failure';
+            echo 'failure: 更新に失敗しました。';
         }
     } catch (PDOException $e) {
         // エラーハンドリング
@@ -28,7 +28,7 @@ if ($shopId > 0 && $newQuantity > 0) {
     }
 } else {
     // 不正なデータの場合
-    echo 'invalid_input';
+    echo 'invalid_input: shop_id または quantity が不正です';
 }
 
 // データベース接続を閉じる
