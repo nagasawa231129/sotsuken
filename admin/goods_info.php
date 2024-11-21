@@ -4,7 +4,74 @@
 // データベース接続
 include './../../db_open.php';
 
-// すべての商品情報を取得
+// フォームが送信された場合
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    // フォームから送信されたデータを受け取る
+    $shop_id = $_POST['shop_id'];
+    $brand_id = $_POST['brand'];
+    $goods = $_POST['goods'];
+    $price = $_POST['price'];
+    $size_id = $_POST['size'];
+    $color_id = $_POST['color'];
+    $category_id = $_POST['category'];
+    $subcategory_id = $_POST['subcategory'];
+    $gender_id = $_POST['gender'];
+
+    if (isset($_POST['update'])) {
+        // 更新SQL文
+        $update_sql = "
+        UPDATE shop SET 
+            brand_id = :brand_id,
+            goods = :goods,
+            price = :price,
+            size = :size_id,
+            color = :color_id,
+            category_id = :category_id,
+            subcategory_id = :subcategory_id,
+            gender = :gender_id
+        WHERE shop_id = :shop_id
+    ";
+
+        // 更新クエリの準備
+        $stmt = $dbh->prepare($update_sql);
+        $stmt->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
+        $stmt->bindParam(':brand_id', $brand_id, PDO::PARAM_INT);
+        $stmt->bindParam(':goods', $goods, PDO::PARAM_STR);
+        $stmt->bindParam(':price', $price, PDO::PARAM_INT);
+        $stmt->bindParam(':size_id', $size_id, PDO::PARAM_INT);
+        $stmt->bindParam(':color_id', $color_id, PDO::PARAM_INT);
+        $stmt->bindParam(':category_id', $category_id, PDO::PARAM_INT);
+        $stmt->bindParam(':subcategory_id', $subcategory_id, PDO::PARAM_INT);
+        $stmt->bindParam(':gender_id', $gender_id, PDO::PARAM_INT);
+
+        // 更新を実行
+        if ($stmt->execute()) {
+            echo "商品情報が更新されました。";
+        } else {
+            echo "更新に失敗しました。";
+        }
+    }
+    if (isset($_POST['delete'])) {
+        // 削除対象のshop_idを取得
+        $shop_id = $_POST['shop_id'];
+
+        // 削除SQL文
+        $delete_sql = "DELETE FROM shop WHERE shop_id = :shop_id";
+
+        // SQLを準備して実行
+        $stmt = $dbh->prepare($delete_sql);
+        $stmt->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
+
+        // 実行して結果を確認
+        if ($stmt->execute()) {
+            echo "商品情報が削除されました。";
+        } else {
+            echo "削除に失敗しました。";
+        }
+    }
+}
+
+// 商品情報を取得するSQLクエリ
 $sql = "SELECT 
             shop.shop_id,
             shop.goods,
@@ -30,173 +97,9 @@ $sql = "SELECT
         LEFT JOIN size ON shop.size = size.size_id";
 
 $stmt = $dbh->query($sql);
-
-// フォーム送信が行われた場合、追加処理、更新処理または削除処理を実行
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // 更新処理
-    if (isset($_POST['update'])) {
-        $shop_id = $_POST['shop_id'];
-        $brand = $_POST['brand'];
-        $goods = $_POST['goods'];
-        $price = $_POST['price'];
-        $size = $_POST['size'];
-        $color = $_POST['color'];
-        $category = $_POST['category'];
-        $subcategory = $_POST['subcategory'];
-        $gender = $_POST['gender'];
-
-        // 更新処理
-        $update_sql = "UPDATE shop SET 
-                        brand_id = ?, 
-                        goods = ?, 
-                        price = ?, 
-                        size = ?, 
-                        color = ?, 
-                        category_id = ?, 
-                        subcategory_id = ?, 
-                        gender = ? 
-                        WHERE shop_id = ?";
-        $stmt_update = $dbh->prepare($update_sql);
-        $stmt_update->execute([$brand, $goods, $price, $size, $color, $category, $subcategory, $gender, $shop_id]);
-
-        // 更新後リロード
-        header("Location: " . $_SERVER['PHP_SELF']);
-        exit();
-    }
-
-    // 削除処理
-    if (isset($_POST['delete'])) {
-        $shop_id = $_POST['shop_id'];
-
-        // 削除処理
-        $delete_sql = "DELETE FROM shop WHERE shop_id = ?";
-        $stmt_delete = $dbh->prepare($delete_sql);
-        $stmt_delete->execute([$shop_id]);
-
-        // 削除後リロード
-        header("Location: " . $_SERVER['PHP_SELF']);
-        exit();
-    }
-
-    // 追加処理
-    if (isset($_POST['add_new'])) {
-        $brand = $_POST['brand'];
-        $goods = $_POST['goods'];
-        $price = $_POST['price'];
-        $size = $_POST['size'];
-        $color = $_POST['color'];
-        $category = $_POST['category'];
-        $subcategory = $_POST['subcategory'];
-        $gender = $_POST['gender'];
-
-        // 追加処理
-        $insert_sql = "INSERT INTO shop (brand_id, goods, price, size, color, category_id, subcategory_id, gender) 
-                       VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        $stmt_insert = $dbh->prepare($insert_sql);
-        $stmt_insert->execute([$brand, $goods, $price, $size, $color, $category, $subcategory, $gender]);
-
-        // 追加後リロード
-        header("Location: " . $_SERVER['PHP_SELF']);
-        exit();
-    }
-}
 ?>
-    <button id="addNewButton" onclick="toggleAddForm()">新しい商品を追加</button>
-    <div id="addFormContainer" style="display:none; margin-top: 20px;">
-        <form method="post" action="">
-            <table>
-                <tr>
-                    <td>ブランド</td>
-                    <td>
-                        <select name="brand" required>
-                            <?php
-                            $brand_sql = "SELECT brand_id, brand_name FROM brand";
-                            foreach ($dbh->query($brand_sql) as $brand_option) {
-                                echo "<option value='{$brand_option['brand_id']}'>{$brand_option['brand_name']}</option>";
-                            }
-                            ?>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td>商品名</td>
-                    <td><input type="text" name="goods" required></td>
-                </tr>
-                <tr>
-                    <td>価格</td>
-                    <td><input type="number" name="price" required></td>
-                </tr>
-                <tr>
-                    <td>サイズ</td>
-                    <td>
-                        <select name="size" required>
-                            <?php
-                            $size_sql = "SELECT size_id, size FROM size";
-                            foreach ($dbh->query($size_sql) as $size_option) {
-                                echo "<option value='{$size_option['size_id']}'>{$size_option['size']}</option>";
-                            }
-                            ?>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td>色</td>
-                    <td>
-                        <select name="color" required>
-                            <?php
-                            $color_sql = "SELECT color_id, ja_color FROM color";
-                            foreach ($dbh->query($color_sql) as $color_option) {
-                                echo "<option value='{$color_option['color_id']}'>{$color_option['ja_color']}</option>";
-                            }
-                            ?>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td>カテゴリ</td>
-                    <td>
-                        <select name="category" required>
-                            <?php
-                            $category_sql = "SELECT category_id, category_name FROM category";
-                            foreach ($dbh->query($category_sql) as $category_option) {
-                                echo "<option value='{$category_option['category_id']}'>{$category_option['category_name']}</option>";
-                            }
-                            ?>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td>サブカテゴリー</td>
-                    <td>
-                        <select name="subcategory" required>
-                            <?php
-                            $subcategory_sql = "SELECT subcategory_id, subcategory_name FROM subcategory";
-                            foreach ($dbh->query($subcategory_sql) as $subcategory_option) {
-                                echo "<option value='{$subcategory_option['subcategory_id']}'>{$subcategory_option['subcategory_name']}</option>";
-                            }
-                            ?>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td>性別</td>
-                    <td>
-                        <select name="gender" required>
-                            <?php
-                            $gender_sql = "SELECT gender_id, gender FROM gender";
-                            foreach ($dbh->query($gender_sql) as $gender_option) {
-                                echo "<option value='{$gender_option['gender_id']}'>{$gender_option['gender']}</option>";
-                            }
-                            ?>
-                        </select>
-                    </td>
-                </tr>
-            </table>
-            <button type="submit" name="add_new">追加</button>
-        </form>
-    </div>
+
 <div class="form-container">
-    <!-- 商品情報一覧 -->
     <table>
         <thead>
             <tr>
@@ -211,14 +114,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <th>操作</th>
             </tr>
         </thead>
-
         <tbody>
             <?php if ($stmt->rowCount() > 0): ?>
                 <?php while ($product = $stmt->fetch(PDO::FETCH_ASSOC)): ?>
                     <tr>
                         <form method="post" action="">
+                            <input type="hidden" name="shop_id" value="<?= htmlspecialchars($product['shop_id']) ?>">
                             <td>
-                                <input type="hidden" name="shop_id" value="<?= $product['shop_id'] ?>">
                                 <select name="brand" required>
                                     <?php
                                     $brand_sql = "SELECT brand_id, brand_name FROM brand";
@@ -254,7 +156,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 </select>
                             </td>
                             <td>
-                                <select name="category" required>
+                                <select name="category" class="category" required onchange="updateSubcategory(this)">
                                     <?php
                                     $category_sql = "SELECT category_id, category_name FROM category";
                                     foreach ($dbh->query($category_sql) as $category_option) {
@@ -265,8 +167,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 </select>
                             </td>
                             <td>
-                                <select name="subcategory" required>
+                                <select name="subcategory" class="subcategory" required>
                                     <?php
+                                    // サブカテゴリーを取得して選択肢を表示
                                     $subcategory_sql = "SELECT subcategory_id, subcategory_name FROM subcategory WHERE category_id = ?";
                                     $stmt_subcategory = $dbh->prepare($subcategory_sql);
                                     $stmt_subcategory->execute([$product['category_id']]);
@@ -290,27 +193,48 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             </td>
                             <td>
                                 <button type="submit" name="update">更新</button>
-                                <button type="submit" name="delete" onclick="return confirm('本当に削除しますか？')">削除</button>
                             </td>
+                            <td>
+                                <button type="button" onclick="confirmDelete(this.form)">削除</button>
+                            </td>
+
                         </form>
                     </tr>
                 <?php endwhile; ?>
             <?php else: ?>
                 <tr>
-                    <td colspan="9">商品情報が見つかりません。</td>
+                    <td colspan="8">商品情報が見つかりません。</td>
                 </tr>
             <?php endif; ?>
         </tbody>
     </table>
-
-    <!-- 新規追加フォーム -->
-
-    
 </div>
 
 <script>
-function toggleAddForm() {
-    const form = document.getElementById('addFormContainer');
-    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    // categoryが選択された時にsubcategoriesを更新
+    function updateSubcategory(categoryElement) {
+        var categoryId = categoryElement.value;
+        var subcategorySelect = categoryElement.closest('tr').querySelector('.subcategory');
+
+        // AJAXを使用してサーバーにリクエストを送信
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'get_subcategories.php?category_id=' + categoryId, true);
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                // サブカテゴリーを更新
+                subcategorySelect.innerHTML = xhr.responseText;
+            }
+        };
+        xhr.send();
+    }
+
+    function confirmDelete(form) {
+    // 確認ダイアログを表示
+    if (confirm("本当に削除しますか？")) {
+        
+    } else {
+        // キャンセルの場合は何もしない
+        console.log("削除がキャンセルされました。");
+    }
 }
-</script>
+</script>これにかいて
