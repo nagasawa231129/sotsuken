@@ -8,52 +8,53 @@ echo "<link rel='stylesheet' href='./category.css'>";
 
 <form action="advanced_search.php" method="get">
     <!-- キーワード -->
-    <label for="keyword">キーワード</label>
-    <input type="text" name="keyword" placeholder="キーワード" value="<?php echo isset($_GET['keyword']) ? htmlspecialchars($_GET['keyword']) : ''; ?>" />
+    <label for="keyword" data-i18n="keyword_label">キーワード</label>
+    <input type="text" name="keyword" placeholder="キーワード" value="<?php echo isset($_GET['keyword']) ? htmlspecialchars($_GET['keyword']) : ''; ?>" data-i18n="keyword_placeholder"/>
 
-    <!--性別 -->
-    <label for="gender">性別：</label>
-    <select name="gender">
-        <option value="">すべて</option>
-        <option value="1" <?php echo (isset($_GET['gender']) && $_GET['gender'] === '1') ? 'selected' : ''; ?>>男性</option>
-        <option value="0" <?php echo (isset($_GET['gender']) && $_GET['gender'] === '0') ? 'selected' : ''; ?>>女性</option>
+    <!-- 性別 -->
+    <label for="gender" data-i18n="gender_label">性別：</label>
+    <select name="gender" data-i18n="gender_label">
+        <option value="" data-i18n="all">すべて</option>
+        <option value="1" <?php echo (isset($_GET['gender']) && $_GET['gender'] === '1') ? 'selected' : ''; ?> data-i18n="men">男性</option>
+        <option value="0" <?php echo (isset($_GET['gender']) && $_GET['gender'] === '0') ? 'selected' : ''; ?> data-i18n="woman">女性</option>
     </select>
 
-    <!--カテゴリー -->
-    <label for="categoryr">カテゴリー：</label>
-    <select name="category" id="category" onchange="updateSubcategories()">
-        <option value="">すべて</option>
-        <option value="1" <?php echo (isset($_GET['category']) && $_GET['category'] === '1') ? 'selected' : ''; ?>>トップス</option>
-        <option value="2" <?php echo (isset($_GET['category']) && $_GET['category'] === '2') ? 'selected' : ''; ?>>ジャケット/アウター</option>
-        <option value="3" <?php echo (isset($_GET['category']) && $_GET['category'] === '3') ? 'selected' : ''; ?>>パンツ</option>
-        <option value="4" <?php echo (isset($_GET['category']) && $_GET['category'] === '4') ? 'selected' : ''; ?>>スカート</option>
-        <option value="5" <?php echo (isset($_GET['category']) && $_GET['category'] === '5') ? 'selected' : ''; ?>>ワンピース</option>
+    <!-- カテゴリー -->
+    <label for="category" data-i18n="category_label">カテゴリー：</label>
+    <select name="category" id="category" onchange="updateSubcategories()" data-i18n="category_label">
+        <option value="" data-i18n="all">すべて</option>
+        <option value="1" <?php echo (isset($_GET['category']) && $_GET['category'] === '1') ? 'selected' : ''; ?> data-i18n="tops">トップス</option>
+        <option value="2" <?php echo (isset($_GET['category']) && $_GET['category'] === '2') ? 'selected' : ''; ?> data-i18n="outerwear">ジャケット/アウター</option>
+        <option value="3" <?php echo (isset($_GET['category']) && $_GET['category'] === '3') ? 'selected' : ''; ?> data-i18n="pants">パンツ</option>
+        <option value="4" <?php echo (isset($_GET['category']) && $_GET['category'] === '4') ? 'selected' : ''; ?> data-i18n="skirt">スカート</option>
+        <option value="5" <?php echo (isset($_GET['category']) && $_GET['category'] === '5') ? 'selected' : ''; ?> data-i18n="onepiece">ワンピース</option>
     </select>
 
-        <!-- サブカテゴリー -->
-        <div id="subcategory-container" style="display: none;">
-        <label for="subcategory">サブカテゴリー：</label>
-        <select name="subcategory" id="subcategory">
+    <!-- サブカテゴリー -->
+    <div id="subcategory-container" style="display: none;">
+        <label for="subcategory" data-i18n="subcategory_label">サブカテゴリー：</label>
+        <select name="subcategory" id="subcategory" data-i18n="subcategory_label">
             <!-- サブカテゴリーが動的に追加されます -->
         </select>
     </div>
 
     <!-- 価格帯 -->
-    <label for="min_price">価格帯：</label>
-    <input type="number" name="min_price" placeholder="最小価格" value="<?php echo isset($_GET['min_price']) ? htmlspecialchars($_GET['min_price']) : ''; ?>" />
-    ～
-    <input type="number" name="max_price" placeholder="最大価格" value="<?php echo isset($_GET['max_price']) ? htmlspecialchars($_GET['max_price']) : ''; ?>" />
+    <label for="min_price" data-i18n="price_range">価格帯：</label>
+    <input type="number" name="min_price" placeholder="最小価格" value="<?php echo isset($_GET['min_price']) ? htmlspecialchars($_GET['min_price']) : ''; ?>" data-i18n="min_price_placeholder"/>
+    ～ 
+    <input type="number" name="max_price" placeholder="最大価格" value="<?php echo isset($_GET['max_price']) ? htmlspecialchars($_GET['max_price']) : ''; ?>" data-i18n="max_price_placeholder"/>
 
     <!-- セール対象商品 -->
-    <label for="sale_subject">セール対象：</label>
-    <select name="sale_subject">
-        <option value="">すべて</option>
-        <option value="1" <?php echo (isset($_GET['sale_subject']) && $_GET['sale_subject'] === '1') ? 'selected' : ''; ?>>セール対象</option>
-        <option value="0" <?php echo (isset($_GET['sale_subject']) && $_GET['sale_subject'] === '0') ? 'selected' : ''; ?>>セールなし</option>
+    <label for="sale_subject" data-i18n="sale_label">セール対象：</label>
+    <select name="sale_subject" data-i18n="sale_label">
+        <option value="" data-i18n="all">すべて</option>
+        <option value="1" <?php echo (isset($_GET['sale_subject']) && $_GET['sale_subject'] === '1') ? 'selected' : ''; ?> data-i18n="sale">セール対象</option>
+        <option value="0" <?php echo (isset($_GET['sale_subject']) && $_GET['sale_subject'] === '0') ? 'selected' : ''; ?> data-i18n="no_sale">セールなし</option>
     </select>
 
-    <input type="submit" value="検索">
+    <input type="submit" value="検索" data-i18n="search_button"/>
 </form>
+
 
 
 <script>
@@ -225,16 +226,16 @@ if (empty($results)) {
         $product_link = "goods.php?shop_id=" . $product_id; // 商品詳細ページへのリンク
 
         echo "<a href=\"$product_link\" style=\"text-decoration: none; color: inherit;\">"; // リンク開始
-        echo "商品名: " . htmlspecialchars($row['goods']) . "<br>";
-        echo "価格: " . htmlspecialchars($row['price']) . "<br>";
+        echo "<span data-i18n='product_name'>商品名</span>:" . htmlspecialchars($row['goods']) . "<br>";
+        echo "<span data-i18n='price'>価格</span>:" . htmlspecialchars($row['price']) . "<br>";
 
         // 割引率を計算
         $sale_subject = $row['sale_subject'];
         if ($sale_subject >= 1 && $sale_subject <= 9) {
             $discount_percentage = $sale_subject * 10;  // 1なら10%、2なら20%など
-            echo "割引率: " . $discount_percentage . "%<br>";
+            echo "<span data-i18n='discounted'>割引率</span>: " . $discount_percentage . "%<br>";
         } else {
-            echo "割引率: 0% (セールなし)<br>";
+            echo "<span data-i18n='discounted'>割引率</span>: 0% (セールなし)<br>";
         }
         echo "</a>"; // リンク終了
         echo "<br>";
