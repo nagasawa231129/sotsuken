@@ -1,15 +1,26 @@
 <?php
 session_start();
 $user_name = isset($_SESSION['login']) ? $_SESSION['name'] : 'ゲスト';
+$supported_languages = ['ja', 'en'];
+$lang = isset($_SESSION['lang']) && in_array($_SESSION['lang'], $supported_languages) 
+    ? $_SESSION['lang'] 
+    : 'ja';
+
+if (file_exists("{$lang}.php")) {
+    include("{$lang}.php");
+} else {
+    die("Error: Language file not found.");
+}
+
 ?>
 <script src="https://cdn.i18next.com/i18next.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next/21.6.0/i18next.min.js"></script>
 
 <!-- 言語切り替えボタン -->
-<button id="btn-ja">日本語</button>
+<!-- <button id="btn-ja">日本語</button>
 <button id="btn-en">English</button>
 
-<script src="lunguage.js"></script>
+<script src="lunguage.js"></script> -->
 
 <header>
     <link rel="stylesheet" href="./user/header.css">
@@ -182,25 +193,25 @@ $user_name = isset($_SESSION['login']) ? $_SESSION['name'] : 'ゲスト';
         <!-- 「卒研TOWN」を左側に移動 -->
         <div class="search-bar">
             <a class="site-name" href="/sotsuken/sotsuken/user/toppage.php">卒研TOWN</a>
-            <input type="text" id="search-input" data-i18n="search_placeholder" placeholder="すべてのアイテムから探す" onkeydown="if(event.key === 'Enter') performSearch()">
+            <input type="text" id="search-input" data-i18n="search_placeholder" placeholder="<?php echo $translations['search_placeholder'] ?? 'すべてのアイテムから探す'; ?>" onkeydown="if(event.key === 'Enter') performSearch()">
         </div>
     </div>
     <div class="icon">
-        <a href="/sotsuken/sotsuken/user/login.php" data-i18n="login">ログイン</a>
-        <a href="/sotsuken/sotsuken/user/notification.php" data-i18n="🔔">🔔</a>
-        <a href="/sotsuken/sotsuken/user/cart.php" data-i18n="cart">カート</a>
-        <a href="/sotsuken/sotsuken/user/favorite.php" data-i18n="♡">♡</a>
+        <a href="/sotsuken/sotsuken/user/login.php" data-i18n="login"><?php echo $translations['login']?></a>
+        <a href="/sotsuken/sotsuken/user/notification.php" data-i18n="🔔"><?php echo $translations['🔔']?></a>
+        <a href="/sotsuken/sotsuken/user/cart.php" data-i18n="cart"><?php echo $translations['cart']?></a>
+        <a href="/sotsuken/sotsuken/user/favorite.php" data-i18n="♡"><?php echo $translations['♡']?></a>
         <div class="user-menu">
             <span class="user-name"><?php echo htmlspecialchars($user_name); ?></span>
             <div class="dropdown-menu">
-                <a href="/sotsuken/sotsuken/user/account.php" data-i18n="info">登録情報</a>
-                <a href="/sotsuken/sotsuken/user/orders.php" data-i18n="order">注文履歴・発送状況</a>
-                <a href="/sotsuken/sotsuken/user/logout.php" data-i18n="logout">ログアウト</a>
+                <a href="/sotsuken/sotsuken/user/settings.php" data-i18n="info"><?php echo $translations['info']?></a>
+                <a href="/sotsuken/sotsuken/user/order.php" data-i18n="order"><?php echo $translations['order']?></a>
+                <a href="/sotsuken/sotsuken/user/logout.php" data-i18n="logout"><?php echo $translations['logout']?></a>
             </div>
         </div>
     </div>
 </header>
-<script>
+<!-- <script>
     i18next.init({
         lng: 'ja', // 初期言語
         resources: {
@@ -407,11 +418,11 @@ $user_name = isset($_SESSION['login']) ? $_SESSION['name'] : 'ゲスト';
         element.innerHTML = translatedText;
     });
     }
-    
+
     // コンテンツを更新する関数
     function updateContent() {
         document.querySelectorAll('[data-i18n]').forEach(function(element) {
             element.innerHTML = i18next.t(element.getAttribute('data-i18n'));
         });
     }
-</script>
+</script> -->
