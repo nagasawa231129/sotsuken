@@ -1,17 +1,17 @@
 <?php
-include '../../db_open.php';  // db_open.phpをインクルードして、$connを利用できるようにする
+include '../../db_open.php';  // db_open.phpをインクルードして、$dbhを利用できるようにする
 
 $sumPrice = 0;
 
 // データベース接続が成功しているか確認（デバッグ用）
-if ($conn) {
+if ($dbh) {
     // 接続が成功した場合、データベースからshop.idを取得
     $sql = "SELECT * FROM cart ";
-    $result = $conn->query($sql);
+    $result = $dbh->query($sql);
     
     // クエリが失敗した場合
     if ($result === false) {
-        $errorInfo = $conn->errorInfo();  // PDO::errorInfo()で詳細エラーを取得
+        $errorInfo = $dbh->errorInfo();  // PDO::errorInfo()で詳細エラーを取得
         $shopId = 'クエリ失敗: ' . $errorInfo[2];  // エラーメッセージを表示
     } else {
         echo "<h1>内容をお確かめください</h1>";
@@ -20,7 +20,7 @@ if ($conn) {
             $quantity = $row['quantity'];
             // shopテーブルから商品情報を取得
             $sqlGoods = "SELECT goods, price FROM shop WHERE shop_id = :shop_id";
-            $stmt = $conn->prepare($sqlGoods);
+            $stmt = $dbh->prepare($sqlGoods);
             $stmt->bindParam(':shop_id', $shopId, PDO::PARAM_INT);
             $stmt->execute();
             if($stmt->rowCount() > 0){
@@ -48,7 +48,7 @@ if ($conn) {
 }
 
 // データベース接続を閉じる
-$conn = null;
+$dbh = null;
 ?>
 
 <!DOCTYPE html>

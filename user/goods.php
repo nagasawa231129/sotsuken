@@ -60,6 +60,13 @@ if ($goodsResult['sale_id']) {
         $discounted_price = $goodsResult['price'] * (1 - $sale['sale'] / 100);
         echo "<p>割引後価格：{$discounted_price}円</p>";
     }
+    ?>
+    <form action="add_to_cart.php" method="POST">
+    <input type="hidden" name="shop_id" value="<?php echo $goodsResult['shop_id']; ?>">
+    <input type="hidden" name="user_id" value="<?php echo $userId; ?>">
+    <button type="submit">カートに入れる</button>
+</form>
+<?php
 }
 
 
