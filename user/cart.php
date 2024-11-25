@@ -53,7 +53,8 @@ function updateQuantityHandler(button) {
     // 合計金額を即座に更新
     updateTotalAmount(shopId, price, newQuantity);
 
-    // ボタンを無効化して、リクエスト中は重複操作を防ぐ
+
+
     button.disabled = true;
 
     // サーバーに数量更新リクエストを送信
