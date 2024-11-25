@@ -1,0 +1,195 @@
+.main-content {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: #f8f9fa;
+    width: 100%; /* 親要素の幅を100%に */
+}
+
+/* サイドバーのスタイル */
+.sidebar {
+    width: 250px;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+    height: auto; /* コンテンツに合わせて高さを自動調整 */
+    position: relative; /* サブカテゴリーを親要素内に収めるための位置設定 */
+    overflow-y: auto; /* コンテンツが多くなった場合、スクロールできるようにする */
+}
+
+/* メインカテゴリのリスト */
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* メインカテゴリアイテム */
+.sidebar ul li {
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+/* メインカテゴリリンク */
+.sidebar ul li > a {
+    text-decoration: none;
+    color: #333;
+    display: block;
+}
+
+/* カテゴリーリストの基本設定 */
+.category-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.category-item {
+    position: relative; /* サブカテゴリーのドロップダウンに必要 */
+}
+
+/* 各カテゴリリンクのスタイル */
+.category-item > a {
+    display: block;
+    padding: 10px 15px;
+    text-decoration: none;
+    color: #333;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.category-item > a:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+/* サブカテゴリーの非表示設定 */
+.sub-category {
+    display: none;
+    list-style: none;
+    padding-left: 20px; /* サブカテゴリーのインデント */
+    margin: 0;
+    background-color: #f8f9fa; /* サブカテゴリも親カテゴリと同じ背景色 */
+}
+
+/* 親カテゴリリンクをホバーした時にサブカテゴリーを表示 */
+.category-item:hover .sub-category {
+    display: block;
+}
+
+/* サブカテゴリーのリンクのスタイル */
+.sub-category li a {
+    display: block;
+    padding: 8px 15px;
+    text-decoration: none;
+    color: #333;
+    font-size: 14px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* サブカテゴリーのリンクにホバーした時 */
+.sub-category li a:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+/* サブカテゴリーにサブサブカテゴリーがあった場合のスタイル */
+.sub-category li:hover > .sub-category {
+    display: block; /* サブサブカテゴリーも表示 */
+    position: absolute; /* 親カテゴリーの右側に表示 */
+    left: 100%;
+    top: 0;
+    padding-left: 10px;
+}
+
+/* 商品カードのレイアウト */
+.products-container {
+    display: flex;  /* フレックスボックスに設定 */
+    justify-content: space-between;  /* 商品を均等に配置 */
+    gap: 20px;  /* 商品間のスペースを調整 */
+}
+
+/* 商品カードのスタイル */
+.product-card {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+    text-decoration: none;
+    color: inherit;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+}
+
+/* 商品カード内の画像 */
+.product-card .product-img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+/* 商品情報のスタイル */
+.product-card .brand-name,
+.product-card .product-name,
+.product-card .price {
+    text-align: center;
+    margin: 10px 0;
+}
+
+.product-card .price {
+    font-weight: bold;
+    color: #e74c3c; /* 価格は赤色に */
+}
+
+/* 割引後価格のスタイル */
+.product-card .discounted-price {
+    color: red;
+    font-size: 1.1em;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* メディアクエリ: 小さい画面向け（モバイル対応） */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        box-shadow: none;
+    }
+    
+    .main-content {
+        width: 100%;
+    }
+}
+
+.pagination {
+    text-align: center; /* ページネーションを中央に配置 */
+    margin-top: 20px;   /* 上部にスペースを追加 */
+}
+
+.pagination a,
+.pagination span {
+    padding: 5px 10px;
+    margin: 0 5px;
+    text-decoration: none;
+    color: #333;
+}
+
+.pagination a:hover {
+    background-color: #ddd; /* ホバー時の背景色 */
+}
+
+.pagination span {
+    font-weight: bold; /* 現在のページの表示を強調 */
+}

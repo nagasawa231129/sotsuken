@@ -1,17 +1,24 @@
 <?php
-include '../../db_open.php';  // db_open.phpをインクルードして、$connを利用できるようにする
-
+session_start();
+include '../../db_open.php';  // db_open.phpをインクルードして、$dbhを利用できるようにする
+if (isset($_SESSION['id'])) {
+    $userId = $_SESSION['id'];
+} else {
+    $userId = null;
+}
 $sumPrice = 0;
 
 // データベース接続が成功しているか確認（デバッグ用）
-if ($conn) {
-    // 接続が成功した場合、データベースからshop.idを取得
-    $sql = "SELECT * FROM cart ";
-    $result = $conn->query($sql);
+if ($dbh) {
+    // 接続が成功した場合、データベースからcartテーブルの情報を取得
+    $sql = "SELECT * FROM cart WHERE user_id = :user_id";
+    $result = $dbh->prepare($sql); 
+    $result->bindParam(':user_id', $userId, PDO::PARAM_INT);
+    $result->execute();
     
     // クエリが失敗した場合
     if ($result === false) {
-        $errorInfo = $conn->errorInfo();  // PDO::errorInfo()で詳細エラーを取得
+        $errorInfo = $dbh->errorInfo();  // PDO::errorInfo()で詳細エラーを取得
         $shopId = 'クエリ失敗: ' . $errorInfo[2];  // エラーメッセージを表示
     } else {
         echo "<h1>内容をお確かめください</h1>";
@@ -20,7 +27,7 @@ if ($conn) {
             $quantity = $row['quantity'];
             // shopテーブルから商品情報を取得
             $sqlGoods = "SELECT goods, price FROM shop WHERE shop_id = :shop_id";
-            $stmt = $conn->prepare($sqlGoods);
+            $stmt = $dbh->prepare($sqlGoods);
             $stmt->bindParam(':shop_id', $shopId, PDO::PARAM_INT);
             $stmt->execute();
             if($stmt->rowCount() > 0){
@@ -35,8 +42,7 @@ if ($conn) {
                 echo "<p>商品名: <span class='info-text'>" . htmlspecialchars($goods, ENT_QUOTES, 'UTF-8') . "</span><br>";
                 echo "価格: <span class='info-text'>" . htmlspecialchars($price, ENT_QUOTES, 'UTF-8') . "円</span><br>";
                 echo "数量: <span id='quantity_$shopId'>" . $quantity . "</span> 個<br>";
-                 echo "合計: <span id='totalAmount_$shopId'>" . ($price * $quantity) . "円</span><br>";
-
+                echo "合計: <span id='totalAmount_$shopId'>" . ($price * $quantity) . "円</span><br>";
                 echo "</div>";
             } else {
                 echo "<p>shop_id: $shopId に該当する商品はありません</p>";
@@ -48,7 +54,7 @@ if ($conn) {
 }
 
 // データベース接続を閉じる
-$conn = null;
+$dbh = null;
 ?>
 
 <!DOCTYPE html>
@@ -66,13 +72,6 @@ $conn = null;
     <div class="container">
         <h1>決済用バーコード生成</h1>
         <button id="payButton">バーコードを表示</button>
-        <!-- <p class="barcode-info">
-        商品名: <span class="info-text"><?php echo htmlspecialchars($goods, ENT_QUOTES, 'UTF-8'); ?></span><br>
-        価格: <span class="info-text"><?php echo htmlspecialchars($price, ENT_QUOTES, 'UTF-8'); ?>円</span>
-        </p> -->
-
-        <!-- shop.idを表示するためのdiv -->
-        <!-- <p class="barcode-info">取得したshop.id: <span class="info-text"><?php echo htmlspecialchars($shopId, ENT_QUOTES, 'UTF-8'); ?></span></p> -->
 
         <!-- バーコードを表示するためのSVG要素 -->
         <svg id="barcodeContainer"></svg>
@@ -100,9 +99,9 @@ $conn = null;
             document.getElementById('paymentCompleteButton').style.display = 'block';
         });
 
-            document.getElementById('paymentCompleteButton').addEventListener('click',function(){
-                window.location.href='payment_complete.php'
-            });
+        document.getElementById('paymentCompleteButton').addEventListener('click', function() {
+            window.location.href = 'payment_complete.php';
+        });
         
     </script>
     

@@ -1,8 +1,16 @@
+<?php
+session_start();
+if (isset($_SESSION['id'])) {
+    $userId = $_SESSION['id'];
+} else {
+    $userId = null;
+}
+?>
 <!DOCTYPE html>
 <html lang="ja">
     <head>
         <meta charset="UTF-8">
-        <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" href="cart.css">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>ショッピングカート</title>
         <script>
@@ -197,15 +205,15 @@ function updateQuantity(shopId, newQuantity,callback) {
         
             <?php
 include '../../db_open.php';
-
+var_dump($userId);
 $sumPrice = 0;
 
-if($conn){
+if($dbh){
     $sql = "SELECT DISTINCT shop_id,quantity FROM cart";
-    $result = $conn->query($sql);
+    $result = $dbh->query($sql);
 
     if($result === false){
-        $errorInfo = $conn->errorInfo();
+        $errorInfo = $dbh->errorInfo();
         echo 'クエリ失敗: ' . $errorInfo[2];
     }else{
         while($row = $result->fetch(PDO::FETCH_ASSOC)){
@@ -213,7 +221,7 @@ if($conn){
             $quantity = $row['quantity'];
             // shopテーブルから商品情報を取得
             $sqlGoods = "SELECT goods, price FROM shop WHERE shop_id = :shop_id";
-            $stmt = $conn->prepare($sqlGoods);
+            $stmt = $dbh->prepare($sqlGoods);
             $stmt->bindParam(':shop_id', $shopId, PDO::PARAM_INT);
             $stmt->execute();
 
@@ -242,7 +250,7 @@ if($conn){
     echo '接続失敗';  // 接続が失敗した場合
 }
 
-$conn = null;
+$dbh = null;
 ?>
         <p>合計金額: <span id="totalSum" class="info-text"><?php echo htmlspecialchars($sumPrice, ENT_QUOTES, 'UTF-8'); ?>円</span></p>
         <form action="register.php" method="post">
