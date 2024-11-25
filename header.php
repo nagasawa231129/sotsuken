@@ -1,3 +1,27 @@
+<?php
+session_start();
+$user_name = isset($_SESSION['login']) ? $_SESSION['name'] : 'ゲスト';
+$supported_languages = ['ja', 'en'];
+$lang = isset($_SESSION['lang']) && in_array($_SESSION['lang'], $supported_languages) 
+    ? $_SESSION['lang'] 
+    : 'ja';
+
+if (file_exists("{$lang}.php")) {
+    include("{$lang}.php");
+} else {
+    die("Error: Language file not found.");
+}
+
+?>
+<script src="https://cdn.i18next.com/i18next.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/i18next/21.6.0/i18next.min.js"></script>
+
+<!-- 言語切り替えボタン -->
+<!-- <button id="btn-ja">日本語</button>
+<button id="btn-en">English</button>
+
+<script src="lunguage.js"></script> -->
+
 <header>
     <link rel="stylesheet" href="./user/header.css">
     <script>
@@ -165,17 +189,240 @@
         }
     </script>
 
-<div class="search-container">
-    <!-- 「卒研TOWN」を左側に移動 -->
-    <div class="search-bar">
-        <span class="site-name">卒研TOWN</span>
-        <input type="text" id="search-input" placeholder="すべてのアイテムから探す" onkeydown="if(event.key === 'Enter') performSearch()">
+    <div class="search-container">
+        <!-- 「卒研TOWN」を左側に移動 -->
+        <div class="search-bar">
+            <a class="site-name" href="/sotsuken/sotsuken/user/toppage.php">卒研TOWN</a>
+            <input type="text" id="search-input" data-i18n="search_placeholder" placeholder="<?php echo $translations['search_placeholder'] ?? 'すべてのアイテムから探す'; ?>" onkeydown="if(event.key === 'Enter') performSearch()">
+        </div>
     </div>
-</div>
     <div class="icon">
-        <a href="./user/login.php">ログイン</a>
-        <a href="./user/notification.php">🔔</a>
-        <a href="./user/cart.php">カート</a>
-        <a href="./user/favorite.php">♡</a>
+        <a href="/sotsuken/sotsuken/user/login.php" data-i18n="login"><?php echo $translations['login']?></a>
+        <a href="/sotsuken/sotsuken/user/notification.php" data-i18n="🔔"><?php echo $translations['🔔']?></a>
+        <a href="/sotsuken/sotsuken/user/cart.php" data-i18n="cart"><?php echo $translations['cart']?></a>
+        <a href="/sotsuken/sotsuken/user/favorite.php" data-i18n="♡"><?php echo $translations['♡']?></a>
+        <div class="user-menu">
+            <span class="user-name"><?php echo htmlspecialchars($user_name); ?></span>
+            <div class="dropdown-menu">
+                <a href="/sotsuken/sotsuken/user/settings.php" data-i18n="info"><?php echo $translations['info']?></a>
+                <a href="/sotsuken/sotsuken/user/order.php" data-i18n="order"><?php echo $translations['order']?></a>
+                <a href="/sotsuken/sotsuken/user/logout.php" data-i18n="logout"><?php echo $translations['logout']?></a>
+            </div>
+        </div>
     </div>
 </header>
+<!-- <script>
+    i18next.init({
+        lng: 'ja', // 初期言語
+        resources: {
+            ja: {
+                translation: {
+                    translation: {
+                        "search_placeholder": "すべてのアイテムから探す",
+                        "guest": "ゲスト",
+                        "user_name": "{{name}}さん"
+                    },
+                    "brand_search_title": "ブランド検索",
+                    "filter_by_alphabet": "アルファベットで絞り込む",
+                    "all": "すべて",
+                    "alphabet_A": "A",
+                    "alphabet_B": "B",
+                    "alphabet_C": "C",
+                    "alphabet_D": "D",
+                    "alphabet_E": "E",
+                    "alphabet_F": "F",
+                    "alphabet_G": "G",
+                    "alphabet_H": "H",
+                    "alphabet_I": "I",
+                    "alphabet_J": "J",
+                    "alphabet_K": "K",
+                    "alphabet_L": "L",
+                    "alphabet_M": "M",
+                    "alphabet_N": "N",
+                    "alphabet_O": "O",
+                    "alphabet_P": "P",
+                    "alphabet_Q": "Q",
+                    "alphabet_R": "R",
+                    "alphabet_S": "S",
+                    "alphabet_T": "T",
+                    "alphabet_U": "U",
+                    "alphabet_V": "V",
+                    "alphabet_W": "W",
+                    "alphabet_X": "X",
+                    "alphabet_Y": "Y",
+                    "alphabet_Z": "Z",
+
+                    "keyword_label": "キーワード",
+                    "keyword_placeholder": "キーワードを入力",
+                    "gender_label": "性別",
+                    "men": "男性",
+                    "woman": "女性",
+                    "category_label": "カテゴリー",
+                    "all": "すべて",
+                    "outerwear": "ジャケット/アウター",
+                    "pants": "パンツ",
+                    "skirt": "スカート",
+                    "onepiece": "ワンピース",
+                    "subcategory_label": "サブカテゴリー",
+                    "price_range": "価格帯",
+                    "min_price_placeholder": "最小価格",
+                    "max_price_placeholder": "最大価格",
+                    "sale_label": "セール対象",
+                    "sale": "セール対象",
+                    "no_sale": "セールなし",
+                    "search_button": "検索",
+
+                    "cart": "カート",
+                    "🔔": "🔔",
+                    "login": "ログイン",
+                    "♡": "♡",
+                    "info": "登録情報",
+                    "order": "発注履歴・発送状況",
+                    "logout": "ログアウト",
+
+                    "search": "探す",
+                    "search_by_brand": "ブランドで探す",
+                    "search_by_category": "カテゴリ―で探す",
+                    "search_by_ranking": "ランキングで探す",
+                    "search_by_sale": "セール対象で探す",
+                    "search_by_diagnosis": "診断から探す",
+                    "advanced_search": "詳細検索",
+                    "categories_from": "カテゴリーから探す",
+                    "tops": "トップス",
+                    "brand": "ブランド",
+                    "product_name": "商品名",
+                    "price": "値段",
+                    "discounted_price": "割引後価格",
+                    "description": "商品説明",
+                    "previous": "前へ",
+                    "next": "次へ"
+                }
+            },
+            en: {
+                translation: {
+                    translation: {
+                        "search_placeholder": "Search all items",
+                        "guest": "Guest",
+                        "user_name": "{{name}}"
+                    },
+                    "brand_search_title": "Brand Search",
+                    "filter_by_alphabet": "Filter by Alphabet",
+                    "all": "All",
+                    "alphabet_A": "A",
+                    "alphabet_B": "B",
+                    "alphabet_C": "C",
+                    "alphabet_D": "D",
+                    "alphabet_E": "E",
+                    "alphabet_F": "F",
+                    "alphabet_G": "G",
+                    "alphabet_H": "H",
+                    "alphabet_I": "I",
+                    "alphabet_J": "J",
+                    "alphabet_K": "K",
+                    "alphabet_L": "L",
+                    "alphabet_M": "M",
+                    "alphabet_N": "N",
+                    "alphabet_O": "O",
+                    "alphabet_P": "P",
+                    "alphabet_Q": "Q",
+                    "alphabet_R": "R",
+                    "alphabet_S": "S",
+                    "alphabet_T": "T",
+                    "alphabet_U": "U",
+                    "alphabet_V": "V",
+                    "alphabet_W": "W",
+                    "alphabet_X": "X",
+                    "alphabet_Y": "Y",
+                    "alphabet_Z": "Z",
+
+                    "keyword_label": "Keyword",
+                    "keyword_placeholder": "Enter keyword",
+                    "gender_label": "Gender",
+                    "male": "Men",
+                    "female": "Woman",
+                    "category_label": "Category",
+                    "all": "All",
+                    "outerwear": "Jackets/Outerwear",
+                    "pants": "Pants",
+                    "skirt": "Skirt",
+                    "onepiece": "Onepiece",
+                    "subcategory_label": "Subcategory",
+                    "price_range": "Price range",
+                    "min_price_placeholder": "Minimum price",
+                    "max_price_placeholder": "Maximum price",
+                    "sale_label": "Sale items",
+                    "sale": "On sale",
+                    "no_sale": "No sale",
+                    "search_button": "Search",
+
+                    "cart": "Cart",
+                    "🔔": "🔔",
+                    "login": "Login",
+                    "♡": "♡",
+                    "info": "User Info",
+                    "order": "Order",
+                    "logout": "Logout",
+
+                    "search": "Search",
+                    "search_by_brand": "Search by Brand",
+                    "search_by_category": "Search by Category",
+                    "search_by_ranking": "Search by Ranking",
+                    "search_by_sale": "Search by Sale",
+                    "search_by_diagnosis": "Search by Diagnosis",
+                    "advanced_search": "Advanced Search",
+                    "categories_from": "Browse by Category",
+                    "tops": "Tops",
+                    "brand": "Brand",
+                    "product_name": "Product Name",
+                    "price": "Price",
+                    "discounted_price": "Discounted Price",
+                    "description": "Description",
+                    "previous": "Previous",
+                    "next": "Next"
+                }
+            }
+        }
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+        // ページが読み込まれたときにplaceholderをi18nextで翻訳
+        document.getElementById('search-input').placeholder = i18next.t('すべてのアイテムから探す');
+    });
+
+    // 言語切り替え時にplaceholderを更新
+    document.getElementById('btn-ja').addEventListener('click', function() {
+        i18next.changeLanguage('ja', () => {
+            document.getElementById('search-input').placeholder = i18next.t('すべてのアイテムから探す');
+        });
+    });
+
+    document.getElementById('btn-en').addEventListener('click', function() {
+        i18next.changeLanguage('en', () => {
+            document.getElementById('search-input').placeholder = i18next.t('Search all items');
+        });
+    });
+
+
+    document.getElementById('btn-ja').addEventListener('click', function() {
+        i18next.changeLanguage('ja', () => updateContent());
+    });
+
+    document.getElementById('btn-en').addEventListener('click', function() {
+        i18next.changeLanguage('en', () => updateContent());
+    });
+
+    function updateContent() {
+    document.querySelectorAll('[data-i18n]').forEach(function(element) {
+        // 名前を動的に埋め込む
+        let translatedText = i18next.t(element.getAttribute('data-i18n'), { name: document.querySelector('.user-name').innerText });
+        element.innerHTML = translatedText;
+    });
+    }
+
+    // コンテンツを更新する関数
+    function updateContent() {
+        document.querySelectorAll('[data-i18n]').forEach(function(element) {
+            element.innerHTML = i18next.t(element.getAttribute('data-i18n'));
+        });
+    }
+</script> -->
