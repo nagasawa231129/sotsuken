@@ -79,5 +79,9 @@ $translations = [
     "discounted_price" => "Discounted Price",
     "description" => "Description",
     "previous" => "Previous",
-    "next" => "Next"
+    "next" => "Next",
+
+    // "brand"=> "Brand",
+    // "goods"=> "Goods",
+
 ];

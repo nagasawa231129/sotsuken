@@ -43,10 +43,6 @@
         "woman"=> "女性",
         "category_label"=> "カテゴリー",
         "all"=> "すべて",
-        "outerwear"=> "ジャケット/アウター",
-        "pants"=> "パンツ",
-        "skirt"=> "スカート",
-        "onepiece"=> "ワンピース",
         "subcategory_label"=> "サブカテゴリー",
         "price_range"=> "価格帯",
         "min_price_placeholder"=> "最小価格",
@@ -72,14 +68,73 @@
         "search_by_diagnosis"=> "診断から探す",
         "advanced_search"=> "詳細検索",
         "categories_from"=> "カテゴリーから探す",
-        "tops"=> "トップス",
         "brand"=> "ブランド",
         "product_name"=> "商品名",
         "price"=> "値段",
         "discounted_price"=> "割引後価格",
         "description"=> "商品説明",
         "previous"=> "前へ",
-        "next"=> "次へ"
+        "next"=> "次へ",
 
-    ];
+            "tops" => "トップス",
+            "tshirt-cutsew" => "tシャツ/カットソー",
+            "shirt/blouse" => "シャツ/ブラウス",
+            "polo-shirt" => "ポロシャツ",
+            "knit/sweater" => "ニット/セーター",
+            "vest" => "ベスト",
+            "parka" => "パーカー",
+            "sweat" => "スウェット",
+            "cardigan" => "カーディガン",
+            "bolero" => "ボレロ",
+            "ensemble" => "アンサンブル",
+            "jersey" => "ジャージ",
+            "tanktop" => "タンクトップ",
+            "camisole" => "キャミソール",
+            "tubetop" => "チューブトップス",
+            "other-tops" => "その他トップス",
+        
+            // ジャケット/アウター
+            "jacket" => "ジャケット",
+            "outerwear" => "アウター",
+            "tailored-jacket" => "テーラードジャケット",
+            "collarless-jacket" => "ノーカラージャケット",
+            "collarless-coat" => "ノーカラーコート",
+            "denim-jacket" => "デニムジャケット",
+            "riders-jacket" => "ライダースジャケット",
+            "blouson" => "ブルゾン",
+            "military-jacket" => "ミリタリージャケット",
+            "down-jacket" => "ダウンジャケット",
+            "coat" => "コート",
+            "down-vest" => "ダウンベスト",
+            "duffle-coat" => "ダッフルコート",
+            "trench-coat" => "トレンチコート",
+            "nylon-jacket" => "ナイロンジャケット",
+            "mods-coat" => "モッズコート",
+            "other-outerwear" => "その他アウター",
+        
+            // パンツ
+            "pants" => "パンツ",
+            "denim-pants" => "デニムパンツ",
+            "cargo-pants" => "カーゴパンツ",
+            "chino-pants" => "チノパンツ",
+            "sweat-pants" => "スウェットパンツ",
+            "slacks" => "スラックス",
+            "other-pants" => "その他パンツ",
+        
+            // スカート
+            "skirt" => "スカート",
+            "denim-skirt" => "デニムスカート",
+        
+            // ワンピース
+            "onepiece" => "ワンピース",
+            "shirt-onepiece" => "シャツワンピース",
+            "jumper-skirt" => "ジャンパースカート",
+            "tunic" => "チュニック",
+            "dress" => "ドレス",
+            "pants-dress" => "パンツドレス"
+        
+        
+        
+        
+        ];
     ?>

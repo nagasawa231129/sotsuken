@@ -1,0 +1,13 @@
+.star-rating {
+    font-size: 30px;
+    color: #ccc; /* 星のデフォルト色（灰色） */
+}
+
+.star {
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.star.selected, .star.hover {
+    color: #ffcc00; /* 選択された星とカーソルが乗った星の色（黄色） */
+}

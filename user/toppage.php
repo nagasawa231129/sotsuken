@@ -1,20 +1,29 @@
 <?php
 include "../../db_open.php";
-
+include "../header.php";
+include "../head.php";
 // ログインしていないときにエラーが出ない処理
 if (isset($_SESSION['id'])) {
     $userId = $_SESSION['id'];
 } else {
     $userId = null;
 }
+$lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ja';
+
+// // 言語ファイルのパスを設定
+$lang_file = __DIR__ . "/{$lang}.php";
+
+// // 言語ファイルを読み込み
+if (file_exists($lang_file)) {
+    include($lang_file);
+} else {
+    die("Error: Language file not found.");
+}
+var_dump("$lang");
+var_dump("$lang_file");
 ?>
 
 <!DOCTYPE html>
-<?php
-include "../header.php";
-include "../head.php";
-?>
-
 <link rel="stylesheet" href="toppage.css">
 <link rel="stylesheet" href="header.css">
 
@@ -44,23 +53,23 @@ $totalPages = ceil($totalItems / $itemsPerPage);
 
 <div class="main-content">
     <aside class="sidebar">
-        <h2 data-i18n="search">探す</h2>
+        <h2 data-i18n="search"><?php echo $translations['search']?></h2>
         <ul>
-        <li><a href="brand.php" data-i18n="search_by_brand">ブランドで探す</a></li>
-            <li><a href="category/category.php" data-i18n="search_by_category">カテゴリ―で探す</a></li>
-            <li><a href="ranking.php" data-i18n="search_by_ranking">ランキングで探す</a></li>
-            <li><a href="sale.php" data-i18n="search_by_sale">セール対象で探す</a></li>
-            <li><a href="diagnosis.php" data-i18n="search_by_diagnosis">診断から探す</a></li>
-            <li><a href="advanced_search.php" data-i18n="advanced_search">詳細検索</a></li>
+        <li><a href="brand.php" data-i18n="search_by_brand"><?php echo $translations['search_by_brand']?></a></li>
+            <li><a href="category/category.php" data-i18n="search_by_category"><?php echo $translations['search_by_category']?></a></li>
+            <li><a href="ranking.php" data-i18n="search_by_ranking"><?php echo $translations['search_by_ranking']?></a></li>
+            <li><a href="sale.php" data-i18n="search_by_sale"><?php echo $translations['search_by_sale']?></a></li>
+            <li><a href="diagnosis.php" data-i18n="search_by_diagnosis"><?php echo $translations['search_by_diagnosis']?></a></li>
+            <li><a href="advanced_search.php" data-i18n="advanced_search"><?php echo $translations['advanced_search']?></a></li>
         </ul>
 
-        <h2 data-i18n="categories_from">カテゴリーから探す</h2>
+        <h2 data-i18n="categories_from"><?php echo $translations['search_by_category']?></h2>
 
         <ul class="category-list">
             <li class="category-item">
-                <a href="./category/tops.php" data-i18n="tops">トップス</a>
+                <a href="./category/tops.php" data-i18n="tops"><?php echo $translations['tops']?></a>
                 <ul class="sub-category">
-                    <li><a href="./category/tops/tshirt-cutsew.php" data-i18n="Tshirt-cutsew">Tシャツ/カットソー</a></li>
+                    <li><a href="./category/tops/tshirt-cutsew.php" data-i18n="Tshirt-cutsew"><?php echo $translations['tshirt-cutsew']?></a></li>
                     <li><a href="./category/tops/shirt.php" data-i18n="shirt-blouse">シャツ/ブラウス</a></li>
                     <li><a href="./category/tops/poloshirt.php" data-i18n="poloshirt">ポロシャツ</a></li>
                     <li><a href="./category/tops/knit-sweater.php" data-i18n="knit/sweater">ニット/セーター</a></li>
@@ -77,7 +86,7 @@ $totalPages = ceil($totalItems / $itemsPerPage);
                 </ul>
             </li>
             <li class="category-item">
-                <a href="./category/jacket.php" data-i18n="jacket/outer">ジャケット/アウター</a>
+                <a href="./category/jacket.php" data-i18n="jacket/outer"><?php echo $translations['outerwear']?></a>
                 <ul class="sub-category">
                     <li><a href="./category/jacket-outerwear/collarless-coat.php" data-i18n="collarless-coat">ノーカラーコート</a></li>
                     <li><a href="./category/jacket-outerwear/collarless-jacket.php" data-i18n="collarless-jacket">ノーカラージャケット</a></li>
@@ -96,7 +105,7 @@ $totalPages = ceil($totalItems / $itemsPerPage);
                 </ul>
             </li>
             <li class="category-item">
-                <a href="./category/pants.php" data-i18n="pants">パンツ</a>
+                <a href="./category/pants.php" data-i18n="pants"><?php echo $translations['pants']?></a>
                 <ul class="sub-category">
                     <li><a href="./category/pants/cargo-pants.php" data-i18n="cargo-pants">カーゴパンツ</a></li>
                     <li><a href="./category/pants/chino-pants.php" data-i18n="chino-pants">チノパン</a></li>
@@ -107,7 +116,7 @@ $totalPages = ceil($totalItems / $itemsPerPage);
                 </ul>
             </li>
             <li class="category-item">
-                <a href="./category/skirt.php" data-i18n="skirt">スカート</a>
+                <a href="./category/skirt.php" data-i18n="skirt"><?php echo $translations['skirt']?></a>
                 <ul class="sub-category">
                     <li><a href="./category/skirt/mini-skirt.php" data-i18n="mini-skirt">ミニスカート</a></li>
                     <li><a href="./category/skirt/midi-skirt.php" data-i18n="midi-skirt">ミディスカート</a></li>
@@ -116,7 +125,7 @@ $totalPages = ceil($totalItems / $itemsPerPage);
                 </ul>
             </li>
             <li class="category-item">
-                <a href="./category/onepiece.php" data-i18n="onepiece">ワンピース</a>
+                <a href="./category/onepiece.php" data-i18n="onepiece"><?php echo $translations['onepiece']?></a>
                 <ul class="sub-category">
                     <li><a href="./category/onepiece/dress.php" data-i18n="dress">ドレス</a></li>
                     <li><a href="./category/onepiece/jumper-skirt.php" data-i18n="jumper-skirt">ジャンパースカート</a></li>
@@ -172,13 +181,13 @@ $totalPages = ceil($totalItems / $itemsPerPage);
                 echo "<img src='data:{$mimeType};base64,{$encodedImg}' alt='goods img' style='height: 100px; width: 100px; object-fit: cover; display: block; margin: 0 auto;'>";
 
                 // ブランド名
-                echo "<p style='text-align: center;' data-i18n='brand'>ブランド：{$rec['brand_name']}</p>";
+                echo "<p style='text-align: center;' data-i18n='brand'>" . $translations['brand'] . "： {$rec['brand_name']}</p>";
 
                 // 商品名
-                echo "<p style='text-align: center; font-weight: bold;' data-i18n='goods_name'>商品名：{$rec['goods']}</p>";
+                echo "<p style='text-align: center; font-weight: bold;' data-i18n='goods_name'>". $translations['product_name'] ." ：{$rec['goods']}</p>";
 
                 // 価格
-                echo "<p style='text-align: center;' data-i18n='price'>値段：{$rec['price']}円</p>";
+                echo "<p style='text-align: center;' data-i18n='price'>". $translations['price'] ."：{$rec['price']}円</p>";
 
                 // 割引計算と表示
                 if ($rec['sale_id']) {
@@ -191,12 +200,12 @@ $totalPages = ceil($totalItems / $itemsPerPage);
 
                     if ($sale) {
                         $discounted_price = $rec['price'] * (1 - $sale['sale'] / 100);
-                        echo "<p style='text-align: center; color: red;' data-i18n='discounted_price'>割引後価格：{$discounted_price}円</p>";
+                        echo "<p style='text-align: center; color: red;' data-i18n='discounted_price'>" . $translations['discounted_price'] ."：{$discounted_price}円</p>";
                     }
                 }
 
                 // 商品説明
-                echo "<p style='text-align: center;' data-i18n='description'>商品説明：{$rec['explanation']}</p>";
+                echo "<p style='text-align: center;' data-i18n='description'>" . $translations['description'] ."：{$rec['explanation']}</p>";
 
                 echo "</div>";
                 echo "</a>";
