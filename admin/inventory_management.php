@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="inventory_management.css">
     <title>在庫管理ページ</title>
-
 </head>
 
 <body>
@@ -30,29 +29,32 @@
     <?php
     include "./../../db_open.php"; // DB接続
 
+    // セッションの開始
+    session_start();
+
     if (isset($_GET['query']) && !empty($_GET['query'])) {
         $query = htmlspecialchars($_GET['query'], ENT_QUOTES, 'UTF-8'); // 入力された検索キーワードを取得
-        
+
         // 最初に商品名（goods）で検索
         $stmt = $dbh->prepare("SELECT s.shop_id, s.goods, s.price, s.material, sz.size, c.color, b.brand_name 
                                FROM shop s
                                LEFT JOIN size sz ON s.size = sz.size_id
                                LEFT JOIN color c ON s.color = c.color_id
-                               LEFT JOIN brand b ON s.brand = b.brand_id
+                               LEFT JOIN brand b ON s.brand_id = b.brand_id
                                WHERE s.goods LIKE :query"); // 商品名に一致するデータを取得
         $stmt->bindValue(':query', '%' . $query . '%', PDO::PARAM_STR); // 部分一致検索
         $stmt->execute();
-    
+
         // 検索結果の取得
         $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
+
         // 商品名で検索した結果が空の場合、同じ検索ワードで商品ID（shop_id）で再検索
         if (count($products) === 0) {
             $stmt = $dbh->prepare("SELECT s.shop_id, s.goods, s.price, s.material, sz.size, c.color, b.brand_name 
                                    FROM shop s
                                    LEFT JOIN size sz ON s.size = sz.size_id
                                    LEFT JOIN color c ON s.color = c.color_id
-                                   LEFT JOIN brand b ON s.brand = b.brand_id
+                                   LEFT JOIN brand b ON s.brand_id = b.brand_id
                                    WHERE b.brand_name LIKE :query"); // ブランド名で再検索
             $stmt->bindValue(':query', '%' . $query . '%', PDO::PARAM_STR); // 部分一致検索
             $stmt->execute();
@@ -60,28 +62,27 @@
         }
     } else {
         $query = ''; // $_GET['query']が空の場合、デフォルトで空文字を設定
-    
+
         // 商品ID（shop_id）で検索
         $stmt = $dbh->prepare("SELECT s.shop_id, s.goods, s.price, s.material, sz.size, c.color, b.brand_name 
                                FROM shop s
                                LEFT JOIN size sz ON s.size = sz.size_id
                                LEFT JOIN color c ON s.color = c.color_id
-                               LEFT JOIN brand b ON s.brand = b.brand_id
+                               LEFT JOIN brand b ON s.brand_id = b.brand_id
                                WHERE s.shop_id LIKE :query"); // 商品IDで検索
         $stmt->bindValue(':query', '%' . $query . '%', PDO::PARAM_STR); // 部分一致検索
         $stmt->execute();
         $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-    
+
     // 検索結果の表示
     if (count($products) > 0) {
         echo "<h3>在庫一覧</h3>";
-    
     } else {
         echo "<p>該当する商品はありません。</p>";
     }
 
-
+    // 在庫更新処理
     if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_stock'])) {
         $shop_id = $_POST['shop_id'];
         $change_stock = isset($_POST['stock_change']) ? $_POST['stock_change'] : 0;
@@ -101,7 +102,10 @@
         $stmt->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
         $stmt->execute();
 
-        echo "<script>alert('在庫が更新されました。');</script>";
+        // セッションにメッセージを保存してリダイレクト
+        $_SESSION['flash_message'] = '在庫が更新されました。';
+        header("Location: inventory_management.php"); // リダイレクト
+        exit();
     }
     ?>
 
@@ -136,6 +140,14 @@
         </tr>
         <?php endforeach; ?>
     </table>
+
+    <?php
+    // リダイレクト後にアラートメッセージを表示
+    if (isset($_SESSION['flash_message'])) {
+        echo "<script>alert('" . $_SESSION['flash_message'] . "');</script>";
+        unset($_SESSION['flash_message']); // メッセージを表示したら削除
+    }
+    ?>
 </body>
 
 </html>
