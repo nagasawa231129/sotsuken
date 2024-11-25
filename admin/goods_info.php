@@ -1,74 +1,63 @@
 <link rel="stylesheet" href="goods_info.css">
 
+<a href="admin_toppage.php">戻る</a>
+
 <?php
 // データベース接続
 include './../../db_open.php';
-
-// フォームが送信された場合
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // フォームから送信されたデータを受け取る
+// 商品情報を更新する処理
+if (isset($_POST['update'])) {
     $shop_id = $_POST['shop_id'];
-    $brand_id = $_POST['brand'];
     $goods = $_POST['goods'];
     $price = $_POST['price'];
-    $size_id = $_POST['size'];
-    $color_id = $_POST['color'];
-    $category_id = $_POST['category'];
-    $subcategory_id = $_POST['subcategory'];
-    $gender_id = $_POST['gender'];
+    $size = $_POST['size'];
+    $color = $_POST['color'];
+    $category = $_POST['category'];
+    $subcategory = $_POST['subcategory'];
+    $gender = $_POST['gender'];
+    $brand = $_POST['brand'];
 
-    if (isset($_POST['update'])) {
-        // 更新SQL文
-        $update_sql = "
-        UPDATE shop SET 
-            brand_id = :brand_id,
-            goods = :goods,
-            price = :price,
-            size = :size_id,
-            color = :color_id,
-            category_id = :category_id,
-            subcategory_id = :subcategory_id,
-            gender = :gender_id
-        WHERE shop_id = :shop_id
-    ";
+    // 商品情報を更新するSQLクエリ
+    $update_sql = "UPDATE shop 
+                   SET goods = :goods, price = :price, size = :size, color = :color, category_id = :category, 
+                       subcategory_id = :subcategory, gender = :gender, brand_id = :brand 
+                   WHERE shop_id = :shop_id";
+    
+    // SQLの準備
+    $stmt = $dbh->prepare($update_sql);
+    $stmt->bindParam(':goods', $goods);
+    $stmt->bindParam(':price', $price);
+    $stmt->bindParam(':size', $size);
+    $stmt->bindParam(':color', $color);
+    $stmt->bindParam(':category', $category);
+    $stmt->bindParam(':subcategory', $subcategory);
+    $stmt->bindParam(':gender', $gender);
+    $stmt->bindParam(':brand', $brand);
+    $stmt->bindParam(':shop_id', $shop_id);
 
-        // 更新クエリの準備
-        $stmt = $dbh->prepare($update_sql);
-        $stmt->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
-        $stmt->bindParam(':brand_id', $brand_id, PDO::PARAM_INT);
-        $stmt->bindParam(':goods', $goods, PDO::PARAM_STR);
-        $stmt->bindParam(':price', $price, PDO::PARAM_INT);
-        $stmt->bindParam(':size_id', $size_id, PDO::PARAM_INT);
-        $stmt->bindParam(':color_id', $color_id, PDO::PARAM_INT);
-        $stmt->bindParam(':category_id', $category_id, PDO::PARAM_INT);
-        $stmt->bindParam(':subcategory_id', $subcategory_id, PDO::PARAM_INT);
-        $stmt->bindParam(':gender_id', $gender_id, PDO::PARAM_INT);
+    // 実行
+    $stmt->execute();
+}
 
-        // 更新を実行
-        if ($stmt->execute()) {
-            echo "商品情報が更新されました。";
-        } else {
-            echo "更新に失敗しました。";
-        }
-    }
-    if (isset($_POST['delete'])) {
-        // 削除対象のshop_idを取得
-        $shop_id = $_POST['shop_id'];
+// 商品情報を削除する処理
+if (isset($_POST['delete'])) {
+    $shop_id = $_POST['shop_id'];
 
-        // 削除SQL文
-        $delete_sql = "DELETE FROM shop WHERE shop_id = :shop_id";
+    // 商品を削除するSQLクエリ
+    $delete_sql = "DELETE FROM shop WHERE shop_id = :shop_id";
 
-        // SQLを準備して実行
-        $stmt = $dbh->prepare($delete_sql);
-        $stmt->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
+    // SQLの準備
+    $stmt = $dbh->prepare($delete_sql);
+    $stmt->bindParam(':shop_id', $shop_id);
 
-        // 実行して結果を確認
-        if ($stmt->execute()) {
-            echo "商品情報が削除されました。";
-        } else {
-            echo "削除に失敗しました。";
-        }
-    }
+    // 実行
+    $stmt->execute();
+}
+
+// 検索条件が送信された場合
+$search_query = '';
+if (isset($_POST['search'])) {
+    $search_query = $_POST['search_query'];  // フォームから送信された検索キーワードを受け取る
 }
 
 // 商品情報を取得するSQLクエリ
@@ -94,12 +83,28 @@ $sql = "SELECT
         LEFT JOIN category ON shop.category_id = category.category_id  
         LEFT JOIN gender ON shop.gender = gender.gender_id
         LEFT JOIN subcategory ON shop.subcategory_id = subcategory.subcategory_id
-        LEFT JOIN size ON shop.size = size.size_id";
+        LEFT JOIN size ON shop.size = size.size_id
+        WHERE shop.goods LIKE :search_query";  // 商品名による検索条件を追加
 
-$stmt = $dbh->query($sql);
+// プレースホルダに検索条件をバインド
+$stmt = $dbh->prepare($sql);
+$stmt->bindValue(':search_query', '%' . $search_query . '%', PDO::PARAM_STR);
+$stmt->execute();
 ?>
 
+<div style="position: relative; height: 100px;">
+    <button id="add-button" onclick="location.href='add_goods.php'">追加</button>
+</div>
+
 <div class="form-container">
+    <!-- 商品名検索フォーム -->
+    <form method="post" action="">
+        <input type="text" name="search_query" placeholder="商品名で検索" value="<?= htmlspecialchars($search_query) ?>">
+        <button type="submit" name="search">検索</button>
+        <!-- 全て表示するボタン -->
+        <button type="submit" name="reset_search">全て表示する</button>
+    </form>
+
     <table>
         <thead>
             <tr>
@@ -115,6 +120,37 @@ $stmt = $dbh->query($sql);
             </tr>
         </thead>
         <tbody>
+            <?php
+            // 「全て表示する」ボタンが押された場合、検索条件をリセット
+            if (isset($_POST['reset_search'])) {
+                $search_query = '';  // 検索クエリを空にしてすべての商品を表示
+                $stmt = $dbh->prepare("SELECT 
+                                        shop.shop_id,
+                                        shop.goods,
+                                        shop.price,
+                                        shop.size AS size_id,
+                                        shop.color AS color_id,
+                                        shop.category_id AS category_id,
+                                        shop.gender AS gender_id,
+                                        brand.brand_id, 
+                                        brand.brand_name,          
+                                        color.ja_color AS color_name,  
+                                        gender.gender AS gender_name,
+                                        size.size,
+                                        subcategory.subcategory_name,
+                                        category.category_name,
+                                        shop.subcategory_id AS subcategory_id
+                                    FROM shop
+                                    LEFT JOIN brand ON shop.brand_id = brand.brand_id  
+                                    LEFT JOIN color ON shop.color = color.color_id  
+                                    LEFT JOIN category ON shop.category_id = category.category_id  
+                                    LEFT JOIN gender ON shop.gender = gender.gender_id
+                                    LEFT JOIN subcategory ON shop.subcategory_id = subcategory.subcategory_id
+                                    LEFT JOIN size ON shop.size = size.size_id");
+                $stmt->execute();
+            }
+            ?>
+
             <?php if ($stmt->rowCount() > 0): ?>
                 <?php while ($product = $stmt->fetch(PDO::FETCH_ASSOC)): ?>
                     <tr>
@@ -195,9 +231,8 @@ $stmt = $dbh->query($sql);
                                 <button type="submit" name="update">更新</button>
                             </td>
                             <td>
-                                <button type="button" onclick="confirmDelete(this.form)">削除</button>
+                                <button type="submit" name="delete">削除</button>
                             </td>
-
                         </form>
                     </tr>
                 <?php endwhile; ?>
@@ -227,14 +262,4 @@ $stmt = $dbh->query($sql);
         };
         xhr.send();
     }
-
-    function confirmDelete(form) {
-    // 確認ダイアログを表示
-    if (confirm("本当に削除しますか？")) {
-        
-    } else {
-        // キャンセルの場合は何もしない
-        console.log("削除がキャンセルされました。");
-    }
-}
-</script>これにかいて
+</script>
