@@ -10,7 +10,7 @@
         include '../../db_open.php';
 
         // 接続が成功している場合
-        if ($conn) {
+        if ($dbh) {
             // // ユーザーIDを取得（例えば、セッションから）
             // session_start();
             // $userId = $_SESSION['user_id']; // ユーザーIDがセッションに保存されていると仮定
@@ -19,7 +19,7 @@
             $sql = "UPDATE `cart` SET `trade_situation` = 4 WHERE `user_id` = :user_id AND `trade_situation` != 4";
 
             // SQL文の実行準備
-            $stmt = $conn->prepare($sql);
+            $stmt = $dbh->prepare($sql);
             // パラメータをバインド
             $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
 
@@ -36,7 +36,7 @@
         }
 
         // データベース接続を閉じる
-        $conn = null;
+        $dbh = null;
         ?>
         <p><a href="toppage.php">トップページに戻る</a></p>
     </body>
