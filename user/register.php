@@ -36,7 +36,6 @@ if ($conn) {
                 echo "価格: <span class='info-text'>" . htmlspecialchars($price, ENT_QUOTES, 'UTF-8') . "円</span><br>";
                 echo "数量: <span id='quantity_$shopId'>" . $quantity . "</span> 個<br>";
                  echo "合計: <span id='totalAmount_$shopId'>" . ($price * $quantity) . "円</span><br>";
-
                 echo "</div>";
             } else {
                 echo "<p>shop_id: $shopId に該当する商品はありません</p>";
@@ -66,25 +65,16 @@ $conn = null;
     <div class="container">
         <h1>決済用バーコード生成</h1>
         <button id="payButton">バーコードを表示</button>
-        <!-- <p class="barcode-info">
-        商品名: <span class="info-text"><?php echo htmlspecialchars($goods, ENT_QUOTES, 'UTF-8'); ?></span><br>
-        価格: <span class="info-text"><?php echo htmlspecialchars($price, ENT_QUOTES, 'UTF-8'); ?>円</span>
-        </p> -->
 
-        <!-- shop.idを表示するためのdiv -->
-        <!-- <p class="barcode-info">取得したshop.id: <span class="info-text"><?php echo htmlspecialchars($shopId, ENT_QUOTES, 'UTF-8'); ?></span></p> -->
-
-        <!-- バーコードを表示するためのSVG要素 -->
         <svg id="barcodeContainer"></svg>
         
-        <button id="paymentCompleteButton">決済完了</button>
+        <button id="paymentCompleteButton" style="display:none;">決済完了</button>
         
     </div>
 
     <script>
         document.getElementById('payButton').addEventListener('click', function() {
-            // PHPから取得したshop.idの値をJavaScriptに渡す
-            const paymentData = '123456789-' + '<?php echo $shopId; ?>'; // バーコードにするデータ
+            const paymentData = '<?php echo $shopId; ?>-123456789'; // バーコードにするデータ
             const barcodeContainer = document.getElementById('barcodeContainer');
             barcodeContainer.innerHTML = ''; // 前のバーコードを消去
 
@@ -92,19 +82,17 @@ $conn = null;
             JsBarcode(barcodeContainer, paymentData, {
                 format: 'CODE128',
                 displayValue: true,  // バーコードの値も表示
-                width: 2,           // バーコードの線の幅
-                height: 60,         // バーコードの高さ
-                margin: 10          // バーコードの周りの余白
+                width: 3,           // バーコードの線の幅
+                height: 100,         // バーコードの高さ
+                margin: 20          // バーコードの周りの余白
             });
 
             document.getElementById('paymentCompleteButton').style.display = 'block';
         });
 
-            document.getElementById('paymentCompleteButton').addEventListener('click',function(){
-                window.location.href='payment_complete.php'
-            });
-        
+        document.getElementById('paymentCompleteButton').addEventListener('click', function() {
+            window.location.href = 'payment_complete.php';
+        });
     </script>
-    
 </body>
 </html>
