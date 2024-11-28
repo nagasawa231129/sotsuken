@@ -105,8 +105,9 @@ $dbh = null;
         <button id="payButton">バーコードを表示</button>
 
         <svg id="barcodeContainer"></svg>
-        
-        <button id="paymentCompleteButton" style="display:none;" onclick="deleteCart($dbh)">決済完了</button>
+    <form action="delete_cart.php" method="post">
+        <button id="paymentCompleteButton" style="display:none;" >決済完了</button>
+    </form>
     </div>
 
     <script>
