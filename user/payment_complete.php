@@ -1,43 +1,51 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>決済完了</title>
-        <link rel="stylesheet" href="style.css">
-    </head>
-    <body>
-        <h1>決済完了</h1>
-        <?php
-        include '../../db_open.php';
+<?php
+include '../../db_open.php';  // db_open.phpをインクルードして、$dbhを利用できるようにする
 
-        // 接続が成功している場合
-        if ($conn) {
-            // // ユーザーIDを取得（例えば、セッションから）
-            // session_start();
-            // $userId = $_SESSION['user_id']; // ユーザーIDがセッションに保存されていると仮定
+// データベース接続が成功しているか確認（デバッグ用）
+if ($dbh) {
+    $selectSql = "SELECT `cart_id`, `user_id`, `shop_id`, `quantity`, `trade_situation`, `order_date` FROM `cart`";
+    $stmt = $dbh->prepare($selectSql);
 
-            // `cart` テーブルの `trade_situation` を 4 に更新するSQL
-            $sql = "UPDATE `cart` SET `trade_situation` = 4 WHERE `user_id` = :user_id AND `trade_situation` != 4";
+    if($stmt->execute()){
+       $cartItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            // SQL文の実行準備
-            $stmt = $conn->prepare($sql);
-            // パラメータをバインド
-            $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+       //カートの削除処理
+       $deleteSql = "DELETE FROM cart";
+       $stmt = $dbh->prepare($deleteSql);
 
-            // SQLの実行
-            $result = $stmt->execute();
+       if($stmt->execute()){
+        echo "ご購入ありがとうございます";
 
-            if ($result) {
-                echo "<p>決済が完了しました！</p>";
-            } else {
-                echo "<p>決済の更新に失敗しました。</p>";
-            }
-        } else {
-            echo "<p>データベース接続に失敗しました。</p>";
+        foreach ($cartItems as $row) {
+            $cartId = $row['cart_id'];
+            $shopId = $row['shop_id'];
+            $userId = $row['user_id'];
+            $quantity = $row['quantity'];
+            $tradeSituation = $row['trade_situation'];
+            $orderDate = $row['order_date'];
+
+            // INSERT文の作成
+            $insertSql = "INSERT INTO `cart_detail`(`cart_id`, `user_id`, `shop_id`, `quantity`, `trade_situation`, `order_date`) 
+                        VALUES (:cart_id, :user_id, :shop_id, :quantity, :trade_situation, :order_date)";
+            $insertStmt = $dbh->prepare($insertSql);
+
+            // パラメータのバインド
+            $insertStmt->bindParam(':cart_id', $cartId);
+            $insertStmt->bindParam(':user_id', $userId);
+            $insertStmt->bindParam(':shop_id', $shopId);
+            $insertStmt->bindParam(':quantity', $quantity);
+            $insertStmt->bindParam(':trade_situation', $tradeSituation);
+            $insertStmt->bindParam(':order_date', $orderDate);
+
+            // データを挿入
+            $insertStmt->execute();
         }
+       }
+    }
+} else {
+    echo "db_error";    // DB接続エラー
+}
 
-        // データベース接続を閉じる
-        $conn = null;
-        ?>
-        <p><a href="toppage.php">トップページに戻る</a></p>
-    </body>
-</html>
+// データベース接続を閉じる
+$dbh = null;
+?>

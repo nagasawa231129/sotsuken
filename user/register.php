@@ -94,48 +94,18 @@ $dbh = null;
     <meta charset="UTF-8">
     <link rel="stylesheet" href="register_style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>決済用バーコード生成</title>
-    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js"></script>
+    <title>決済完了</title>
 </head>
 <body>
     <p>合計金額: <span id="totalSum" class="info-text"><?php echo htmlspecialchars($sumPrice, ENT_QUOTES, 'UTF-8'); ?>円</span></p>
     
     <div class="container">
-        <h1>決済用バーコード生成</h1>
-        <button id="payButton">バーコードを表示</button>
+        <h1>決済完了</h1>
 
-        <svg id="barcodeContainer"></svg>
-    <form action="delete_cart.php" method="post">
-        <button id="paymentCompleteButton" style="display:none;" >決済完了</button>
-    </form>
+        <!-- 決済完了ボタン（初期状態で表示） -->
+        <form action="payment_complete.php" method="post"  id="paymentForm">
+            <button id="paymentCompleteButton">決済完了</button>
+        </form>
     </div>
-
-    <script>
-        document.getElementById('payButton').addEventListener('click', function() {
-            const paymentData = '<?php echo $shop_id; ?>-123456789'; // バーコードにするデータ
-            const barcodeContainer = document.getElementById('barcodeContainer');
-            barcodeContainer.innerHTML = ''; // 前のバーコードを消去
-
-            // JsBarcodeを使用してバーコードを生成
-            JsBarcode(barcodeContainer, paymentData, {
-                format: 'CODE128',
-                displayValue: true,  // バーコードの値も表示
-                width: 3,           // バーコードの線の幅
-                height: 100,         // バーコードの高さ
-                margin: 20          // バーコードの周りの余白
-            });
-
-            // バーコード表示後に決済完了ボタンを表示
-            document.getElementById('paymentCompleteButton').style.display = 'block';
-
-            document.getElementById('paymentCompleteButton')
-        });
-
-        
-        // function deleteCart() {
-        //     header("Location: delete_cart.php");
-        //     exit();
-        // }
-    </script>
 </body>
 </html>
