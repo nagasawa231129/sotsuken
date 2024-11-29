@@ -26,7 +26,7 @@ if ($dbh) {
 
             // INSERT文の作成
             $insertSql = "INSERT INTO `cart_detail`(`cart_id`, `user_id`, `shop_id`, `quantity`, `trade_situation`, `order_date`) 
-                        VALUES (:cart_id, :user_id, :shop_id, :quantity, :trade_situation, :order_date)";
+                        VALUES (:cart_id, :user_id, :shop_id, :quantity, :trade_situation, CURRENT_TIMESTAMP)";
             $insertStmt = $dbh->prepare($insertSql);
 
             // パラメータのバインド
@@ -35,7 +35,6 @@ if ($dbh) {
             $insertStmt->bindParam(':shop_id', $shopId);
             $insertStmt->bindParam(':quantity', $quantity);
             $insertStmt->bindParam(':trade_situation', $tradeSituation);
-            $insertStmt->bindParam(':order_date', $orderDate);
 
             // データを挿入
             $insertStmt->execute();

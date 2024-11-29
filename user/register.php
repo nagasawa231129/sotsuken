@@ -2,6 +2,7 @@
 include '../../db_open.php';  // db_open.phpをインクルードして、$dbhを利用できるようにする
 
 $sumPrice = 0;
+$cartItemsExist = false;
 
 // データベース接続が成功しているか確認（デバッグ用）
 if ($dbh) {
@@ -44,7 +45,7 @@ if ($dbh) {
 
                 // 商品情報を表示
                 echo "<div class='cart-item'>";
-                echo "<p>商品名: <span class='info-text'>" . htmlspecialchars($goods, ENT_QUOTES, 'UTF-8') . "</span><br>";
+                echo "<p>商品名: <span class='info-text'>" . htmlspecialchars($goods, ENT_QUOTES, 'UTF-8') . "</span><br>"; 
                 echo "価格: <span class='info-text'>" . htmlspecialchars($price, ENT_QUOTES, 'UTF-8') . "円</span><br>";
                 echo "数量: <span id='quantity_$shop_id'>" . $quantity . "</span> 個<br>";
                 echo "合計: <span id='totalAmount_$shop_id'>" . ($price * $quantity) . "円</span><br>";
@@ -52,6 +53,7 @@ if ($dbh) {
             } else {
                 echo "<p>shop_id: $shop_id に該当する商品はありません</p>";
             }
+            $cartItemsExist = true;
         }
     }
 } else {
@@ -95,6 +97,7 @@ $dbh = null;
     <link rel="stylesheet" href="register_style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>決済完了</title>
+    <script src="register_script.js"></script>
 </head>
 <body>
     <p>合計金額: <span id="totalSum" class="info-text"><?php echo htmlspecialchars($sumPrice, ENT_QUOTES, 'UTF-8'); ?>円</span></p>
@@ -102,10 +105,13 @@ $dbh = null;
     <div class="container">
         <h1>決済完了</h1>
 
-        <!-- 決済完了ボタン（初期状態で表示） -->
+        <?php if($cartItemsExist):?>
         <form action="payment_complete.php" method="post"  id="paymentForm">
             <button id="paymentCompleteButton">決済完了</button>
         </form>
+        <?php else: ?>
+            <p>カートに商品がありません。</p>
+        <?php endif; ?>
     </div>
 </body>
 </html>
