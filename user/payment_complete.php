@@ -39,6 +39,14 @@ if ($dbh) {
 
             // データを挿入
             $insertStmt->execute();
+
+            $updateSql = "UPDATE `cart_detail` SET `trade_situation`=1 WHERE `shop_id` = :shop_id";
+            $updateStmt = $dbh->prepare($updateSql);
+
+            //パラメーターのバインド
+            $updateStmt->bindParam(':shop_id',$shopId);
+            //データの更新
+            $updateStmt->execute();
         }
        }
     }
