@@ -51,9 +51,9 @@
                         echo "カラー: <span class='info-text'>" . htmlspecialchars($color, ENT_QUOTES, 'UTF-8') . "</span><br>";
                         echo "<div class='item-actions'>";
                         echo "<button class='decrease-btn' data-shop-id='$shopId' data-price='$price' data-quantity='$quantity' onClick='updateQuantityHandler(this)'>-</button>";
-                        echo "数量: <span id='quantity_$shopId'>" . $quantity . "</span> 個<br>";
+                        echo " <span id='quantity_$shopId'>" . $quantity .  "</span> ";
                         echo "<button class='increase-btn' data-shop-id='$shopId' data-price='$price' data-quantity='$quantity' onClick='updateQuantityHandler(this)'>+</button>";
-                        echo "<br>合計: <span id='totalAmount_$shopId'>" . ($price * $quantity) . "円</span>";
+                        echo "<br> <span id='totalAmount_$shopId'>" . ($price * $quantity) . "円</span>";
                         echo "</div>";
                         echo "</div>";
                     } else {
@@ -79,7 +79,3 @@
 
     </body>
 </html>
-
-
-
-
