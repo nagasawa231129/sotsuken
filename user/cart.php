@@ -1,5 +1,4 @@
 <?php
-session_start();
 if (isset($_SESSION['id'])) {
     $userId = $_SESSION['id'];
 } else {
@@ -10,7 +9,7 @@ if (isset($_SESSION['id'])) {
 <html lang="ja">
     <head>
         <meta charset="UTF-8">
-        <link rel="stylesheet" href="cart.css">
+        <link rel="stylesheet" href="style.css">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>ショッピングカート</title>
         <script>
@@ -205,24 +204,33 @@ function updateQuantity(shopId, newQuantity,callback) {
         
             <?php
 include '../../db_open.php';
-var_dump($userId);
+
 $sumPrice = 0;
 
 if($dbh){
-    $sql = "SELECT DISTINCT shop_id,quantity FROM cart";
-    $result = $dbh->query($sql);
+    $sql = "SELECT DISTINCT shop_id,quantity FROM cart WHERE user_id = :user_id";
+    $result = $dbh->prepare($sql);
+    $result->bindParam(':user_id', $userId, PDO::PARAM_INT);
 
+   
+    $result->execute();
+    $re = $result->fetch(PDO::FETCH_ASSOC);
+
+    echo $re['shop_id'];
+    
     if($result === false){
         $errorInfo = $dbh->errorInfo();
         echo 'クエリ失敗: ' . $errorInfo[2];
     }else{
+      
         while($row = $result->fetch(PDO::FETCH_ASSOC)){
             $shopId = $row['shop_id'];
             $quantity = $row['quantity'];
             // shopテーブルから商品情報を取得
-            $sqlGoods = "SELECT goods, price FROM shop WHERE shop_id = :shop_id";
+            $sqlGoods = "SELECT goods, price FROM shop WHERE user_id = :user_id";
             $stmt = $dbh->prepare($sqlGoods);
             $stmt->bindParam(':shop_id', $shopId, PDO::PARAM_INT);
+
             $stmt->execute();
 
             if($stmt->rowCount() > 0){
