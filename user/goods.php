@@ -25,7 +25,7 @@ if ($shop_id) {
     // $sql = "SELECT shop.*, brand.brand_name FROM shop
     //     LEFT OUTER JOIN brand ON brand.brand_id = shop.brand_id
     //     WHERE shop.shop_id = :shop_id";
-    
+
     $sql = "SELECT shop.*, brand.brand_name, sale.sale FROM shop
     LEFT OUTER JOIN brand ON brand.brand_id = shop.brand_id
     LEFT OUTER JOIN sale ON sale.sale_id = shop.sale_id
@@ -44,63 +44,167 @@ if ($shop_id) {
         echo "<p>ブランド名：{$goodsResult['brand_name']}</p>";
 
         // 商品情報の他の部分を表示
-        echo "<p>値段：{$goodsResult['price']}</p>";
+        echo "<p>値段：{$goodsResult['original_price']}</p>";
 
-// 商品価格がセール中の場合、セール価格を計算
-if ($goodsResult['sale_id']) {
-    $sale_id = $goodsResult['sale_id'];
-    // saleテーブルから割引率を取得
-    $sql_sale = "SELECT sale FROM sale WHERE sale_id = :sale_id";
-    $stmt_sale = $dbh->prepare($sql_sale);
-    $stmt_sale->bindParam(':sale_id', $sale_id);
-    $stmt_sale->execute();
-    $sale = $stmt_sale->fetch(PDO::FETCH_ASSOC);
+        // 商品価格がセール中の場合、セール価格を計算
+        if ($goodsResult['sale_id']) {
+            $sale_id = $goodsResult['sale_id'];
+            // saleテーブルから割引率を取得
+            $sql_sale = "SELECT sale FROM sale WHERE sale_id = :sale_id";
+            $stmt_sale = $dbh->prepare($sql_sale);
+            $stmt_sale->bindParam(':sale_id', $sale_id);
+            $stmt_sale->execute();
+            $sale = $stmt_sale->fetch(PDO::FETCH_ASSOC);
 
-    if ($sale) {
-        $discounted_price = $goodsResult['price'] * (1 - $sale['sale'] / 100);
-        echo "<p>割引後価格：{$discounted_price}円</p>";
-    }
-    ?>
-    <form action="add_to_cart.php" method="POST">
-    <input type="hidden" name="shop_id" value="<?php echo $goodsResult['shop_id']; ?>">
-    <input type="hidden" name="user_id" value="<?php echo $userId; ?>">
-    <button type="submit">カートに入れる</button>
-</form>
-<?php
-}
+            if ($sale) {
+                $discounted_price = ceil($goodsResult['original_price'] * (1 - $sale['sale'] / 100)); // 小数点切り上げ
+                echo "<p>割引後価格：{$discounted_price}円</p>";
+            }
+        }
 
+?>
+        <div class="button-container">
+            <form action="add_to_cart.php" method="POST">
+                <input type="hidden" name="shop_id" value="<?php echo $goodsResult['shop_id']; ?>">
+                <input type="hidden" name="user_id" value="<?php echo $userId; ?>">
+                <button type="submit">カートに入れる</button>
+            </form>
 
-        echo "<p>商品説明：{$goodsResult['explanation']}</p>";
+            <?php
+            // お気に入りボタンを表示する前に、ユーザーがその商品をお気に入りに登録しているかをチェック
+            if ($userId) {
+                // 商品がすでにお気に入りに追加されているかを確認
+                $sql_favorite_check = "SELECT * FROM favorite WHERE user_id = :user_id AND shop_id = :shop_id";
+                $stmt_favorite_check = $dbh->prepare($sql_favorite_check);
+                $stmt_favorite_check->bindParam(':user_id', $userId);
+                $stmt_favorite_check->bindParam(':shop_id', $goodsResult['shop_id']);
+                $stmt_favorite_check->execute();
+                $is_favorite = $stmt_favorite_check->rowCount() > 0; // 既にお気に入りに追加されているかどうか
 
-        // 商品に紐づくすべての画像を取得
-        $sql_images = "SELECT img FROM image WHERE shop_id = :shop_id";
-        $stmt_images = $dbh->prepare($sql_images);
-        $stmt_images->bindParam(':shop_id', $shop_id);
-        $stmt_images->execute();
-        
-        // 画像がある場合
-        if ($stmt_images->rowCount() > 0) {
-            echo "<h3>商品画像</h3>";
-            while ($image = $stmt_images->fetch(PDO::FETCH_ASSOC)) {
-                $imgBlob = $image['img'];
-                
-                // BLOB型の画像データをBase64エンコードして表示
-                if (!empty($imgBlob)) {
-                    // MIMEタイプを動的に取得
-                    $finfo = new finfo(FILEINFO_MIME_TYPE);
-                    $mimeType = $finfo->buffer($imgBlob); // BLOBデータからMIMEタイプを取得
-
-                    // Base64にエンコード
-                    $encodedImg = base64_encode($imgBlob);
-
-                    // エンコードされた画像をimgタグに表示
-                    echo "<p><img src='data:{$mimeType};base64,{$encodedImg}' alt='商品画像' style='width: 150px; height: auto;'></p>";
+                // お気に入りボタンの表示
+                if ($is_favorite) {
+                    echo "<button class='favorite-button filled' data-shop-id='{$goodsResult['shop_id']}' data-user-id='{$userId}' title='お気に入り済み'>❤️</button>";
+                } else {
+                    echo "<button class='favorite-button' data-shop-id='{$goodsResult['shop_id']}' data-user-id='{$userId}' title='お気に入りに追加'>♡</button>";
                 }
+            } else {
+                echo "<button class='favorite-button' disabled>♡</button>"; // ログインしていない場合の表示
+            }
+
+            ?>
+        </div>
+
+        <script>
+            // お気に入りボタンのクリックイベントを設定
+            document.querySelectorAll('.favorite-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const shopId = this.getAttribute('data-shop-id');
+                    const userId = this.getAttribute('data-user-id');
+
+                    // AJAXリクエストを作成
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('POST', 'toggle_favorite.php', true);
+                    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+                    // リクエストの送信
+                    xhr.send(`user_id=${userId}&shop_id=${shopId}`);
+
+                    // リクエストが成功した場合の処理
+                    xhr.onload = function() {
+                        if (xhr.status === 200) {
+                            const response = JSON.parse(xhr.responseText);
+                            if (response.success) {
+                                // ボタンの状態を更新
+                                if (response.action === 'added') {
+                                    button.classList.add('filled');
+                                    button.innerHTML = '❤️'; // お気に入り追加
+                                    button.title = 'お気に入りから削除'; // ツールチップを更新
+                                } else {
+                                    button.classList.remove('filled');
+                                    button.innerHTML = '♡'; // お気に入り削除
+                                    button.title = 'お気に入りに追加'; // ツールチップを更新
+                                }
+                            } else {
+                                alert('エラーが発生しました。');
+                            }
+                        }
+                    };
+                });
+            });
+        </script>
+
+<?php
+        // 商品IDの取得
+        $shop_id = isset($_GET['shop_id']) ? $_GET['shop_id'] : '';
+
+        // サムネイル画像をshopテーブルから取得
+        $sql_thumbnail = "SELECT thumbnail FROM shop WHERE shop_id = :shop_id";
+        $stmt_thumbnail = $dbh->prepare($sql_thumbnail);
+        $stmt_thumbnail->bindParam(':shop_id', $shop_id);
+        $stmt_thumbnail->execute();
+        $thumbnail_result = $stmt_thumbnail->fetch(PDO::FETCH_ASSOC);
+
+        // サムネイル画像が取得できた場合
+        if ($thumbnail_result) {
+            $thumbnailImgBlob = $thumbnail_result['thumbnail'];
+
+            // BLOBデータからMIMEタイプを取得
+            $finfo = new finfo(FILEINFO_MIME_TYPE);
+            $mimeTypeThumbnail = $finfo->buffer($thumbnailImgBlob);  // BLOBデータを解析
+
+            // Base64にエンコードして表示
+            $encodedThumbnailImg = base64_encode($thumbnailImgBlob);
+            echo "<img src='data:{$mimeTypeThumbnail};base64,{$encodedThumbnailImg}' alt='サムネイル画像' id='main-thumbnail' class='main-thumbnail'>";
+        } else {
+            echo "<p>サムネイル画像が見つかりません。</p>";
+        }
+
+        // サムネイル画像（shopテーブル）の追加取得
+        $sql_shop_images = "SELECT thumbnail FROM shop WHERE shop_id = :shop_id";
+        $stmt_shop_images = $dbh->prepare($sql_shop_images);
+        $stmt_shop_images->bindParam(':shop_id', $shop_id);
+        $stmt_shop_images->execute();
+
+        // サムネイル画像を追加表示（もしあれば）
+        if ($stmt_shop_images->rowCount() > 0) {
+            echo "<div class='sub-images'>";
+            while ($shop_image = $stmt_shop_images->fetch(PDO::FETCH_ASSOC)) {
+                $shopImgBlob = $shop_image['thumbnail'];
+
+                // BLOBデータからMIMEタイプを取得
+                $mimeTypeShop = $finfo->buffer($shopImgBlob);  // サムネイルのMIMEタイプを解析
+
+                // Base64にエンコードして表示
+                $encodedShopImg = base64_encode($shopImgBlob);
+                echo "<img src='data:{$mimeTypeShop};base64,{$encodedShopImg}' alt='サムネイル画像' class='sub-thumbnail' onclick='changeThumbnail(this)'>";
             }
         } else {
-            echo "<p>画像がありません。</p>";
+            echo "<p>サムネイル画像はありません。</p>";
         }
-        
+
+        // サブ画像をimageテーブルから取得
+        $sql_sub_images = "SELECT img FROM image WHERE shop_id = :shop_id";
+        $stmt_sub_images = $dbh->prepare($sql_sub_images);
+        $stmt_sub_images->bindParam(':shop_id', $shop_id);
+        $stmt_sub_images->execute();
+
+        // サブ画像があれば表示
+        if ($stmt_sub_images->rowCount() > 0) {
+            while ($sub_image = $stmt_sub_images->fetch(PDO::FETCH_ASSOC)) {
+                $subImgBlob = $sub_image['img'];
+
+                // BLOBデータからMIMEタイプを取得
+                $mimeTypeSub = $finfo->buffer($subImgBlob);  // サブ画像のMIMEタイプを解析
+
+                // Base64にエンコードして表示
+                $encodedSubImg = base64_encode($subImgBlob);
+                echo "<img src='data:{$mimeTypeSub};base64,{$encodedSubImg}' alt='サブ画像' class='sub-thumbnail' onclick='changeThumbnail(this)'>";
+            }
+            echo "</div>";
+        } else {
+            echo "<p>サブ画像はありません。</p>";
+        }
+        echo "</div>";
     } else {
         echo "<p>該当する商品が見つかりません。</p>";
     }
@@ -108,6 +212,14 @@ if ($goodsResult['sale_id']) {
     echo "<p>商品IDが指定されていません。</p>";
 }
 ?>
+<script>
+    // サムネイルクリックでメイン画像を変更
+    function changeThumbnail(subImgElement) {
+        var mainThumbnail = document.getElementById('main-thumbnail');
+        mainThumbnail.src = subImgElement.src; // メイン画像をサブ画像に変更
+    }
+</script>
+
 <body>
     <nav class="tabs">
         <div class="tab-button active" data-target="info">アイテム説明</div>
@@ -116,13 +228,107 @@ if ($goodsResult['sale_id']) {
     </nav>
 
     <div id="info" class="tab-content active-tab">
-        <h1>アイテム説明</h1>
+        <?php
+        if (isset($goodsResult['exp'])) {
+            echo "<p>{$goodsResult['exp']}</p>";
+        } else {
+            echo "<p>商品説明はまだありません。</p>";
+        }
+        ?>
     </div>
     <div id="size" class="tab-content">
-        <h1>サイズ</h1>
     </div>
     <div id="review" class="tab-content">
-        <h1>レビュー</h1>
+        <?php
+        // 商品ページに関連するレビューを表示する部分
+        if ($shop_id) {
+            // reviewsテーブルからshop_idに関連するレビューを取得
+            $sql_reviews = "SELECT reviews.*, user.display_name 
+            FROM reviews 
+            LEFT JOIN user ON reviews.user_id = user.user_id 
+            WHERE reviews.shop_id = :shop_id";
+            $stmt_reviews = $dbh->prepare($sql_reviews);
+            $stmt_reviews->bindParam(':shop_id', $shop_id);
+            $stmt_reviews->execute();
+
+            // レビューの平均評価を計算
+            $sql_avg_rating = "SELECT AVG(rate) AS average_rating FROM reviews WHERE shop_id = :shop_id";
+            $stmt_avg_rating = $dbh->prepare($sql_avg_rating);
+            $stmt_avg_rating->bindParam(':shop_id', $shop_id);
+            $stmt_avg_rating->execute();
+            $avg_rating = $stmt_avg_rating->fetch(PDO::FETCH_ASSOC);
+            $average_rating = $avg_rating['average_rating']; // 小数点以下もそのまま使用
+
+            // 平均評価の表示（☆で表示）
+            echo "<h3>全体の評価: </h3>";
+            echo "<div class='star-rating'>";
+            $full_stars = floor($average_rating); // 完全な星の数
+            $half_star = ($average_rating - $full_stars) >= 0.5 ? 1 : 0; // 半分の星が必要かどうか
+            $empty_stars = 5 - $full_stars - $half_star; // 空の星の数
+
+            // 完全な星の表示
+            for ($i = 0; $i < $full_stars; $i++) {
+                echo "<span class='star selected'>&#9733;</span>";
+            }
+
+            // 半分の星の表示
+            if ($half_star) {
+                echo "<span class='star half-selected'>&#9733;</span>";
+            }
+
+            // 空の星の表示
+            for ($i = 0; $i < $empty_stars; $i++) {
+                echo "<span class='star'>&#9733;</span>";
+            }
+            echo "</div>";
+
+            // レビューが存在する場合
+            if ($stmt_reviews->rowCount() > 0) {
+                echo "<h3>レビュー</h3>";
+                while ($review = $stmt_reviews->fetch(PDO::FETCH_ASSOC)) {
+                    $reviewer_name = $review['display_name']; // レビュアーの名前
+                    $rating = $review['rate']; // レビューの評価 (1～5など)
+                    $comment = $review['review_content']; // レビュー内容
+
+                    // レビューの表示
+                    echo "<div class='review-card'>";
+                    echo "<p><strong>{$reviewer_name}</strong>さんの評価: ";
+
+                    // 個別の評価も星で表示
+                    echo "<div class='star-rating'>";
+                    $full_stars_review = floor($rating); // 完全な星の数
+                    $half_star_review = ($rating - $full_stars_review) >= 0.5 ? 1 : 0; // 半分の星が必要かどうか
+                    $empty_stars_review = 5 - $full_stars_review - $half_star_review; // 空の星の数
+
+                    // 完全な星の表示
+                    for ($i = 0; $i < $full_stars_review; $i++) {
+                        echo "<span class='star selected'>&#9733;</span>";
+                    }
+
+                    // 半分の星の表示
+                    if ($half_star_review) {
+                        echo "<span class='star half-selected'>&#9733;</span>";
+                    }
+
+                    // 空の星の表示
+                    for ($i = 0; $i < $empty_stars_review; $i++) {
+                        echo "<span class='star'>&#9733;</span>";
+                    }
+                    echo "</div>";
+
+                    echo "</p>";
+                    echo "<p>{$comment}</p>";
+                    echo "</div>";
+                }
+            } else {
+                echo "<p>まだレビューはありません。</p>";
+            }
+        }
+        ?>
+    </div>
+
+
+
     </div>
 
     <script>
@@ -145,4 +351,5 @@ if ($goodsResult['sale_id']) {
         });
     </script>
 </body>
+
 </html>

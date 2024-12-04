@@ -26,7 +26,8 @@ if ($shopId > 0 && $newQuantity > 0) {
             echo 'success';
         } else {
             // 更新失敗
-            echo 'failure: 更新に失敗しました。';
+            echo 'failure: 更新に失敗しまし。';
+            echo $shopId;
         }
     } catch (PDOException $e) {
         // エラーハンドリング
