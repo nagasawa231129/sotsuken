@@ -107,3 +107,42 @@ svg {
 p {
     font-size: 16px;
 }
+
+.modal {
+    display: none; /* 初期状態では非表示 */
+    position: absolute;
+    z-index: 1; /* モーダルが他のコンテンツの上に表示されるように */
+    top: 50%; /* 親要素から50%の位置 */
+    left: 50%; /* 親要素から50%の位置 */
+    transform: translate(-50%, -50%); /* 画面中央に位置合わせ */
+    background-color: rgba(0, 0, 0, 0.4);  /* 背景は透明な黒 */
+    display: flex;
+    justify-content: center;  /* 水平方向の中央に配置 */
+    align-items: center;  /* 垂直方向の中央に配置 */
+}
+
+/* モーダルコンテンツ */
+.modal-content {
+    background-color: #fefefe;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 300px;  /* モーダルの幅を指定 */
+    max-width: 90%;  /* 最大幅を親要素の90%に制限 */
+    box-sizing: border-box;  /* パディングを含むボックスモデル */
+    border-radius: 8px;  /* 角を丸くする */
+}
+
+/* モーダルを閉じるボタン */
+.close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-btn:hover,
+.close-btn:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}

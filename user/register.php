@@ -50,10 +50,19 @@ if ($dbh) {
                 echo "数量: <span id='quantity_$shop_id'>" . $quantity . "</span> 個<br>";
                 echo "合計: <span id='totalAmount_$shop_id'>" . ($price * $quantity) . "円</span><br>";
                 echo "</div>";
+                $cartItemsExist = true;
             } else {
                 echo "<p>shop_id: $shop_id に該当する商品はありません</p>";
             }
-            $cartItemsExist = true;
+
+            $addressSql = "SELECT address FROM user WHERE user_id = :user_id";
+            $stmt = $dbh->prepare($addressSql);
+            $stmt->bindParam(':user_id',$user_id, PDO::PARAM_INT);
+            $stmt->execute();
+            
+            $addressRow = $stmt->fetch(PDO::FETCH_ASSOC);
+            $address = $addressRow['address'] ?? '住所情報がありません';  // 住所がない場合はデフォルトメッセージ
+
         }
     }
 } else {
@@ -87,7 +96,7 @@ function detailCart($dbh, $goods, $user_id, $shop_id, $quantity, $trade_situatio
 }
 
 // データベース接続を閉じる
-$dbh = null;
+// $dbh = null;
 ?>
 
 <!DOCTYPE html>
@@ -97,11 +106,29 @@ $dbh = null;
     <link rel="stylesheet" href="register_style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>決済完了</title>
-    <script src="register_script.js"></script>
+    
 </head>
 <body>
     <p>合計金額: <span id="totalSum" class="info-text"><?php echo htmlspecialchars($sumPrice, ENT_QUOTES, 'UTF-8'); ?>円</span></p>
-    
+
+    <h3>お届け先住所を指定</h3>
+    <p><?php echo htmlspecialchars($address,ENT_QUOTES,'UTF-8') ?></p>
+    <button id="openModalButton">住所変更</button>
+
+    <!-- モーダル -->
+    <div id="modal" class="modal">
+     <div class="modal-content">
+        <span class="close-btn" id="closeModalBtn">&times;</span>
+        
+        <!-- モーダル内にフォームを追加 -->
+        <form action="set_address.php" method="POST">
+            <h3>新しい住所を入力してください</h3>
+            <input type="text" id="new_address" name="new_address" value="<?php echo htmlspecialchars($address, ENT_QUOTES, 'UTF-8')?>" required>
+            <input type="submit" value="変更する">
+        </form>
+     </div>
+    </div>
+
     <div class="container">
         <h1>決済完了</h1>
 
@@ -113,5 +140,28 @@ $dbh = null;
             <p>カートに商品がありません。</p>
         <?php endif; ?>
     </div>
+
+    <script>
+        // モーダルの表示
+        const modal = document.getElementById('modal');
+        const openModalButton = document.getElementById('openModalButton');
+        const closeModalButton = document.getElementById('closeModalBtn');
+
+        openModalButton.onclick = function() {
+            modal.style.display = 'block';
+        };
+
+        // モーダルの閉じるボタン
+        closeModalButton.onclick = function() {
+            modal.style.display = 'none';
+        };
+
+        // モーダル外をクリックして閉じる
+        window.onclick = function(event) {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
 </body>
 </html>

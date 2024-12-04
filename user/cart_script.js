@@ -179,3 +179,11 @@ xhr.send('shop_id=' + shopId + '&quantity=' + newQuantity);
 }
 var totalSum = 0;
 var totalElements
+
+
+var paymentButton = document.getElementById('submit');
+if(paymentButton.style.display === none){
+    <p>カートの中身は空です</p>
+}else{
+    paymentButton.style.display = 'block';
+}
