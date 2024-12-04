@@ -1,0 +1,80 @@
+/* 基本的なレイアウト */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+
+/* トップページリンク */
+a {
+    display: inline-block;
+    margin-bottom: 20px;
+    text-decoration: none;
+    color: #333;
+    font-size: 16px;
+}
+
+/* 注文データの枠 */
+.order-data {
+    background-color: #ffffff;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* 注文時間、カナ、宛名を見やすく表示 */
+h2 {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.data-label {
+    font-weight: bold;
+}
+
+.data-value {
+    margin-left: 10px;
+}
+
+/* 商品情報の枠 */
+.product-data {
+    background-color: #f9f9f9;
+    padding: 15px;
+    margin-top: 15px;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* 商品ごとの情報を行ごとに表示 */
+.product-data p {
+    margin: 5px 0;
+}
+
+/* 商品情報内のラベルと値の間隔 */
+.product-data .data-label {
+    font-weight: bold;
+}
+
+/* 複数の商品情報を一緒に表示 */
+.product-data span.data-value {
+    color: #555;
+}
+
+/* 取引状況を強調表示 */
+.product-data p:last-child {
+    font-weight: bold;
+    color: #007bff;
+}
+
+/* 注文情報の境界線 */
+.order-data .product-data:first-child {
+    border-top: 2px solid #e0e0e0;
+}
+
+/* 取引状況のラベルを目立たせる */
+.order-data .product-data p:last-child {
+    font-weight: bold;
+    color: #ff9800; /* 取引状況に応じて色を変更することも可能 */
+}

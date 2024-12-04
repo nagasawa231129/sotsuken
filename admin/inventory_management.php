@@ -78,12 +78,25 @@
         $current_stock = $stmt->fetchColumn();
 
         $new_stock = max(0, $current_stock + $change_stock);
-
-        $stmt = $dbh->prepare("UPDATE shop SET material = :material WHERE shop_id = :shop_id");
+  
+        // 現在の日時を取得
+        $current_time = date('Y-m-d H:i:s'); // フォーマット: YYYY-MM-DD HH:MM:SS
+        
+        // UPDATE 文で material と arrival を同時に更新
+        $stmt = $dbh->prepare("
+            UPDATE shop 
+            SET material = :material, arrival = :arrival 
+            WHERE shop_id = :shop_id
+        ");
+        
+        // パラメータをバインド
         $stmt->bindParam(':material', $new_stock, PDO::PARAM_INT);
+        $stmt->bindParam(':arrival', $current_time, PDO::PARAM_STR);
         $stmt->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
+        
+        // クエリを実行
         $stmt->execute();
-
+        
         $_SESSION['flash_message'] = '在庫が更新されました。';
         header("Location: inventory_management.php");
         exit();
