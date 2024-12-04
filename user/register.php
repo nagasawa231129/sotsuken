@@ -1,60 +1,102 @@
 <?php
-session_start();
 include '../../db_open.php';  // db_open.phpをインクルードして、$dbhを利用できるようにする
-if (isset($_SESSION['id'])) {
-    $userId = $_SESSION['id'];
-} else {
-    $userId = null;
-}
+
 $sumPrice = 0;
+$cartItemsExist = false;
 
 // データベース接続が成功しているか確認（デバッグ用）
 if ($dbh) {
-    // 接続が成功した場合、データベースからcartテーブルの情報を取得
-    $sql = "SELECT * FROM cart WHERE user_id = :user_id";
-    $result = $dbh->prepare($sql); 
-    $result->bindParam(':user_id', $userId, PDO::PARAM_INT);
-    $result->execute();
-    
+    // カートからデータを取得
+    $sql = "SELECT * FROM cart";
+    $result = $dbh->query($sql);
+
     // クエリが失敗した場合
     if ($result === false) {
         $errorInfo = $dbh->errorInfo();  // PDO::errorInfo()で詳細エラーを取得
-        $shopId = 'クエリ失敗: ' . $errorInfo[2];  // エラーメッセージを表示
+        echo 'クエリ失敗: ' . $errorInfo[2];  // エラーメッセージを表示
     } else {
         echo "<h1>内容をお確かめください</h1>";
+
+        // カートのデータを処理
         while($row = $result->fetch(PDO::FETCH_ASSOC)){
-            $shopId = $row['shop_id'];
+            $cart_id = $row['cart_id'];
+            $user_id = $row['user_id'];
+            $shop_id = $row['shop_id'];
             $quantity = $row['quantity'];
+            $trade_situation = $row['trade_situation'];
+            $order_date = $row['order_date'];
+
             // shopテーブルから商品情報を取得
             $sqlGoods = "SELECT goods, price FROM shop WHERE shop_id = :shop_id";
             $stmt = $dbh->prepare($sqlGoods);
-            $stmt->bindParam(':shop_id', $shopId, PDO::PARAM_INT);
+            $stmt->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
             $stmt->execute();
-            if($stmt->rowCount() > 0){
-                $goodsRow = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            // 商品情報が正しく取得できたか確認
+            $goodsRow = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($goodsRow) {
+                // 商品情報が取得できた場合
                 $goods = $goodsRow['goods'];
                 $price = $goodsRow['price'];
-                
-                $sumPrice = $sumPrice + ($price * $quantity);
+
+                // 合計金額の計算
+                $sumPrice += ($price * $quantity);
 
                 // 商品情報を表示
                 echo "<div class='cart-item'>";
-                echo "<p>商品名: <span class='info-text'>" . htmlspecialchars($goods, ENT_QUOTES, 'UTF-8') . "</span><br>";
+                echo "<p>商品名: <span class='info-text'>" . htmlspecialchars($goods, ENT_QUOTES, 'UTF-8') . "</span><br>"; 
                 echo "価格: <span class='info-text'>" . htmlspecialchars($price, ENT_QUOTES, 'UTF-8') . "円</span><br>";
-                echo "数量: <span id='quantity_$shopId'>" . $quantity . "</span> 個<br>";
-                echo "合計: <span id='totalAmount_$shopId'>" . ($price * $quantity) . "円</span><br>";
+                echo "数量: <span id='quantity_$shop_id'>" . $quantity . "</span> 個<br>";
+                echo "合計: <span id='totalAmount_$shop_id'>" . ($price * $quantity) . "円</span><br>";
                 echo "</div>";
+                $cartItemsExist = true;
             } else {
-                echo "<p>shop_id: $shopId に該当する商品はありません</p>";
+                echo "<p>shop_id: $shop_id に該当する商品はありません</p>";
             }
+
+            $addressSql = "SELECT address FROM user WHERE user_id = :user_id";
+            $stmt = $dbh->prepare($addressSql);
+            $stmt->bindParam(':user_id',$user_id, PDO::PARAM_INT);
+            $stmt->execute();
+            
+            $addressRow = $stmt->fetch(PDO::FETCH_ASSOC);
+            $address = $addressRow['address'] ?? '住所情報がありません';  // 住所がない場合はデフォルトメッセージ
+
         }
     }
 } else {
-    $shopId = '接続失敗';  // 接続が失敗した場合
+    echo 'データベース接続に失敗しました。';  // 接続失敗時のエラーメッセージ
+}
+
+// カート削除関数
+function deleteCart($dbh) {
+    $sql = "DELETE FROM cart";
+    $stmt = $dbh->prepare($sql);
+    $stmt->execute();
+}
+
+// カート詳細追加関数
+function detailCart($dbh, $goods, $user_id, $shop_id, $quantity, $trade_situation, $order_date) {
+    $sql = "INSERT INTO `cart_detail`(`cart_id`, `user_id`, `shop_id`, `quantity`, `trade_situation`, `order_date`) 
+            VALUES (:goods, :user_id, :shop_id, :quantity, :trade_situation, :order_date)";
+
+    $stmt = $dbh->prepare($sql);
+
+    // パラメータをバインド
+    $stmt->bindParam(':goods', $goods, PDO::PARAM_STR);
+    $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $stmt->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
+    $stmt->bindParam(':quantity', $quantity, PDO::PARAM_INT);
+    $stmt->bindParam(':trade_situation', $trade_situation, PDO::PARAM_STR);
+    $stmt->bindParam(':order_date', $order_date, PDO::PARAM_STR);
+
+    // 実行
+    $stmt->execute();
 }
 
 // データベース接続を閉じる
-$dbh = null;
+// $dbh = null;
 ?>
 
 <!DOCTYPE html>
@@ -63,47 +105,63 @@ $dbh = null;
     <meta charset="UTF-8">
     <link rel="stylesheet" href="register_style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>決済用バーコード生成</title>
-    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js"></script>
-</head>
-<p>合計金額: <span id="totalSum" class="info-text"><?php echo htmlspecialchars($sumPrice, ENT_QUOTES, 'UTF-8'); ?>円</span></p>
-<body>
+    <title>決済完了</title>
     
-    <div class="container">
-        <h1>決済用バーコード生成</h1>
-        <button id="payButton">バーコードを表示</button>
+</head>
+<body>
+    <p>合計金額: <span id="totalSum" class="info-text"><?php echo htmlspecialchars($sumPrice, ENT_QUOTES, 'UTF-8'); ?>円</span></p>
 
-        <!-- バーコードを表示するためのSVG要素 -->
-        <svg id="barcodeContainer"></svg>
+    <h3>お届け先住所を指定</h3>
+    <p><?php echo htmlspecialchars($address,ENT_QUOTES,'UTF-8') ?></p>
+    <button id="openModalButton">住所変更</button>
+
+    <!-- モーダル -->
+    <div id="modal" class="modal">
+     <div class="modal-content">
+        <span class="close-btn" id="closeModalBtn">&times;</span>
         
-        <button id="paymentCompleteButton">決済完了</button>
-        
+        <!-- モーダル内にフォームを追加 -->
+        <form action="set_address.php" method="POST">
+            <h3>新しい住所を入力してください</h3>
+            <input type="text" id="new_address" name="new_address" value="<?php echo htmlspecialchars($address, ENT_QUOTES, 'UTF-8')?>" required>
+            <input type="submit" value="変更する">
+        </form>
+     </div>
+    </div>
+
+    <div class="container">
+        <h1>決済完了</h1>
+
+        <?php if($cartItemsExist):?>
+        <form action="payment_complete.php" method="post"  id="paymentForm">
+            <button id="paymentCompleteButton">決済完了</button>
+        </form>
+        <?php else: ?>
+            <p>カートに商品がありません。</p>
+        <?php endif; ?>
     </div>
 
     <script>
-        document.getElementById('payButton').addEventListener('click', function() {
-            // PHPから取得したshop.idの値をJavaScriptに渡す
-            const paymentData = '123456789-' + '<?php echo $shopId; ?>'; // バーコードにするデータ
-            const barcodeContainer = document.getElementById('barcodeContainer');
-            barcodeContainer.innerHTML = ''; // 前のバーコードを消去
+        // モーダルの表示
+        const modal = document.getElementById('modal');
+        const openModalButton = document.getElementById('openModalButton');
+        const closeModalButton = document.getElementById('closeModalBtn');
 
-            // JsBarcodeを使用してバーコードを生成
-            JsBarcode(barcodeContainer, paymentData, {
-                format: 'CODE128',
-                displayValue: true,  // バーコードの値も表示
-                width: 2,           // バーコードの線の幅
-                height: 60,         // バーコードの高さ
-                margin: 10          // バーコードの周りの余白
-            });
+        openModalButton.onclick = function() {
+            modal.style.display = 'block';
+        };
 
-            document.getElementById('paymentCompleteButton').style.display = 'block';
-        });
+        // モーダルの閉じるボタン
+        closeModalButton.onclick = function() {
+            modal.style.display = 'none';
+        };
 
-        document.getElementById('paymentCompleteButton').addEventListener('click', function() {
-            window.location.href = 'payment_complete.php';
-        });
-        
+        // モーダル外をクリックして閉じる
+        window.onclick = function(event) {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
     </script>
-    
 </body>
 </html>
