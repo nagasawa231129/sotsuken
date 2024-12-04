@@ -3,16 +3,18 @@ include "../../../db_open.php"; // PDO接続のファイルをインクルード
 include "../../head.php";
 include "../../header.php";
 echo "<link rel='stylesheet' href='../header.css'>";
-// echo "<link rel='stylesheet' href='category.css'>";
 echo "<link rel='stylesheet' href='tops.css'>";
 
 $sort = isset($_GET['sort']) ? $_GET['sort'] : 'default';
+$brand = isset($_GET['brand']) && $_GET['brand'] !== '' ? $_GET['brand'] : null;
 
+// SQL文の初期設定
+$sql = "SELECT shop.*, sale.* FROM shop LEFT OUTER JOIN sale ON sale.sale_id = shop.sale_id WHERE shop.category_id = '1'";
 
-$sql = "SELECT shop.*, sale.*
-        FROM shop 
-        LEFT OUTER JOIN sale ON sale.sale_id = shop.sale_id
-        WHERE shop.category_id = '1'";
+// ブランドフィルタがある場合の条件追加
+if ($brand !== null) {
+    $sql .= " AND shop.brand_id = ?";
+}
 
 // ソート条件に応じてクエリを追加
 switch ($sort) {
@@ -29,13 +31,27 @@ switch ($sort) {
         $sql .= " ORDER BY shop.buy DESC";
         break;
     default:
-        //セール商品
+        // セール商品
         $sql .= " ORDER BY shop.sale_id DESC";
         break;
 }
 
-$stmt = $dbh->query($sql);
+// ブランドフィルタがある場合、パラメータをバインド
+$params = [];
+if ($brand !== null) {
+    $params[] = $brand;
+}
+
+// SQL実行
+$stmt = $dbh->prepare($sql);
+$stmt->execute($params);
 $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// ブランドリストの取得
+$sql = "SELECT * FROM brand";
+$stmt = $dbh->prepare($sql);
+$stmt->execute();
+$brands = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -138,6 +154,21 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <option value="price_desc" <?php echo isset($_GET['sort']) && $_GET['sort'] === 'price_desc' ? 'selected' : ''; ?>>価格の高い順</option>
                     <option value="new_arrivals" <?php echo isset($_GET['sort']) && $_GET['sort'] === 'new_arrivals' ? 'selected' : ''; ?>>新着順</option>
                 </select>
+
+                <select name="brand" id="brand" onchange="this.form.submit()">
+                    <option value="">すべて</option> <!-- デフォルトで「すべて」選択肢を表示 -->
+                    <?php
+                    // ブランドを表示
+                    foreach ($brands as $brand_option) {
+                        $brand_id = htmlspecialchars($brand_option['brand_id']);
+                        $brand_name = htmlspecialchars($brand_option['brand_name']);
+
+                        // 選択されているブランドを保持
+                        $selected = (isset($_GET['brand']) && $_GET['brand'] === $brand_id) ? 'selected' : '';
+                        echo "<option value=\"$brand_id\" $selected>$brand_name</option>";
+                    }
+                    ?>
+                </select>
             </form>
 
             <h2>トップス 商品一覧</h2>
@@ -156,8 +187,8 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <div>元値: ¥<?php echo htmlspecialchars(number_format($product['original_price']), ENT_QUOTES, 'UTF-8'); ?></div>
                                     <div>セール: <?php echo htmlspecialchars($product['sale'], ENT_QUOTES, 'UTF-8'); ?>%</div>
                                     <div>人気: <?php echo htmlspecialchars($product['buy'], ENT_QUOTES, 'UTF-8'); ?></div>
+                                    <div>ブランド: <?php echo htmlspecialchars($product['brand_id'], ENT_QUOTES, 'UTF-8'); ?></div>
                                 </a>
-
                             </li>
                         <?php endforeach; ?>
                     <?php else: ?>

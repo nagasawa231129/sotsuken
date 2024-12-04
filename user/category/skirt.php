@@ -3,16 +3,18 @@ include "../../../db_open.php"; // PDO接続のファイルをインクルード
 include "../../head.php";
 include "../../header.php";
 echo "<link rel='stylesheet' href='../header.css'>";
-// echo "<link rel='stylesheet' href='category.css'>";
 echo "<link rel='stylesheet' href='tops.css'>";
 
 $sort = isset($_GET['sort']) ? $_GET['sort'] : 'default';
+$brand = isset($_GET['brand']) && $_GET['brand'] !== '' ? $_GET['brand'] : null;
 
+// SQL文の初期設定
+$sql = "SELECT shop.*, sale.* FROM shop LEFT OUTER JOIN sale ON sale.sale_id = shop.sale_id WHERE shop.category_id = '1'";
 
-$sql = "SELECT shop.*, sale.*
-        FROM shop 
-        LEFT OUTER JOIN sale ON sale.sale_id = shop.sale_id
-        WHERE shop.category_id = '4'";
+// ブランドフィルタがある場合の条件追加
+if ($brand !== null) {
+    $sql .= " AND shop.brand_id = ?";
+}
 
 // ソート条件に応じてクエリを追加
 switch ($sort) {
@@ -29,13 +31,27 @@ switch ($sort) {
         $sql .= " ORDER BY shop.buy DESC";
         break;
     default:
-        //セール商品
-        $sql .= " ORDER BY shop.sale_id ASC";
+        // セール商品
+        $sql .= " ORDER BY shop.sale_id DESC";
         break;
 }
 
-$stmt = $dbh->query($sql);
+// ブランドフィルタがある場合、パラメータをバインド
+$params = [];
+if ($brand !== null) {
+    $params[] = $brand;
+}
+
+// SQL実行
+$stmt = $dbh->prepare($sql);
+$stmt->execute($params);
 $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// ブランドリストの取得
+$sql = "SELECT * FROM brand";
+$stmt = $dbh->prepare($sql);
+$stmt->execute();
+$brands = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -130,13 +146,28 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </ul>
         </aside>
         <div class="products-section">
-            <form method="get" class="sort-form">
+        <form method="get" class="sort-form">
                 <select name="sort" id="sort" onchange="this.form.submit()">
                     <option value="sale" <?php echo isset($_GET['sort']) && $_GET['sort'] === 'sale' ? 'selected' : ''; ?>>おすすめ順</option>
                     <option value="favorite" <?php echo isset($_GET['sort']) && $_GET['sort'] === 'favorite' ? 'selected' : ''; ?>>人気順</option>
                     <option value="price_asc" <?php echo isset($_GET['sort']) && $_GET['sort'] === 'price_asc' ? 'selected' : ''; ?>>価格の安い順</option>
                     <option value="price_desc" <?php echo isset($_GET['sort']) && $_GET['sort'] === 'price_desc' ? 'selected' : ''; ?>>価格の高い順</option>
                     <option value="new_arrivals" <?php echo isset($_GET['sort']) && $_GET['sort'] === 'new_arrivals' ? 'selected' : ''; ?>>新着順</option>
+                </select>
+
+                <select name="brand" id="brand" onchange="this.form.submit()">
+                    <option value="">すべて</option> <!-- デフォルトで「すべて」選択肢を表示 -->
+                    <?php
+                    // ブランドを表示
+                    foreach ($brands as $brand_option) {
+                        $brand_id = htmlspecialchars($brand_option['brand_id']);
+                        $brand_name = htmlspecialchars($brand_option['brand_name']);
+
+                        // 選択されているブランドを保持
+                        $selected = (isset($_GET['brand']) && $_GET['brand'] === $brand_id) ? 'selected' : '';
+                        echo "<option value=\"$brand_id\" $selected>$brand_name</option>";
+                    }
+                    ?>
                 </select>
             </form>
 
