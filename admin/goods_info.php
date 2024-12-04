@@ -22,7 +22,7 @@ if (isset($_POST['update'])) {
                    SET goods = :goods, price = :price, size = :size, color = :color, category_id = :category, 
                        subcategory_id = :subcategory, gender = :gender, brand_id = :brand 
                    WHERE shop_id = :shop_id";
-    
+
     // SQLの準備
     $stmt = $dbh->prepare($update_sql);
     $stmt->bindParam(':goods', $goods);
@@ -76,7 +76,8 @@ $sql = "SELECT
             size.size,
             subcategory.subcategory_name,
             category.category_name,
-            shop.subcategory_id AS subcategory_id
+            shop.subcategory_id AS subcategory_id,
+            shop.thumbnail
         FROM shop
         LEFT JOIN brand ON shop.brand_id = brand.brand_id  
         LEFT JOIN color ON shop.color = color.color_id  
@@ -91,9 +92,9 @@ $stmt = $dbh->prepare($sql);
 $stmt->bindValue(':search_query', '%' . $search_query . '%', PDO::PARAM_STR);
 $stmt->execute();
 ?>
-
-<div style="position: relative; height: 100px;">
+<div class="select">
     <button id="add-button" onclick="location.href='add_goods.php'">追加</button>
+    <button id="sale-button" onclick="location.href='sale.php'">セール</button>
 </div>
 
 <div class="form-container">
@@ -108,9 +109,10 @@ $stmt->execute();
     <table>
         <thead>
             <tr>
+                <th>サムネ</th>
                 <th>ブランド</th>
                 <th>商品名</th>
-                <th>価格</th>
+                <th>価格(円)</th>
                 <th>サイズ</th>
                 <th>色</th>
                 <th>カテゴリ</th>
@@ -139,7 +141,8 @@ $stmt->execute();
                                         size.size,
                                         subcategory.subcategory_name,
                                         category.category_name,
-                                        shop.subcategory_id AS subcategory_id
+                                        shop.subcategory_id AS subcategory_id,
+                                   
                                     FROM shop
                                     LEFT JOIN brand ON shop.brand_id = brand.brand_id  
                                     LEFT JOIN color ON shop.color = color.color_id  
@@ -153,9 +156,22 @@ $stmt->execute();
 
             <?php if ($stmt->rowCount() > 0): ?>
                 <?php while ($product = $stmt->fetch(PDO::FETCH_ASSOC)): ?>
-                    <tr>
-                        <form method="post" action="">
-                            <input type="hidden" name="shop_id" value="<?= htmlspecialchars($product['shop_id']) ?>">
+
+                    <form method="post" action="">
+                        <input type="hidden" name="shop_id" value="<?= htmlspecialchars($product['shop_id']) ?>">
+                        <tr>
+
+                            <td>
+                                <?php
+                                $imgBlob = $product['thumbnail']; // サムネイルのBLOBデータ
+                                $shopId = $product['shop_id'];    // shop_idを取得
+                                if ($imgBlob) {
+                                    $encodedImg = base64_encode($imgBlob); // Base64エンコード
+                                    // 画像をクリックするとモーダルが開くように設定
+                                    echo "<img src='data:image/jpeg;base64,$encodedImg' alt='サムネイル' width='100' class='thumbnail' data-shop-id='$shopId' />";
+                                }
+                                ?>
+                            </td>
                             <td>
                                 <select name="brand" required>
                                     <?php
@@ -168,9 +184,9 @@ $stmt->execute();
                                 </select>
                             </td>
                             <td><input type="text" name="goods" value="<?= htmlspecialchars($product['goods']) ?>" required></td>
-                            <td><input type="number" name="price" value="<?= htmlspecialchars($product['price']) ?>" required></td>
+                            <td class="price-select"><input type="number" name="price" value="<?= htmlspecialchars($product['price']) ?>" required></td>
                             <td>
-                                <select name="size" required>
+                                <select name="size" class="size-select" required>
                                     <?php
                                     $size_sql = "SELECT size_id, size FROM size";
                                     foreach ($dbh->query($size_sql) as $size_option) {
@@ -233,7 +249,14 @@ $stmt->execute();
                             <td>
                                 <button type="submit" name="delete">削除</button>
                             </td>
-                        </form>
+                    </form>
+                    <div id="imageModal" class="modal">
+                        <div class="modal-content" id="modalContent">
+                            <!-- ここに画像が追加されます -->
+                        </div>
+                        <span id="closeModal" class="close">&times;</span>
+                    </div>
+
                     </tr>
                 <?php endwhile; ?>
             <?php else: ?>
@@ -262,4 +285,49 @@ $stmt->execute();
         };
         xhr.send();
     }
+    const thumbnails = document.querySelectorAll('.thumbnail');
+    const modal = document.getElementById('imageModal');
+    const modalContent = document.getElementById('modalContent');
+    const closeModal = document.getElementById('closeModal');
+
+    thumbnails.forEach(thumbnail => {
+        thumbnail.addEventListener('click', function() {
+            const shopId = this.dataset.shopId; // クリックしたサムネイルのshop_idを取得
+            fetch(`show_images.php?shop_id=${shopId}`) // shop_idを渡して画像を取得
+                .then(response => response.json()) // 画像のBase64エンコードされた配列を取得
+                .then(images => {
+                    // モーダル内のコンテンツをクリア
+                    modalContent.innerHTML = '';
+
+                    if (images.length > 0) {
+                        // 画像を順にモーダルに追加
+                        images.forEach(encodedImg => {
+                            const imgElement = document.createElement('img');
+                            imgElement.src = encodedImg; // Base64エンコードされた画像をセット
+                            imgElement.alt = '商品画像';
+                            modalContent.appendChild(imgElement); // モーダル内に画像を追加
+                        });
+                        modal.style.display = 'flex'; // モーダルを表示
+                    } else {
+                        modalContent.innerHTML = "画像が見つかりません"; // 画像がない場合
+                        modal.style.display = 'flex'; // モーダルを表示
+                    }
+                })
+                .catch(error => {
+                    console.error("画像の取得に失敗しました:", error);
+                });
+        });
+    });
+
+    // モーダルを閉じる処理
+    closeModal.addEventListener('click', function() {
+        modal.style.display = 'none';
+    });
+
+    // モーダルの外側をクリックすると閉じる
+    window.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
 </script>

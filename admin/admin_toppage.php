@@ -1,6 +1,6 @@
 <?php
 // 未読メール数を取得
-$unreadCount = include('get_unread_count.php');
+// $unreadCount = include('get_unread_count.php');
 ?>
 
 <!DOCTYPE html>
@@ -22,7 +22,7 @@ $unreadCount = include('get_unread_count.php');
   </a>
   <a href="https://mail.google.com/mail/u/1/#inbox" class="admin-button">
     メール管理
-    <span class="notification-badge" id="emailBadge"><?php echo $unreadCount; ?></span> <!-- 未読メール数 -->
+    <span class="notification-badge" id="emailBadge"></span> <!-- 未読メール数 -->
   </a>
   <a href="inventory_management.php" class="admin-button">
     在庫管理

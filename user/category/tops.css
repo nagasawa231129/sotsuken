@@ -1,0 +1,211 @@
+/* サイドバーのスタイル */
+.sidebar {
+    width: 250px;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+    height: auto; /* コンテンツに合わせて高さを自動調整 */
+    position: relative; /* サブカテゴリーを親要素内に収めるための位置設定 */
+    overflow-y: auto; /* コンテンツが多くなった場合、スクロールできるようにする */
+}
+
+/* メインカテゴリのリスト */
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* メインカテゴリアイテム */
+.sidebar ul li {
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+/* メインカテゴリリンク */
+.sidebar ul li > a {
+    text-decoration: none;
+    color: #333;
+    display: block;
+}
+
+/* カテゴリーリストの基本設定 */
+.category-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.category-item {
+    position: relative; /* サブカテゴリーのドロップダウンに必要 */
+}
+
+/* 各カテゴリリンクのスタイル */
+.category-item > a {
+    display: block;
+    padding: 10px 15px;
+    text-decoration: none;
+    color: #333;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.category-item > a:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+/* サブカテゴリーの非表示設定 */
+.sub-category {
+    display: none;
+    list-style: none;
+    padding-left: 20px; /* サブカテゴリーのインデント */
+    margin: 0;
+    background-color: #f8f9fa; /* サブカテゴリも親カテゴリと同じ背景色 */
+}
+
+/* 親カテゴリリンクをホバーした時にサブカテゴリーを表示 */
+.category-item:hover .sub-category {
+    display: block;
+}
+
+/* サブカテゴリーのリンクのスタイル */
+.sub-category li a {
+    display: block;
+    padding: 8px 15px;
+    text-decoration: none;
+    color: #333;
+    font-size: 14px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* サブカテゴリーのリンクにホバーした時 */
+.sub-category li a:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+/* サブカテゴリーにサブサブカテゴリーがあった場合のスタイル */
+.sub-category li:hover > .sub-category {
+    display: block; /* サブサブカテゴリーも表示 */
+    position: absolute; /* 親カテゴリーの右側に表示 */
+    left: 100%;
+    top: 0;
+    padding-left: 10px;
+}
+
+.main-content {
+    display: flex;
+    align-items: flex-start; /* 子要素を上揃え */
+    gap: 20px; /* サイドバーと商品一覧の間に余白 */
+    padding: 20px;
+    background-color: #f8f9fa;
+    width: 100%; /* 親要素の幅を100%に */
+    box-sizing: border-box;
+}
+
+.products-section {
+    flex: 1; /* サイドバー以外の空間を商品一覧が占める */
+    display: flex;
+    flex-direction: column; /* タイトル、ソートフォーム、商品一覧を縦並びに */
+    gap: 20px; /* 各要素間に余白 */
+}
+
+.products-section h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0;
+    color: #333;
+    text-align: left;
+}
+
+/* ソートフォーム */
+.sort-form {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* 右寄せ */
+    gap: 10px; /* ラベルとセレクトボックスの間に余白 */
+}
+
+/* 商品一覧 */
+.products-container ul {
+    display: flex;
+    flex-wrap: wrap; /* 商品を折り返して表示 */
+    gap: 20px; /* 各商品間の間隔 */
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.products-container ul li {
+    flex: 0 0 23%; /* 横に4つ並べる（余白込みで） */
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.products-container ul li a {
+    display: block;
+    text-decoration: none;
+    color: #333;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+    transition: 0.3s;
+}
+
+.products-container ul li a:hover {
+    background-color: #f9f9f9;
+    border-color: #bbb;
+}
+
+/* 並び替えフォームのスタイル */
+.sort-form {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* フォームを右寄せ */
+    margin: 20px 0; /* 上下に適度な余白を追加 */
+}
+
+.sort-form label {
+    font-size: 16px;
+    margin-right: 10px; /* ラベルとセレクトボックスの間に余白 */
+}
+
+.sort-form select {
+    padding: 5px 10px; /* 内側の余白を調整 */
+    font-size: 16px;
+    border: 1px solid #ddd; /* セレクトボックスの境界線 */
+    border-radius: 5px; /* 角を丸く */
+    background-color: #f9f9f9; /* 背景色を薄いグレー */
+    cursor: pointer; /* 選択可能なデザイン */
+    transition: background-color 0.3s, border-color 0.3s; /* ホバー時のスムーズな変化 */
+}
+
+.sort-form select:hover {
+    background-color: #fff; /* ホバー時に背景を白に */
+    border-color: #bbb; /* 境界線を少し濃く */
+}
+
+/* レスポンシブ調整 */
+@media (max-width: 768px) {
+    .main-content {
+        flex-direction: column; /* 縦並びに切り替え */
+    }
+
+    .sidebar {
+        width: 100%;
+    }
+
+    .products-section {
+        width: 100%;
+    }
+
+    .products-container ul li {
+        flex: 0 0 48%; /* 2列表示に変更 */
+    }
+}

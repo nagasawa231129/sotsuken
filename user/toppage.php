@@ -8,6 +8,7 @@ if (isset($_SESSION['id'])) {
 } else {
     $userId = null;
 }
+var_dump($userId);
 $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ja';
 
 // // 言語ファイルのパスを設定
