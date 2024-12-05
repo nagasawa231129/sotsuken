@@ -75,18 +75,8 @@ if ($sale_id) {
 }
 
 
-
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply_discount'])) {
-    // 割引を適用する
-    // $selected_items = $_POST['selected_items'] ?? [];
-
-    // // デバッグ表示
-    // echo '<pre>';
-    // print_r($selected_items);
-    // echo '</pre>';
     if (!empty($selected_items)) {
-
         foreach ($selected_items as $shop_id) {
             // 割引前の価格を取得
             $get_price_stmt = $dbh->prepare("SELECT original_price FROM shop WHERE shop_id = :shop_id");
@@ -99,18 +89,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply_discount'])) {
             $discounted_price = $original_price * (1 - $sale_percentage / 100);
 
             // sale_idを取得（$_POST['sale_id']から）
-            $sale_id = $_POST['sale_id'];  // 割引率を適用するsale_idを指定
+            $sale_id = $_POST['sale_id'];
 
-            // `price`に割引後の価格を、`discount_price`に元の価格を設定、`sale_id`も更新
+            // `price`に割引後の価格を、`sale_id`を更新
             $update_stmt = $dbh->prepare("UPDATE shop 
                                           SET price = :discounted_price, 
-                                        sale_id = :sale_id 
+                                              sale_id = :sale_id 
                                           WHERE shop_id = :shop_id");
             $update_stmt->bindValue(':shop_id', $shop_id, PDO::PARAM_INT);
             $update_stmt->bindValue(':discounted_price', $discounted_price, PDO::PARAM_STR);
             $update_stmt->bindValue(':sale_id', $sale_id, PDO::PARAM_INT);  // sale_idの更新
             $update_stmt->execute();
+
+            // favoriteテーブルからこの商品をお気に入りにしているユーザーを取得
+            $favorite_stmt = $dbh->prepare("SELECT user_id, favorite_id FROM favorite WHERE shop_id = :shop_id");
+            $favorite_stmt->bindValue(':shop_id', $shop_id, PDO::PARAM_INT);
+            $favorite_stmt->execute();
+
+            // お気に入りユーザーに通知を送信
+            while ($favorite = $favorite_stmt->fetch(PDO::FETCH_ASSOC)) {
+                $user_id = $favorite['user_id'];
+                $favorite_id = $favorite['favorite_id'];
+
+                // 通知を追加する
+                $notification_title = "割引のお知らせ: 商品が割引されました!";
+                $notification_content = "お気に入りの商品が" . $sale_percentage . "%割引されました。新しい価格は " . number_format($discounted_price) . " 円です。";
+                $insert_notification_stmt = $dbh->prepare("INSERT INTO notification (user_id, title, content, favorite_id, brand_id, shop_id, read_status) 
+                                           VALUES (:user_id, :title, :content, :favorite_id, 
+                                                   (SELECT brand_id FROM shop WHERE shop_id = :shop_id_sub), 
+                                                   :shop_id, 0)");
+                $insert_notification_stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
+                $insert_notification_stmt->bindValue(':title', $notification_title, PDO::PARAM_STR);
+                $insert_notification_stmt->bindValue(':content', $notification_content, PDO::PARAM_STR);
+                $insert_notification_stmt->bindValue(':favorite_id', $favorite_id, PDO::PARAM_INT);
+                $insert_notification_stmt->bindValue(':shop_id', $shop_id, PDO::PARAM_INT);
+                $insert_notification_stmt->bindValue(':shop_id_sub', $shop_id, PDO::PARAM_INT); // サブクエリ用に追加
+                $insert_notification_stmt->execute();
+            }
         }
+
         header("Location: " . $_SERVER['REQUEST_URI']);
         exit();
     }

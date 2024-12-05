@@ -1,9 +1,14 @@
 <?php
 session_start();
+if (isset($_SESSION['id'])) {
+    $userId = $_SESSION['id'];
+} else {
+    $userId = null;
+}
 $user_name = isset($_SESSION['login']) ? $_SESSION['display_name'] : 'ゲスト';
 $supported_languages = ['ja', 'en'];
-$lang = isset($_SESSION['lang']) && in_array($_SESSION['lang'], $supported_languages) 
-    ? $_SESSION['lang'] 
+$lang = isset($_SESSION['lang']) && in_array($_SESSION['lang'], $supported_languages)
+    ? $_SESSION['lang']
     : 'ja';
 
 // 言語ファイルの絶対パスを指定
@@ -15,6 +20,12 @@ if (file_exists($languageFile)) {
 } else {
     die("Error: Language file not found.");
 }
+
+$notification_count_stmt = $dbh->prepare("SELECT COUNT(*) FROM notification WHERE user_id = :user_id AND read_status = 0");
+$notification_count_stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+$notification_count_stmt->execute();
+$unread_count = $notification_count_stmt->fetchColumn();
+
 ?>
 
 <script src="https://cdn.i18next.com/i18next.min.js"></script>
@@ -195,16 +206,22 @@ if (file_exists($languageFile)) {
         </div>
     </div>
     <div class="icon">
-        <a href="/sotsuken/sotsuken/user/login.php" data-i18n="login"><?php echo $translations['login']?></a>
-        <a href="/sotsuken/sotsuken/user/notification.php" data-i18n="🔔"><?php echo $translations['🔔']?></a>
-        <a href="/sotsuken/sotsuken/user/cart.php" data-i18n="cart"><?php echo $translations['cart']?></a>
-        <a href="/sotsuken/sotsuken/user/favorite.php" data-i18n="♡"><?php echo $translations['♡']?></a>
+        <a href="/sotsuken/sotsuken/user/login.php" data-i18n="login"><?php echo $translations['login'] ?></a>
+        <a href="/sotsuken/sotsuken/user/notification.php" data-i18n="🔔">
+            <?php echo $translations['🔔']; ?>
+            <?php if ($unread_count > 0): ?>
+                <span class="notification-count"><?php echo $unread_count; ?></span>
+            <?php endif; ?>
+
+        </a>
+        <a href="/sotsuken/sotsuken/user/cart.php" data-i18n="cart"><?php echo $translations['cart'] ?></a>
+        <a href="/sotsuken/sotsuken/user/favorite.php" data-i18n="♡"><?php echo $translations['♡'] ?></a>
         <div class="user-menu">
             <span class="user-name"><?php echo htmlspecialchars($user_name); ?></span>
             <div class="dropdown-menu">
-                <a href="/sotsuken/sotsuken/user/account.php" data-i18n="info"><?php echo $translations['info']?></a>
-                <a href="/sotsuken/sotsuken/user/order.php" data-i18n="order"><?php echo $translations['order']?></a>
-                <a href="/sotsuken/sotsuken/user/logout.php" data-i18n="logout"><?php echo $translations['logout']?></a>
+                <a href="/sotsuken/sotsuken/user/account.php" data-i18n="info"><?php echo $translations['info'] ?></a>
+                <a href="/sotsuken/sotsuken/user/order.php" data-i18n="order"><?php echo $translations['order'] ?></a>
+                <a href="/sotsuken/sotsuken/user/logout.php" data-i18n="logout"><?php echo $translations['logout'] ?></a>
             </div>
         </div>
     </div>
