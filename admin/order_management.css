@@ -78,3 +78,108 @@ h2 {
     font-weight: bold;
     color: #ff9800; /* 取引状況に応じて色を変更することも可能 */
 }
+        /* タブのスタイル */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .tab {
+            margin: 0 10px;
+            padding: 10px 20px;
+            text-decoration: none;
+            color: #555;
+            font-weight: bold;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .tab:hover {
+            background-color: #0078d7;
+            color: #fff;
+        }
+
+        .tab.active {
+            background-color: #0078d7;
+            color: #fff;
+        }
+
+        /* コンテンツスタイル */
+        .order-data {
+            margin: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+
+        .data-label {
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        .product-data {
+            margin-left: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+
+        input[type="submit"] {
+            background-color: #0078d7;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #005bb5;
+        }
+
+        /* モーダルの基本スタイル */
+/* モーダルの基本スタイル */
+.modal {
+    display: none; /* 初期状態で非表示にする */
+    position: fixed;
+    z-index: 1000;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%); /* 完全な中央揃え */
+    width: 70%; /* 必要に応じて調整可能 */
+    max-width: 600px; /* 最大幅を設定 */
+    background-color: rgba(0, 0, 0, 0.8); /* 背景の黒さを少し抑える */
+    padding: 20px;
+    border-radius: 10px; /* 角丸で柔らかい印象に */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* モーダル内の画像スタイル */
+.modal-content {
+    max-width: 100%;
+    max-height: 80vh;
+    border: 2px solid white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* モーダルの閉じるボタン */
+.close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    color: white;
+    font-size: 25px;
+    font-weight: bold;
+    cursor: pointer;
+}
