@@ -46,10 +46,6 @@ if (file_exists($lang_file)) {
 <!DOCTYPE html>
 <html lang="ja">
 
-<!-- <link rel='stylesheet' href='header.css'>
-
-<link rel='stylesheet' href='account.css'> -->
-
 <body>
     <div class="container">
         <!-- サブ項目 -->
@@ -64,15 +60,10 @@ if (file_exists($lang_file)) {
                 <hr>
                 <!-- 注文履歴 -->
                 <li><strong>注文履歴</strong></li>
-                <li><a href="order.php">注文履歴</a></li>
-                <li><a href="order">発送前商品</a></li>
-                <li><a href="order">発送済み商品</a></li>
-                <li><a href="review.php">レビュー</a></li>
-                <hr>
-                <!-- セキュリティ -->
-                <li><strong>セキュリティ</strong></li>
-                <li><a href="security.php">ログイン通知の設定</a></li>
-                <li><a href="login-history.php">ログイン履歴</a></li>
+                <li><a href="order.php#history">注文履歴</a></li>
+                <li><a href="order.php#pending">発送前商品</a></li>
+                <li><a href="order.php#shipped">発送済み商品</a></li>
+                <li><a href="order.php#review">レビュー</a></li>
                 <hr>
                 <!-- 退会 -->
                 <li><strong>退会</strong></li>
@@ -88,6 +79,9 @@ if (file_exists($lang_file)) {
                     <h2>会員登録情報</h2>
                     <table>
                         <tr>
+                            <td><?php echo htmlspecialchars($user['display_name']); ?></td>
+                        </tr>
+                        <tr>
                             <td><?php echo htmlspecialchars($user['sei']); ?><?php echo htmlspecialchars($user['mei']); ?></td>
                         </tr>
                         <tr>
@@ -96,12 +90,34 @@ if (file_exists($lang_file)) {
                         <tr>
                             <td><?php echo htmlspecialchars($user['gender']); ?></td>
                         </tr>
-                        <tr>
-                            <td><?php echo htmlspecialchars(strval($user['postcode'])); ?></td>
-                        </tr>
-                        <tr>
-                            <td><?php echo htmlspecialchars($user['address']); ?></td>
-                        </tr>
+
+                        <?php if (!empty($user['postcode']) && $user['postcode'] != '0'): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars(strval($user['postcode'])); ?></td>
+                            </tr>
+                            <tr>
+                                <td><?php echo htmlspecialchars($user['address']); ?></td>
+                            </tr>
+                        <?php endif; ?>
+
+                        <?php if (!empty($user['postcode2']) && $user['postcode2'] != '0'): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars(strval($user['postcode2'])); ?></td>
+                            </tr>
+                            <tr>
+                                <td><?php echo htmlspecialchars($user['address2']); ?></td>
+                            </tr>
+                        <?php endif; ?>
+
+                        <?php if (!empty($user['postcode3']) && $user['postcode3'] != '0'): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars(strval($user['postcode3'])); ?></td>
+                            </tr>
+                            <tr>
+                                <td><?php echo htmlspecialchars($user['address3']); ?></td>
+                            </tr>
+                        <?php endif; ?>
+
                         <tr>
                             <td><?php echo htmlspecialchars(formatPhoneNumber($user['phone'])); ?></td>
                         </tr>

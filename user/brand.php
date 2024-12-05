@@ -53,7 +53,7 @@ foreach ($brands as $brand) {
                             <?php foreach ($brand_groups[$letter] as $brand): ?>
                                 <?php
                                 // ブランドの詳細ページへのリンクURLを作成
-                                $brand_url = "brand_detail.php?brand_id=" . $brand['brand_id'];
+                                $brand_url = "brand_detail.php?brand=" . $brand['brand_id'];
                                 ?>
                                 <li class="brand-item">
                                     <a href="<?php echo $brand_url; ?>" class="brand-link"><?php echo $brand['brand_name']; ?></a>
