@@ -1,24 +1,23 @@
 <!DOCTYPE html>
 <html lang="ja">
-<link rel="stylesheet" href="inventory_management.css">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="inventory_management.css">
     <title>在庫管理ページ</title>
-
-    
 </head>
 
 <body>
     <h2 style="text-align: center;">在庫管理ページ</h2>
 
+    <!-- 検索フォーム -->
     <div class="search-container">
         <form method="GET" action="" name="search">
             <input type="text" name="query" placeholder="商品名で検索" value="<?= isset($_GET['query']) ? htmlspecialchars($_GET['query'], ENT_QUOTES, 'UTF-8') : '' ?>" required>
             <input type="submit" value="検索">
         </form>
 
+        <!-- 検索後に全て表示ボタンを表示 -->
         <?php if (isset($_GET['query']) && !empty($_GET['query'])): ?>
             <a href="inventory_management.php">
                 <button>全て表示</button>
@@ -83,11 +82,7 @@
         $current_time = date('Y-m-d H:i:s'); // フォーマット: YYYY-MM-DD HH:MM:SS
         
         // UPDATE 文で material と arrival を同時に更新
-        $stmt = $dbh->prepare("
-            UPDATE shop 
-            SET material = :material, arrival = :arrival 
-            WHERE shop_id = :shop_id
-        ");
+        $stmt = $dbh->prepare("UPDATE shop SET material = :material, arrival = :arrival WHERE shop_id = :shop_id");
         
         // パラメータをバインド
         $stmt->bindParam(':material', $new_stock, PDO::PARAM_INT);
@@ -150,62 +145,56 @@
     </table>
 
     <!-- モーダルのHTML -->
-<div id="imageModal" class="modal">
-    <div class="modal-content" id="modalContent">
-        <!-- ここに画像が追加されます -->
+    <div id="imageModal" class="modal">
+        <div class="modal-content" id="modalContent">
+            <!-- ここに画像が追加されます -->
+        </div>
+        <span id="closeModal" class="close">&times;</span>
     </div>
-    <span id="closeModal" class="close">&times;</span>
-</div>
 
     <script>
-// サムネイル画像をクリックした時の処理
-const thumbnails = document.querySelectorAll('.thumbnail');
-const modal = document.getElementById('imageModal');
-const modalContent = document.getElementById('modalContent');
-const closeModal = document.getElementById('closeModal');
+        // サムネイル画像をクリックした時の処理
+        const thumbnails = document.querySelectorAll('.thumbnail');
+        const modal = document.getElementById('imageModal');
+        const modalContent = document.getElementById('modalContent');
+        const closeModal = document.getElementById('closeModal');
 
-thumbnails.forEach(thumbnail => {
-    thumbnail.addEventListener('click', function() {
-        const shopId = this.dataset.shopId;  // クリックしたサムネイルのshop_idを取得
-        fetch(`show_images.php?shop_id=${shopId}`)  // shop_idを渡して画像を取得
-            .then(response => response.json())  // 画像のBase64エンコードされた配列を取得
-            .then(images => {
-                // モーダル内のコンテンツをクリア
-                modalContent.innerHTML = '';
+        thumbnails.forEach(thumbnail => {
+            thumbnail.addEventListener('click', function() {
+                const shopId = this.dataset.shopId;  // クリックしたサムネイルのshop_idを取得
+                fetch(`show_images.php?shop_id=${shopId}`)  // shop_idを渡して画像を取得
+                    .then(response => response.json())  // 画像のBase64エンコードされた配列を取得
+                    .then(images => {
+                        // モーダル内のコンテンツをクリア
+                        modalContent.innerHTML = '';
 
-                if (images.length > 0) {
-                    // 画像を順にモーダルに追加
-                    images.forEach(encodedImg => {
-                        const imgElement = document.createElement('img');
-                        imgElement.src = encodedImg;  // Base64エンコードされた画像をセット
-                        imgElement.alt = '商品画像';
-                        modalContent.appendChild(imgElement);  // モーダル内に画像を追加
+                        if (images.length > 0) {
+                            // 画像を順にモーダルに追加
+                            images.forEach(encodedImg => {
+                                const imgElement = document.createElement('img');
+                                imgElement.src = encodedImg;  // Base64エンコードされた画像をセット
+                                imgElement.alt = '商品画像';
+                                modalContent.appendChild(imgElement);  // モーダル内に画像を追加
+                            });
+                            modal.style.display = 'flex';  // モーダルを表示
+                        } else {
+                            modalContent.innerHTML = "画像が見つかりません";  // 画像がない場合
+                            modal.style.display = 'flex';  // モーダルを表示
+                        }
                     });
-                    modal.style.display = 'flex';  // モーダルを表示
-                } else {
-                    modalContent.innerHTML = "画像が見つかりません";  // 画像がない場合
-                    modal.style.display = 'flex';  // モーダルを表示
-                }
-            })
-            .catch(error => {
-                console.error("画像の取得に失敗しました:", error);
             });
-    });
-});
+        });
 
-// モーダルを閉じる処理
-closeModal.addEventListener('click', function() {
-    modal.style.display = 'none';
-});
+        closeModal.addEventListener('click', function() {
+            modal.style.display = 'none';  // モーダルを閉じる
+        });
 
-// モーダルの外側をクリックすると閉じる
-window.addEventListener('click', function(event) {
-    if (event.target === modal) {
-        modal.style.display = 'none';
-    }
-});
-
-</script>
-
+        // モーダル外部をクリックして閉じる
+        window.addEventListener('click', function(event) {
+            if (event.target === modal) {
+                modal.style.display = 'none';  // モーダルを閉じる
+            }
+        });
+    </script>
 </body>
 </html>

@@ -13,11 +13,9 @@
     <div class="tabs">
     <a href="admin_toppage.php" class="tab">トップページ</a>
         <a href="order_management.php" class="tab">全て表示</a>
-        <a href="waiting_for_payment.php" class="tab active">入金待ち</a>
-        <a href="waiting_for_shipment.php" class="tab">発送待ち
-            
-        </a>
-        <a href="send_shipped.php" class="tab">発送済み</a>
+        <a href="waiting_for_payment.php" class="tab">入金待ち</a>
+        <a href="waiting_for_shipment.php" class="tab">発送待ち</a>
+        <a href="send_shipped.php" class="tab active">発送済み</a>
     </div>
   <!-- モーダル -->
   <div id="imageModal" class="modal" style ="display: none;">
@@ -27,12 +25,6 @@
 
     <?php
     include './../../db_open.php';
-    include './../../db_open.php';
-    $stmt = $dbh->prepare("SELECT COUNT(*) AS count FROM cart_detail WHERE trade_situation = 2");
-    $stmt->execute();
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    $orderCount = $result['count'];
-
 
     // SQL修正: WHERE句の位置を正しく修正
     $stmt = $dbh->prepare("SELECT 
@@ -51,7 +43,7 @@ user.kanasei AS k_sei,
 user.kanamei AS k_mei,
 user.phone as tel,
 cart.send_address as senadd,
-cart.quantity as quantity,
+cart.quantity,
 cart.trade_situation,
 cart.send_address
 FROM cart_detail cart 
@@ -60,7 +52,7 @@ LEFT JOIN brand b ON shop.brand_id = b.brand_id
 LEFT JOIN size s ON shop.size = s.size_id
 LEFT JOIN color c ON shop.color = c.color_id
 LEFT JOIN user user ON cart.user_id = user.user_id
-WHERE cart.trade_situation = 1
+WHERE cart.trade_situation = 3
 ORDER BY cart.order_date, cart.user_id, cart.cart_id");
 
     $stmt->execute();
@@ -84,7 +76,7 @@ ORDER BY cart.order_date, cart.user_id, cart.cart_id");
             echo '<p><span class="data-label">宛名:</span> <span class="data-value">' . $row['u_sei'] . ' ' . $row['u_mei'] . '</span></p>';
             echo '<p><span class="data-label">電話番号:</span> <span class="data-value">' . $row['tel'] . '</span></p>';
             echo '<p><span class="data-label">送り先住所:</span> <span class="data-value">' . $row['senadd'] . '</span></p>';
-           echo '<p><span class="data-label">取引状況:</span> 入金待ち</p>';
+           echo '<p><span class="data-label">取引状況:</span> 発送済み</p>';
         }
         $imgBlob = $row['thumb']; // サムネイルのBLOBデータ
         $shopId = $row['shop_id'];    // shop_idを取得

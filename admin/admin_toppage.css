@@ -72,6 +72,25 @@ body {
     transform: translateY(0);
   }
 
+  /* 通知バッジの基本スタイル */
+  .notification-badge {
+      position: absolute;  /* 親要素に対して絶対配置 */
+      top: -5px;           /* 右上に少し離して配置 */
+      right: -10px;        /* 右端に配置 */
+      background-color: red; /* 背景色（赤） */
+      color: white;        /* 文字色（白） */
+      font-size: 12px;      /* 文字サイズ */
+      width: 20px;          /* バッジの幅 */
+      height: 20px;         /* バッジの高さ */
+      border-radius: 50%;   /* 丸い形にする */
+      display: flex;        /* フレックスボックスを使用して中央寄せ */
+      justify-content: center; /* 水平方向に中央寄せ */
+      align-items: center;  /* 垂直方向に中央寄せ */
+      font-weight: bold;    /* 文字を太字に */
+      padding: 0;           /* パディングなし */
+      text-align: center;   /* 文字を中央に */
+  }
+  
   /* メディアクエリ */
   @media (max-width: 768px) {
     .admin-container {
