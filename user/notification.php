@@ -46,7 +46,7 @@ $unread_count = $notification_count_stmt->fetchColumn();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>通知</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="notification.css">
 </head>
 <body>
 

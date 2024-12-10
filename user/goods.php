@@ -21,10 +21,10 @@ include "../head.php";
 <?php
 $shop_id = isset($_GET['shop_id']) ? $_GET['shop_id'] : '';
 if ($shop_id) {
-    // 商品情報とブランド情報を取得
-    // $sql = "SELECT shop.*, brand.brand_name FROM shop
-    //     LEFT OUTER JOIN brand ON brand.brand_id = shop.brand_id
-    //     WHERE shop.shop_id = :shop_id";
+    $sql_update_look = "UPDATE shop SET look = look + 1 WHERE shop_id = :shop_id";
+    $stmt_update_look = $dbh->prepare($sql_update_look);
+    $stmt_update_look->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
+    $stmt_update_look->execute();
 
     $sql = "SELECT shop.*, brand.brand_name, sale.sale FROM shop
     LEFT OUTER JOIN brand ON brand.brand_id = shop.brand_id

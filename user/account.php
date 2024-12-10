@@ -1,7 +1,7 @@
 <?php
+include "../../db_open.php";
 include "../head.php";
 include "../header.php";
-include "../../db_open.php";
 echo "<link rel='stylesheet' href='header.css'>";
 echo "<link rel='stylesheet' href='account.css'>";
 // ユーザーIDをセッションから取得
@@ -11,7 +11,7 @@ if (isset($_SESSION['id'])) {
     header("Location: login.php"); // 再読み込みして設定完了
     exit;
 }
-
+// var_dump($userId);
 if (isset($_POST['lang'])) {
     $_SESSION['lang'] = $_POST['lang'];
     header("Location: account.php"); // 再読み込みして設定完了

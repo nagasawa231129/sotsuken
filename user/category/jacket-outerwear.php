@@ -9,7 +9,7 @@ $sort = isset($_GET['sort']) ? $_GET['sort'] : 'default';
 $brand = isset($_GET['brand']) && $_GET['brand'] !== '' ? $_GET['brand'] : null;
 
 // SQL文の初期設定
-$sql = "SELECT shop.*, sale.* FROM shop LEFT OUTER JOIN sale ON sale.sale_id = shop.sale_id WHERE shop.category_id = '1'";
+$sql = "SELECT shop.*, sale.* FROM shop LEFT OUTER JOIN sale ON sale.sale_id = shop.sale_id WHERE shop.category_id = '2'";
 
 // ブランドフィルタがある場合の条件追加
 if ($brand !== null) {
@@ -75,22 +75,22 @@ $brands = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             <ul class="category-list">
                 <li class="category-item">
-                    <a href="..y/tops.php">トップス</a>
+                    <a href="tops.php">トップス</a>
                     <ul class="sub-category">
-                        <li><a href="tshirt-cutsew.php">Tシャツ/カットソー</a></li>
-                        <li><a href="shirt.php">シャツ/ブラウス</a></li>
-                        <li><a href="poloshirt.php">ポロシャツ</a></li>
-                        <li><a href="knit-sweater.php">ニット/セーター</a></li>
-                        <li><a href="vest.php">ベスト</a></li>
-                        <li><a href="parka.php">パーカー</a></li>
-                        <li><a href="sweat.php">スウェット</a></li>
-                        <li><a href="cardigan.php">カーディガン</a></li>
-                        <li><a href="ensemble.php">アンサンブル</a></li>
-                        <li><a href="jersey.php">ジャージ</a></li>
-                        <li><a href="tanktop.php">タンクトップ</a></li>
-                        <li><a href="camisole.php">キャミソール</a></li>
-                        <li><a href="tubetops.php">チューブトップス</a></li>
-                        <li><a href="auter-tops.php">その他トップス</a></li>
+                        <li><a href="tops/tshirt-cutsew.php">Tシャツ/カットソー</a></li>
+                        <li><a href="tops/shirt.php">シャツ/ブラウス</a></li>
+                        <li><a href="tops/poloshirt.php">ポロシャツ</a></li>
+                        <li><a href="tops/knit-sweater.php">ニット/セーター</a></li>
+                        <li><a href="tops/vest.php">ベスト</a></li>
+                        <li><a href="tops/parka.php">パーカー</a></li>
+                        <li><a href="tops/sweat.php">スウェット</a></li>
+                        <li><a href="tops/cardigan.php">カーディガン</a></li>
+                        <li><a href="tops/ensemble.php">アンサンブル</a></li>
+                        <li><a href="tops/jersey.php">ジャージ</a></li>
+                        <li><a href="tops/tanktop.php">タンクトップ</a></li>
+                        <li><a href="tops/camisole.php">キャミソール</a></li>
+                        <li><a href="tops/tubetops.php">チューブトップス</a></li>
+                        <li><a href="tops/auter-tops.php">その他トップス</a></li>
                     </ul>
                 </li>
                 <li class="category-item">

@@ -8,7 +8,11 @@ if (isset($_SESSION['id'])) {
 } else {
     $userId = null;
 }
-var_dump($userId);
+$user_name = isset($_SESSION['login']) ? $_SESSION['display_name'] : 'ゲスト';
+// var_dump($_SESSION['login']);
+// var_dump($_SESSION['display_name']);
+// var_dump($user_name);
+// var_dump($userId);
 $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ja';
 
 // // 言語ファイルのパスを設定
@@ -20,8 +24,6 @@ if (file_exists($lang_file)) {
 } else {
     die("Error: Language file not found.");
 }
-var_dump("$lang");
-var_dump("$lang_file");
 ?>
 
 <!DOCTYPE html>
@@ -54,23 +56,23 @@ $totalPages = ceil($totalItems / $itemsPerPage);
 
 <div class="main-content">
     <aside class="sidebar">
-        <h2 data-i18n="search"><?php echo $translations['search']?></h2>
+        <h2 data-i18n="search"><?php echo $translations['search'] ?></h2>
         <ul>
-        <li><a href="brand.php" data-i18n="search_by_brand"><?php echo $translations['search_by_brand']?></a></li>
-            <li><a href="category/category.php" data-i18n="search_by_category"><?php echo $translations['search_by_category']?></a></li>
-            <li><a href="ranking.php" data-i18n="search_by_ranking"><?php echo $translations['search_by_ranking']?></a></li>
-            <li><a href="sale.php" data-i18n="search_by_sale"><?php echo $translations['search_by_sale']?></a></li>
-            <li><a href="diagnosis.php" data-i18n="search_by_diagnosis"><?php echo $translations['search_by_diagnosis']?></a></li>
-            <li><a href="advanced_search.php" data-i18n="advanced_search"><?php echo $translations['advanced_search']?></a></li>
+            <li><a href="brand.php" data-i18n="search_by_brand"><?php echo $translations['search_by_brand'] ?></a></li>
+            <li><a href="category/category.php" data-i18n="search_by_category"><?php echo $translations['search_by_category'] ?></a></li>
+            <li><a href="ranking.php" data-i18n="search_by_ranking"><?php echo $translations['search_by_ranking'] ?></a></li>
+            <li><a href="sale.php" data-i18n="search_by_sale"><?php echo $translations['search_by_sale'] ?></a></li>
+            <li><a href="diagnosis.php" data-i18n="search_by_diagnosis"><?php echo $translations['search_by_diagnosis'] ?></a></li>
+            <li><a href="advanced_search.php" data-i18n="advanced_search"><?php echo $translations['advanced_search'] ?></a></li>
         </ul>
 
-        <h2 data-i18n="categories_from"><?php echo $translations['search_by_category']?></h2>
+        <h2 data-i18n="categories_from"><?php echo $translations['search_by_category'] ?></h2>
 
         <ul class="category-list">
             <li class="category-item">
-                <a href="./category/tops.php" data-i18n="tops"><?php echo $translations['tops']?></a>
+                <a href="./category/tops.php" data-i18n="tops"><?php echo $translations['tops'] ?></a>
                 <ul class="sub-category">
-                    <li><a href="./category/tops/tshirt-cutsew.php" data-i18n="Tshirt-cutsew"><?php echo $translations['tshirt-cutsew']?></a></li>
+                    <li><a href="./category/tops/tshirt-cutsew.php" data-i18n="Tshirt-cutsew"><?php echo $translations['tshirt-cutsew'] ?></a></li>
                     <li><a href="./category/tops/shirt.php" data-i18n="shirt-blouse">シャツ/ブラウス</a></li>
                     <li><a href="./category/tops/poloshirt.php" data-i18n="poloshirt">ポロシャツ</a></li>
                     <li><a href="./category/tops/knit-sweater.php" data-i18n="knit/sweater">ニット/セーター</a></li>
@@ -87,7 +89,7 @@ $totalPages = ceil($totalItems / $itemsPerPage);
                 </ul>
             </li>
             <li class="category-item">
-                <a href="./category/jacket.php" data-i18n="jacket/outer"><?php echo $translations['outerwear']?></a>
+                <a href="./category/jacket.php" data-i18n="jacket/outer"><?php echo $translations['outerwear'] ?></a>
                 <ul class="sub-category">
                     <li><a href="./category/jacket-outerwear/collarless-coat.php" data-i18n="collarless-coat">ノーカラーコート</a></li>
                     <li><a href="./category/jacket-outerwear/collarless-jacket.php" data-i18n="collarless-jacket">ノーカラージャケット</a></li>
@@ -106,7 +108,7 @@ $totalPages = ceil($totalItems / $itemsPerPage);
                 </ul>
             </li>
             <li class="category-item">
-                <a href="./category/pants.php" data-i18n="pants"><?php echo $translations['pants']?></a>
+                <a href="./category/pants.php" data-i18n="pants"><?php echo $translations['pants'] ?></a>
                 <ul class="sub-category">
                     <li><a href="./category/pants/cargo-pants.php" data-i18n="cargo-pants">カーゴパンツ</a></li>
                     <li><a href="./category/pants/chino-pants.php" data-i18n="chino-pants">チノパン</a></li>
@@ -117,7 +119,7 @@ $totalPages = ceil($totalItems / $itemsPerPage);
                 </ul>
             </li>
             <li class="category-item">
-                <a href="./category/skirt.php" data-i18n="skirt"><?php echo $translations['skirt']?></a>
+                <a href="./category/skirt.php" data-i18n="skirt"><?php echo $translations['skirt'] ?></a>
                 <ul class="sub-category">
                     <li><a href="./category/skirt/mini-skirt.php" data-i18n="mini-skirt">ミニスカート</a></li>
                     <li><a href="./category/skirt/midi-skirt.php" data-i18n="midi-skirt">ミディスカート</a></li>
@@ -126,7 +128,7 @@ $totalPages = ceil($totalItems / $itemsPerPage);
                 </ul>
             </li>
             <li class="category-item">
-                <a href="./category/onepiece.php" data-i18n="onepiece"><?php echo $translations['onepiece']?></a>
+                <a href="./category/onepiece.php" data-i18n="onepiece"><?php echo $translations['onepiece'] ?></a>
                 <ul class="sub-category">
                     <li><a href="./category/onepiece/dress.php" data-i18n="dress">ドレス</a></li>
                     <li><a href="./category/onepiece/jumper-skirt.php" data-i18n="jumper-skirt">ジャンパースカート</a></li>
@@ -138,9 +140,14 @@ $totalPages = ceil($totalItems / $itemsPerPage);
             </li>
         </ul>
     </aside>
+    <div class="products-wrapper">
+    <h3>古い順</h3>
+
     <div class="products-container">
-        <?php
-        $sql = "SELECT shop.*, 
+        <div class="product-scroll">
+
+            <?php
+            $sql = "SELECT shop.*, 
                brand.brand_name, 
                sale.sale, 
                image.img
@@ -151,104 +158,190 @@ $totalPages = ceil($totalItems / $itemsPerPage);
         GROUP BY shop.shop_id
         LIMIT :limit OFFSET :offset";
 
+            $stmt = $dbh->prepare($sql);
+            $stmt->bindValue(':limit', $itemsPerPage, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+            $stmt->execute();
 
+            if ($stmt->rowCount() > 0) {
+                while ($rec = $stmt->fetch()) {
+                    // BLOB型の画像データをBase64エンコードして表示
+                    $imgBlob = $rec['img'];
+                    $mimeType = 'image/png,image/jpg,image/svg'; // MIMEタイプはデフォルトを設定（例としてPNG）
 
-        $stmt = $dbh->prepare($sql);
-        $stmt->bindValue(':limit', $itemsPerPage, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-        $stmt->execute();
+                    // MIMEタイプを動的に取得
+                    $finfo = new finfo(FILEINFO_MIME_TYPE);
+                    $mimeType = $finfo->buffer($imgBlob); // BLOBデータからMIMEタイプを取得
 
-        if ($stmt->rowCount() > 0) {
-            while ($rec = $stmt->fetch()) {
-                // BLOB型の画像データをBase64エンコードして表示
-                $imgBlob = $rec['img'];
-                $mimeType = 'image/png'; // MIMEタイプはデフォルトを設定（例としてPNG）
+                    // Base64にエンコード
+                    $encodedImg = base64_encode($imgBlob);
 
-                // MIMEタイプを動的に取得
-                $finfo = new finfo(FILEINFO_MIME_TYPE);
-                $mimeType = $finfo->buffer($imgBlob); // BLOBデータからMIMEタイプを取得
+                    // 商品詳細ページへのリンク生成
+                    $productLink = "goods.php?shop_id={$rec['shop_id']}";
 
-                // Base64にエンコード
-                $encodedImg = base64_encode($imgBlob);
+                    // 商品情報を全体リンクで表示
+                    echo "<a href='{$productLink}' style='text-decoration: none; color: inherit;'>";
+                    echo "<div class='product-item'>";
 
-                // 商品詳細ページへのリンク生成
-                $productLink = "goods.php?shop_id={$rec['shop_id']}";
+                    // 画像表示
+                    echo "<img src='data:{$mimeType};base64,{$encodedImg}' alt='goods img' class='product-image'>";
 
-                // 商品情報を全体リンクで表示
-                echo "<a href='{$productLink}' style='text-decoration: none; color: inherit;'>";
-                echo "<div style='border: 1px solid #ccc; padding: 10px; margin: 10px; max-width: 300px;'>";
+                    echo "<div class='product-info'>";
+                    // ブランド名
+                    echo "<p class='product-brand' data-i18n='brand'>" . $translations['brand'] . "： {$rec['brand_name']}</p>";
 
-                // 画像表示
-                echo "<img src='data:{$mimeType};base64,{$encodedImg}' alt='goods img' style='height: 100px; width: 100px; object-fit: cover; display: block; margin: 0 auto;'>";
+                    // 商品名
+                    echo "<p class='product-name' data-i18n='goods_name'>" . $translations['product_name'] . " ：{$rec['goods']}</p>";
 
-                // ブランド名
-                echo "<p style='text-align: center;' data-i18n='brand'>" . $translations['brand'] . "： {$rec['brand_name']}</p>";
+                    // 価格
+                    echo "<p class='product-price' data-i18n='price'>" . $translations['price'] . "：{$rec['original_price']}円</p>";
 
-                // 商品名
-                echo "<p style='text-align: center; font-weight: bold;' data-i18n='goods_name'>". $translations['product_name'] ." ：{$rec['goods']}</p>";
-
-                // 価格
-                echo "<p style='text-align: center;' data-i18n='price'>". $translations['price'] ."：{$rec['price']}円</p>";
-
-                // 割引計算と表示
-                if ($rec['sale_id']) {
-                    $sale_id = $rec['sale_id'];
-                    $sql_sale = "SELECT sale FROM sale WHERE sale_id = :sale_id";
-                    $stmt_sale = $dbh->prepare($sql_sale);
-                    $stmt_sale->bindParam(':sale_id', $sale_id);
-                    $stmt_sale->execute();
-                    $sale = $stmt_sale->fetch(PDO::FETCH_ASSOC);
-
-                    if ($sale) {
-                        $discounted_price = $rec['price'] * (1 - $sale['sale'] / 100);
-                        echo "<p style='text-align: center; color: red;' data-i18n='discounted_price'>" . $translations['discounted_price'] ."：{$discounted_price}円</p>";
+                    // 割引計算と表示
+                    if ($rec['sale_id']) {
+                        $sale_id = $rec['sale_id'];
+                        $sql_sale = "SELECT sale, sale_id FROM sale WHERE sale_id = :sale_id";
+                        $stmt_sale = $dbh->prepare($sql_sale);
+                        $stmt_sale->bindParam(':sale_id', $sale_id);
+                        $stmt_sale->execute();
+                        $sale = $stmt_sale->fetch(PDO::FETCH_ASSOC);
+                    
+                        // 割引情報が取得でき、割引率が10ではない場合のみ処理
+                        if ($sale && isset($rec['original_price']) && $sale['sale_id'] != 10) {
+                            $discounted_price = ceil($rec['original_price'] * (1 - $sale['sale'] / 100)); // 小数点切り上げ
+                            echo "<p class='product-discount' data-i18n='discounted_price'>" . $translations['discounted_price'] . "：{$discounted_price}円</p>";
+                        }
                     }
+                    
+
+                    echo "</div>";
+                    echo "</div>";
+                    echo "</a>";
                 }
-
-                // 商品説明
-                echo "<p style='text-align: center;' data-i18n='description'>" . $translations['description'] ."：{$rec['explanation']}</p>";
-
-                echo "</div>";
-                echo "</a>";
+            } else {
+                echo "<p>商品が見つかりません。</p>";
             }
-        } else {
-            echo "<p>商品が見つかりません。</p>";
-        }
-
-        ?>
+            ?>
+        </div>
     </div>
+    <!-- <div class="product-sale"> -->
+    <!-- セール商品のみ -->
+    <h2>セール商品</h2>
+    <div class="sale-products-container">
+        <div class="sale-product-scroll">
+            <?php
+            $sql = "SELECT shop.*, 
+                brand.brand_name, 
+                sale.sale_id, 
+                image.img
+                FROM shop
+                LEFT OUTER JOIN brand ON brand.brand_id = shop.brand_id
+                LEFT OUTER JOIN image ON image.shop_id = shop.shop_id
+                LEFT OUTER JOIN sale ON sale.sale_id = shop.sale_id
+                WHERE shop.sale_id != 10  -- saleカラムが0以外の商品を表示
+                GROUP BY shop.shop_id
+                LIMIT :limit OFFSET :offset";
+
+
+            $stmt = $dbh->prepare($sql);
+            $stmt->bindValue(':limit', $itemsPerPage, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+            $stmt->execute();
+            if ($stmt->rowCount() > 0) {
+                while ($rec = $stmt->fetch()) {
+                    // BLOB型の画像データをBase64エンコードして表示
+                    $imgBlob = $rec['img'];
+                    $mimeType = 'image/png'; // MIMEタイプはデフォルトを設定（例としてPNG）
+
+                    // MIMEタイプを動的に取得
+                    $finfo = new finfo(FILEINFO_MIME_TYPE);
+                    $mimeType = $finfo->buffer($imgBlob); // BLOBデータからMIMEタイプを取得
+
+                    // Base64にエンコード
+                    $encodedImg = base64_encode($imgBlob);
+
+                    // 商品詳細ページへのリンク生成
+                    $productLink = "goods.php?shop_id={$rec['shop_id']}";
+
+                    // 商品情報を全体リンクで表示
+                    echo "<a href='{$productLink}' style='text-decoration: none; color: inherit;'>";
+                    echo "<div class='sale-product-item'>";
+                    echo "<div class='product-image-block'>";
+
+                    // 画像表示
+                    echo "<img src='data:{$mimeType};base64,{$encodedImg}' alt='goods img' class='sale-product-image'>";
+                    echo "</div>";
+                    echo "<div class='product-info'>";
+
+                    // ブランド名
+                    echo "<p class='sale-product-brand' data-i18n='brand'>" . $translations['brand'] . "： {$rec['brand_name']}</p>";
+
+                    // 商品名
+                    echo "<p class='sale-product-name' data-i18n='goods_name'>" . $translations['product_name'] . " ：{$rec['goods']}</p>";
+
+                    // 価格
+                    echo "<p class='sale-product-price' data-i18n='price'>" . $translations['price'] . "：{$rec['original_price']}円</p>";
+
+                    // 割引計算と表示
+                    if ($rec['sale_id']) {
+                        $sale_id = $rec['sale_id'];
+                        $sql_sale = "SELECT sale, sale_id FROM sale WHERE sale_id = :sale_id";
+                        $stmt_sale = $dbh->prepare($sql_sale);
+                        $stmt_sale->bindParam(':sale_id', $sale_id);
+                        $stmt_sale->execute();
+                        $sale = $stmt_sale->fetch(PDO::FETCH_ASSOC);
+                    
+                        // 割引情報が取得でき、割引率が10ではない場合のみ処理
+                        if ($sale && isset($rec['original_price']) && $sale['sale_id'] != 10) {
+                            $discounted_price = ceil($rec['original_price'] * (1 - $sale['sale'] / 100)); // 小数点切り上げ
+                            echo "<p class='product-discount' data-i18n='discounted_price'>" . $translations['discounted_price'] . "：{$discounted_price}円</p>";
+                        }
+                    }
+                    echo "</div>";
+                    echo "</div>";
+                    echo "</a>";
+                }
+            } else {
+                echo "<p>商品が見つかりません。</p>";
+            }
+            ?>
+        </div>
+    </div>
+    </div>
+
+    <!-- </div> -->
 </div>
-    <div class="pagination">
-        <?php if ($totalPages > 1): // ページ数が1ページより多い場合のみ表示 
-        ?>
-            <?php if ($page > 1): ?>
-                <a href="?page=<?php echo $page - 1; ?>" data-i18n="previous">前へ</a>
-            <?php endif; ?>
-
-            <!-- 最初のページ -->
-            <?php if ($page > 3): ?>
-                <a href="?page=1">1</a>
-                <span>...</span> <!-- 省略 -->
-            <?php endif; ?>
-
-            <!-- ページ番号のリンクを表示 -->
-            <?php for ($i = max(1, $page - 1); $i <= min($totalPages, $page + 1); $i++): ?>
-                <?php if ($i == $page): ?>
-                    <span><?php echo $i; ?></span> <!-- 現在のページ -->
-                <?php else: ?>
-                    <a href="?page=<?php echo $i; ?>"><?php echo $i; ?></a> <!-- 他のページ -->
-                <?php endif; ?>
-            <?php endfor; ?>
-
-            <!-- 最後のページ -->
-            <?php if ($page < $totalPages - 2): ?>
-                <span>...</span> <!-- 省略 -->
-                <a href="?page=<?php echo $totalPages; ?>"><?php echo $totalPages; ?></a>
-            <?php endif; ?>
-
-            <?php if ($page < $totalPages): ?>
-                <a href="?page=<?php echo $page + 1; ?>" data-i18n="next">次へ</a>
-            <?php endif; ?>
+<div class="pagination">
+    <?php if ($totalPages > 1): // ページ数が1ページより多い場合のみ表示 
+    ?>
+        <?php if ($page > 1): ?>
+            <a href="?page=<?php echo $page - 1; ?>" data-i18n="previous">前へ</a>
         <?php endif; ?>
-    </div>
-    </html>
+
+        <!-- 最初のページ -->
+        <?php if ($page > 3): ?>
+            <a href="?page=1">1</a>
+            <span>...</span> <!-- 省略 -->
+        <?php endif; ?>
+
+        <!-- ページ番号のリンクを表示 -->
+        <?php for ($i = max(1, $page - 1); $i <= min($totalPages, $page + 1); $i++): ?>
+            <?php if ($i == $page): ?>
+                <span><?php echo $i; ?></span> <!-- 現在のページ -->
+            <?php else: ?>
+                <a href="?page=<?php echo $i; ?>"><?php echo $i; ?></a> <!-- 他のページ -->
+            <?php endif; ?>
+        <?php endfor; ?>
+
+        <!-- 最後のページ -->
+        <?php if ($page < $totalPages - 2): ?>
+            <span>...</span> <!-- 省略 -->
+            <a href="?page=<?php echo $totalPages; ?>"><?php echo $totalPages; ?></a>
+        <?php endif; ?>
+
+        <?php if ($page < $totalPages): ?>
+            <a href="?page=<?php echo $page + 1; ?>" data-i18n="next">次へ</a>
+        <?php endif; ?>
+    <?php endif; ?>
+</div>
+
+</html>

@@ -9,7 +9,7 @@ $sort = isset($_GET['sort']) ? $_GET['sort'] : 'default';
 $brand = isset($_GET['brand']) && $_GET['brand'] !== '' ? $_GET['brand'] : null;
 
 // SQL文の初期設定
-$sql = "SELECT shop.*, sale.* FROM shop LEFT OUTER JOIN sale ON sale.sale_id = shop.sale_id WHERE shop.category_id = '1'";
+$sql = "SELECT shop.*, sale.* FROM shop LEFT OUTER JOIN sale ON sale.sale_id = shop.sale_id WHERE shop.category_id = '3'";
 
 // ブランドフィルタがある場合の条件追加
 if ($brand !== null) {
@@ -75,7 +75,7 @@ $brands = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             <ul class="category-list">
                 <li class="category-item">
-                    <a href="..y/tops.php">トップス</a>
+                    <a href="tops.php">トップス</a>
                     <ul class="sub-category">
                         <li><a href="tshirt-cutsew.php">Tシャツ/カットソー</a></li>
                         <li><a href="shirt.php">シャツ/ブラウス</a></li>

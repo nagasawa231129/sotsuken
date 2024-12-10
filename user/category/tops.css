@@ -1,13 +1,12 @@
 /* サイドバーのスタイル */
 .sidebar {
-    width: 250px;
-    padding: 20px;
-    background-color: #fff;
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-    box-sizing: border-box;
-    height: auto; /* コンテンツに合わせて高さを自動調整 */
-    position: relative; /* サブカテゴリーを親要素内に収めるための位置設定 */
-    overflow-y: auto; /* コンテンツが多くなった場合、スクロールできるようにする */
+    flex: 0 0 250px; /* サイドバーの幅を固定 */
+    background: #f5f5f5; /* 背景色 */
+    padding: 20px; /* 内側余白 */
+    border-radius: 8px; /* 角を丸める */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 影 */
+    /* margin-right: px; 右側の余白を微調整 */
+
 }
 
 /* メインカテゴリのリスト */
@@ -24,7 +23,7 @@
 }
 
 /* メインカテゴリリンク */
-.sidebar ul li > a {
+.sidebar ul li>a {
     text-decoration: none;
     color: #333;
     display: block;
@@ -38,11 +37,12 @@
 }
 
 .category-item {
-    position: relative; /* サブカテゴリーのドロップダウンに必要 */
+    position: relative;
+    /* サブカテゴリーのドロップダウンに必要 */
 }
 
 /* 各カテゴリリンクのスタイル */
-.category-item > a {
+.category-item>a {
     display: block;
     padding: 10px 15px;
     text-decoration: none;
@@ -53,7 +53,7 @@
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.category-item > a:hover {
+.category-item>a:hover {
     background-color: #007bff;
     color: white;
 }
@@ -62,9 +62,11 @@
 .sub-category {
     display: none;
     list-style: none;
-    padding-left: 20px; /* サブカテゴリーのインデント */
+    padding-left: 20px;
+    /* サブカテゴリーのインデント */
     margin: 0;
-    background-color: #f8f9fa; /* サブカテゴリも親カテゴリと同じ背景色 */
+    background-color: #f8f9fa;
+    /* サブカテゴリも親カテゴリと同じ背景色 */
 }
 
 /* 親カテゴリリンクをホバーした時にサブカテゴリーを表示 */
@@ -91,22 +93,19 @@
 }
 
 /* サブカテゴリーにサブサブカテゴリーがあった場合のスタイル */
-.sub-category li:hover > .sub-category {
-    display: block; /* サブサブカテゴリーも表示 */
-    position: absolute; /* 親カテゴリーの右側に表示 */
+.sub-category li:hover>.sub-category {
+    display: block;
+    /* サブサブカテゴリーも表示 */
+    position: absolute;
+    /* 親カテゴリーの右側に表示 */
     left: 100%;
     top: 0;
     padding-left: 10px;
 }
-
 .main-content {
-    display: flex;
-    align-items: flex-start; /* 子要素を上揃え */
-    gap: 20px; /* サイドバーと商品一覧の間に余白 */
-    padding: 20px;
-    background-color: #f8f9fa;
-    width: 100%; /* 親要素の幅を100%に */
-    box-sizing: border-box;
+    display: flex; /* サイドバーとコンテンツを横並び */
+    gap: 10px; /* 間隔を狭める（デフォルト20px→10px） */
+    width: 100%; /* 横幅100% */
 }
 
 .products-section {
@@ -189,6 +188,25 @@
 .sort-form select:hover {
     background-color: #fff; /* ホバー時に背景を白に */
     border-color: #bbb; /* 境界線を少し濃く */
+}
+
+.product-image-block {
+    width: 100%; /* 幅を商品全体に合わせる */
+    display: flex;
+    justify-content: center; /* 中央揃え */
+    margin-bottom: 10px; /* 下部に余白 */
+}
+
+.product-image, .sale-product-image {
+    max-width: 100%; /*画像の幅をボックスに合わせる */
+    /* height: 170; 縦横比を維持 */
+    border-radius: 4px; /*画像の角を丸める */
+    margin-bottom: 10px; /*画像下に余白を追加 */
+
+    /* width: 100%; カードの横幅に合わせる */
+    height: 160px; /* 固定の高さ */
+    object-fit: cover; /* アスペクト比を保持して枠内に収める */
+    /* border-bottom: 1px solid #eee; 画像下に区切り線 */
 }
 
 /* レスポンシブ調整 */
