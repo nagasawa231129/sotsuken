@@ -142,7 +142,7 @@ input:valid {
 
 /* 幅を広げるセレクトボックス */
 select.wide-select {
-    width: 50px;
+    width: 100px;
 }
 
 select.brand-select {
@@ -153,10 +153,19 @@ th.brand {
     width: 150px;
 }
 
+th.price {
+    width: 100px;
+}
+th.category {
+    width: 120px;
+}
+th.color {
+    width: 120px;
+}
 th.thumbnail {
     width: 300px;
 }
-
+td.color{}
 /* サイズ固定のテキストエリア */
 .input-group textarea {
     width: 100%;

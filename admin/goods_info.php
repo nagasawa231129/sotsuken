@@ -14,12 +14,12 @@ if (isset($_POST['update'])) {
     $goods_info = $_POST['goods_info'];
 
     // 配列で送信されるデータをカンマ区切りで文字列に変換
-    $size = isset($_POST['size']) ? implode(',', $_POST['size']) : null;
-    $color = isset($_POST['color']) ? implode(',', $_POST['color']) : null;
-    $category = isset($_POST['category']) ? implode(',', $_POST['category']) : null;
-    $subcategory = isset($_POST['subcategory']) ? implode(',', $_POST['subcategory']) : null;
-    $gender = isset($_POST['gender']) ? implode(',', $_POST['gender']) : null;
-    $goods_info  = isset($_POST['goods_info']) ? implode(',', $_POST['goods_info']) : null;
+    $size = $_POST['size'];
+    $color = $_POST['color'];
+    $category = $_POST['category'];
+    $subcategory = $_POST['subcategory'];
+    $gender = $_POST['gender'];
+    $goods_info  = $_POST['goods_info'];
 
     $brand = $_POST['brand'];
 
@@ -212,7 +212,7 @@ if (isset($_POST['reset_search'])) {
 
                             <td>
                                 <div class="input-group">
-                                    <textarea name="goods_info[]" rows="4" cols="50" required><?= htmlspecialchars($product['exp']) ?></textarea>
+                                    <textarea name="goods_info" rows="4" cols="50" required><?= htmlspecialchars($product['exp']) ?></textarea>
                                 </div>
                             </td>
 
@@ -225,10 +225,10 @@ if (isset($_POST['reset_search'])) {
                         <tr>
                             <th class="brand">ブランド</th>
                             <th class="goods">商品名</th>
-                            <th>価格(円)</th>
+                            <th class="price">価格(円)</th>
                             <th>サイズ</th>
                             <th>色</th>
-                            <th>カテゴリ</th>
+                            <th class="category">カテゴリ</th>
                             <th>サブカテゴリ</th>
                             <th>性別</th>
                         </tr>
@@ -249,51 +249,56 @@ if (isset($_POST['reset_search'])) {
                             <td><input type="text" name="goods" value="<?= htmlspecialchars($product['goods']) ?>" required></td>
                             <td class="price-select"><input type="number" name="price" value="<?= htmlspecialchars($product['price']) ?>" required></td>
                             <td>
-                                <select name="size[]" class="wide-select" required>
+                                <select name="size" class="wide-select" required>
                                     <?php
                                     $size_sql = "SELECT size_id, size FROM size";
                                     foreach ($dbh->query($size_sql) as $size) {
-                                        echo "<option value='{$size['size_id']}'>{$size['size']}</option>";
+                                        $selected = ($product['size_id'] == $size['size_id']) ? 'selected' : ''; // 選択されたサイズを設定
+                                        echo "<option value='{$size['size_id']}' {$selected}>{$size['size']}</option>";
                                     }
                                     ?>
                                 </select>
                             </td>
-                            <td>
-                                <select name="color[]" class="wide-select" required>
+                            <td class="color">
+                                <select name="color" class="wide-select" required>
                                     <?php
                                     $color_sql = "SELECT color_id, ja_color FROM color";
                                     foreach ($dbh->query($color_sql) as $color) {
-                                        echo "<option value='{$color['color_id']}'>{$color['ja_color']}</option>";
+                                        $selected = ($product['color_id'] == $color['color_id']) ? 'selected' : ''; // 選択された色を設定
+                                        echo "<option value='{$color['color_id']}' {$selected}>{$color['ja_color']}</option>";
                                     }
                                     ?>
                                 </select>
                             </td>
                             <td>
-                                <select name="category[]" class="category" required onchange="updateSubcategory(this)">
+                                <select name="category" class="category" required onchange="updateSubcategory(this)">
                                     <?php
                                     $category_sql = "SELECT category_id, category_name FROM category";
                                     foreach ($dbh->query($category_sql) as $category) {
-                                        echo "<option value='{$category['category_id']}'>{$category['category_name']}</option>";
+                                        $selected = ($product['category_id'] == $category['category_id']) ? 'selected' : ''; // 選択されたカテゴリを設定
+                                        echo "<option value='{$category['category_id']}' {$selected}>{$category['category_name']}</option>";
                                     }
                                     ?>
                                 </select>
                             </td>
                             <td>
-                                <select name="subcategory[]" class="subcategory" required>
+                                <select name="subcategory" class="subcategory" required>
                                     <?php
                                     $subcategory_sql = "SELECT subcategory_id, subcategory_name FROM subcategory";
                                     foreach ($dbh->query($subcategory_sql) as $subcategory) {
-                                        echo "<option value='{$subcategory['subcategory_id']}'>{$subcategory['subcategory_name']}</option>";
+                                        $subselected = ($product['subcategory_id'] == $subcategory['subcategory_id']) ? 'selected' : ''; // 選択されたカテゴリを設定
+                                        echo "<option value='{$subcategory['subcategory_id']}'{$subselected}>{$subcategory['subcategory_name']}</option>";
                                     }
                                     ?>
                                 </select>
                             </td>
                             <td>
-                                <select name="gender[]" required>
+                                <select name="gender" required>
                                     <?php
                                     $gender_sql = "SELECT gender_id, gender FROM gender";
                                     foreach ($dbh->query($gender_sql) as $gender) {
-                                        echo "<option value='{$gender['gender_id']}'>{$gender['gender']}</option>";
+                                        $gselected = ($product['gender_id'] == $gender['gender_id']) ? 'selected' : ''; // 選択された色を設定
+                                        echo "<option value='{$gender['gender_id']}'{$gselected}>{$gender['gender']}</option>";
                                     }
                                     ?>
                                 </select>
