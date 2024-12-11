@@ -19,7 +19,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['image_id'])) {
         $stmt->bindParam(':image_id', $imageId, PDO::PARAM_INT);
         $stmt->execute();
 
-        echo "画像が正常に削除されました。";
+        // 画像削除が成功したら、ページリロードのためのJSを出力
+        echo "<script>
+                alert('画像が正常に削除されました。$imageId ');
+                window.location.href = window.location.href; // 現在のページをリロード
+              </script>";
     } catch (PDOException $e) {
         echo "データベースエラーが発生しました: " . $e->getMessage();
     }

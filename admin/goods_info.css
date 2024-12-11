@@ -1,36 +1,36 @@
-
-/* 画像のコンテナ */
+/* 画像コンテナ */
 .image-container {
-    position: relative; /* ボタンの絶対位置指定の基点にする */
+    position: relative;
     display: inline-block;
-    margin: 10px;
-  }
-  
-  /* 画像 */
-  .image-container img {
-    display: block;
-    max-width: 100%;
-    height: auto;
-  }
-  
-  /* ×ボタン */
-  .close-button {
-    position: absolute; /* コンテナ内の右上に配置 */
-    top: 5px;
-    right: 5px;
-    background: none; /* 背景なし */
-    color: black;
+    margin-right: 10px;
+}
+
+/* 画像スタイル */
+.subthumbnail {
+    width: 50px; /* 画像の幅 */
+    height: auto; /* アスペクト比を維持 */
+    cursor: pointer; /* クリック可能にする */
+}
+
+/* 削除ボタン */
+.delete-button {
+    position: absolute;
+    top: 5px; /* 画像の上部から少し離す */
+    right: 5px; /* 画像の右端から少し離す */
+    background-color: rgba(0, 0, 0, 0.5); /* 半透明の背景 */
+    color: white;
     border: none;
-    font-size: 18px;
-    font-weight: bold;
+    font-size: 16px;
+    padding: 5px;
     cursor: pointer;
-    padding: 0;
-    line-height: 1; /* ボタンサイズを調整 */
-  }
-  
-  .close-button:hover {
-    color: red; /* ホバー時の色（任意） */
-  }
+    border-radius: 50%; /* 丸い形にする */
+}
+
+/* 削除ボタンホバー時のスタイル */
+.delete-button:hover {
+    background-color: rgba(255, 0, 0, 0.7); /* 赤色の背景に変える */
+}
+
   
 /* フォーム全体のスタイル */
 form, .single-form {

@@ -56,42 +56,6 @@ function deleteImage(shop_id, image_id) {
 
 
 
-
-
-// function sendImage(imageId) {
-//     const input = document.getElementById(`imageInput${imageId}`);
-//     const formData = new FormData();
-//     formData.append("image", input.files[0]);
-//     formData.append("image_id", imageId); // 画像IDをフォームデータに追加
-
-//     const xhr = new XMLHttpRequest();
-//     xhr.open("POST", "update_subthumbnail.php", true);
-//     xhr.onload = function () {
-//         if (xhr.status == 200) {
-//             const response = xhr.responseText; // サーバーからの応答（Base64エンコードされた画像データ）
-
-//             // サーバーから画像のBase64データが返ってきた場合
-//             if (response.startsWith("data:image/jpeg;base64,") || response.startsWith("data:image/png;base64,")) {
-//                 const newImageSrc = response; // 返ってきたBase64画像
-//                 const imgElement = document.getElementById(`shopImage${imageId}`); // 修正: imageIdを使う
-
-//                 if (imgElement) {
-//                     imgElement.src = newImageSrc; // 更新された画像を表示
-//                     alert("画像が更新されました。");
-//                 } else {
-//                     console.error("画像要素が見つかりません。");
-//                 }
-//             } else {
-//                 alert("画像の更新に失敗しました。");
-//             }
-//         } else {
-//             alert("サーバーエラーが発生しました。");
-//         }
-//     };
-//     xhr.send(formData);
-// }
-
-
    
    // categoryが選択された時にsubcategoriesを更新
    function updateSubcategory(categoryElement) {
@@ -143,16 +107,44 @@ thumbnails.forEach(thumbnail => {
     });
 });
 
-// // モーダルを閉じる処理
-// closeModal.addEventListener('click', function() {
-//     modal.style.display = 'none';
-// });
-
-// モーダルの外側をクリックすると閉じる
-// window.addEventListener('click', function(event) {
-//     if (event.target === modal) {
-//         modal.style.display = 'none';
-//     }
-// });
 
 
+document.getElementById('uploadButton').addEventListener('click', function() {
+    console.log("Button clicked"); // ボタンがクリックされたかを確認
+    var fileInput = document.getElementById('fileInput');
+    var shopId = document.getElementById('shop_id').value;
+    var files = fileInput.files;
+
+    if (files.length > 0) {
+        var formData = new FormData();
+        formData.append('shop_id', shopId); // shop_idをフォームデータに追加
+
+        // ファイルをFormDataに追加
+        for (var i = 0; i < files.length; i++) {
+            formData.append('subthumbnail[]', files[i]);
+        }
+
+        // アップロード中に表示する進行状況
+        document.getElementById('uploadStatus').textContent = 'アップロード中...';
+
+        // Fetch APIで画像を非同期に送信
+        fetch('insert_image.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json()) // サーバーからのレスポンスをJSONとして処理
+        .then(data => {
+            if (data.success) {
+                document.getElementById('uploadStatus').textContent = '画像が正常にアップロードされました。';
+            } else {
+                document.getElementById('uploadStatus').textContent = '画像のアップロードに失敗しました。';
+            }
+        })
+        .catch(error => {
+            document.getElementById('uploadStatus').textContent = 'アップロードエラーが発生しました。';
+            console.error(error);
+        });
+    } else {
+        document.getElementById('uploadStatus').textContent = '画像を選択してください。';
+    }
+});

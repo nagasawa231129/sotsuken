@@ -8,58 +8,13 @@ include './../../db_open.php';
 include './function.php';
 // 商品情報を更新する処理
 if (isset($_POST['update'])) {
-    $shop_id = $_POST['shop_id'];
-    $goods = $_POST['goods'];
-    $price = $_POST['price'];
-    $goods_info = $_POST['goods_info'];
-
-    // 配列で送信されるデータをカンマ区切りで文字列に変換
-    $size = $_POST['size'];
-    $color = $_POST['color'];
-    $category = $_POST['category'];
-    $subcategory = $_POST['subcategory'];
-    $gender = $_POST['gender'];
-    $goods_info  = $_POST['goods_info'];
-
-    $brand = $_POST['brand'];
-
-    // 商品情報を更新するSQLクエリ
-    $update_sql = "UPDATE shop 
-                   SET goods = :goods, price = :price, size = :size, color = :color, category_id = :category, 
-                       subcategory_id = :subcategory, gender = :gender, brand_id = :brand ,exp = :exp
-                   WHERE shop_id = :shop_id";
-
-    // SQLの準備
-    $stmt = $dbh->prepare($update_sql);
-    $stmt->bindParam(':goods', $goods);
-    $stmt->bindParam(':price', $price);
-    $stmt->bindParam(':size', $size);
-    $stmt->bindParam(':color', $color);
-    $stmt->bindParam(':category', $category);
-    $stmt->bindParam(':subcategory', $subcategory);
-    $stmt->bindParam(':gender', $gender);
-    $stmt->bindParam(':brand', $brand);
-    $stmt->bindParam(':shop_id', $shop_id);
-    $stmt->bindParam(':exp', $goods_info);
-
-    // 実行
-    $stmt->execute();
+    update();
 }
 
 
 // 商品情報を削除する処理
 if (isset($_POST['delete'])) {
-    $shop_id = $_POST['shop_id'];
-
-    // 商品を削除するSQLクエリ
-    $delete_sql = "DELETE FROM shop WHERE shop_id = :shop_id";
-
-    // SQLの準備
-    $stmt = $dbh->prepare($delete_sql);
-    $stmt->bindParam(':shop_id', $shop_id);
-
-    // 実行
-    $stmt->execute();
+    delete();
 }
 
 // 検索条件が送信された場合
@@ -119,39 +74,15 @@ $stmt->execute();
 <?php
 // 「全て表示する」ボタンが押された場合、検索条件をリセット
 if (isset($_POST['reset_search'])) {
-    $search_query = '';  // 検索クエリを空にしてすべての商品を表示
-    $stmt = $dbh->prepare("SELECT 
-                                        shop.shop_id,
-                                        shop.goods,
-                                        shop.price,
-                                        shop.size AS size_id,
-                                        shop.color AS color_id,
-                                        shop.category_id AS category_id,
-                                        shop.gender AS gender_id,
-                                        brand.brand_id, 
-                                        brand.brand_name,          
-                                        color.ja_color AS color_name,  
-                                        gender.gender AS gender_name,
-                                        size.size,
-                                        subcategory.subcategory_name,
-                                        category.category_name,
-                                        shop.subcategory_id AS subcategory_id,
-                                   
-                                    FROM shop
-                                    LEFT JOIN brand ON shop.brand_id = brand.brand_id  
-                                    LEFT JOIN color ON shop.color = color.color_id  
-                                    LEFT JOIN category ON shop.category_id = category.category_id  
-                                    LEFT JOIN gender ON shop.gender = gender.gender_id
-                                    LEFT JOIN subcategory ON shop.subcategory_id = subcategory.subcategory_id
-                                    LEFT JOIN size ON shop.size = size.size_id");
-    $stmt->execute();
+    s_reset();
 }
 ?>
 
 <?php if ($stmt->rowCount() > 0): ?>
     <?php while ($product = $stmt->fetch(PDO::FETCH_ASSOC)): ?>
 
-        <form method="post" action="">
+        <form method="post" action="" enctype="multipart/form-data"> <!-- enctypeを追加 -->
+
             <input type="hidden" name="shop_id" value="<?= htmlspecialchars($product['shop_id']) ?>">
 
             <div class="form-container">
@@ -168,12 +99,12 @@ if (isset($_POST['reset_search'])) {
                         <tr>
                             <td>
                                 <?php
-                                $imgBlob = $product['thumbnail']; // サムネイルのBLOBデータ
+                                $thumbimgBlob = $product['thumbnail']; // サムネイルのBLOBデータ
                                 $shopId = $product['shop_id'];    // shop_idを取得
-                                if ($imgBlob) {
-                                    $encodedImg = base64_encode($imgBlob); // Base64エンコード
+                                if ($thumbimgBlob) {
+                                    $thumbencodedImg = base64_encode($thumbimgBlob); // Base64エンコード
                                     // 画像をクリックするとサムネイル用のファイル選択ダイアログを開く
-                                    echo "<img src='data:image/jpeg;base64,$encodedImg' alt='サムネイル' width='100' class='thumbnail' data-shop-id='$shopId' onclick='document.getElementById(\"thumbnailInput$shopId\").click();' id='shopImage$shopId' />";
+                                    echo "<img src='data:image/jpeg;base64,$thumbencodedImg' alt='サムネイル' width='100' class='thumbnail' data-shop-id='$shopId' onclick='document.getElementById(\"thumbnailInput$shopId\").click();' id='shopImage$shopId' />";
                                     echo "<input type='file' id='thumbnailInput$shopId' style='display:none;' accept='image/jpeg, image/jpg, image/png' onchange='updateThumbnail($shopId)' />";
                                 }
                                 ?>
@@ -191,25 +122,26 @@ if (isset($_POST['reset_search'])) {
                                     // 画像が存在する場合、画像を表示
                                     if ($img_stmt->rowCount() > 0) {
                                         while ($img_data = $img_stmt->fetch(PDO::FETCH_ASSOC)) {
-                                            $encodedImg = base64_encode($img_data['img']); // 画像データをBase64エンコード
+                                            $subencodedImg = base64_encode($img_data['img']); // 画像データをBase64エンコード
                                             $imageId = $img_data['image_id']; // image_idを取得
 
                                             // 各画像を表示
                                             echo "<div class='image-container' style='position: relative; display: inline-block; margin-right: 10px;'>";
-                                            echo "<img src='data:image/jpeg;base64,$encodedImg' alt='サブサムネイル' width='100' class='subthumbnail' 
-                    data-shop-id='$shop_id' data-image-id='$imageId' id='shopImage$shop_id' onclick='triggerFileInput($shop_id)' />";
+                                            echo "<img src='data:image/jpeg;base64,$subencodedImg' alt='サブサムネイル' width='100' class='subthumbnail' 
+                    data-shop-id='$shop_id' data-image-id='$imageId' id='shopImage$shop_id' >";
 
                                             // 「×」ボタンを画像の右上に表示
-                                            echo "<button class='delete-button' onclick='deleteImage($shop_id, $imageId)'>×</button>";
+                                            echo "<button type='button' class='delete-button' onclick='deleteImage($shop_id, $imageId)'>×</button>";
                                             echo "</div>";
                                         }
                                     }
                                     ?>
+
+                                    <div class="input-group">
+                                        <input type="file" name="subthumbnail[]" accept="image/jpeg, image/jpg, image/png" multiple />
+                                    </div>
                                 </div>
                             </td>
-
-
-
                             <td>
                                 <div class="input-group">
                                     <textarea name="goods_info" rows="4" cols="50" required><?= htmlspecialchars($product['exp']) ?></textarea>
