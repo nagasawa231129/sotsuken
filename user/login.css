@@ -1,6 +1,7 @@
+/* ベーススタイル */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f0f8ff;
+    background-color: #f4f4f9;
     margin: 0;
     padding: 0;
     display: flex;
@@ -10,71 +11,108 @@ body {
 }
 
 .container {
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
     padding: 20px;
-    width: 300px;
-    text-align: left; /* 左寄せに変更 */
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
     box-sizing: border-box;
 }
 
-h2.title {
-    color: #333;
-    margin: 0 0 20px 0;
+.title {
     font-size: 24px;
-    text-align: center; /* タイトルを中央寄せ */
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #333;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
 label {
-    margin-bottom: 5px;
     font-weight: bold;
+    color: #555;
 }
 
 input[type="text"],
 input[type="password"] {
-    width: 100%;
     padding: 10px;
-    margin-bottom: 20px; /* 上部マージンを削除 */
-    border: 1px solid #ddd;
+    border: 1px solid #ccc;
     border-radius: 4px;
-    box-sizing: border-box;
+    font-size: 16px;
 }
 
 input[type="submit"] {
-    background-color: #007BFF;
-    color: #fff;
+    padding: 10px;
     border: none;
-    padding: 10px 20px;
     border-radius: 4px;
-    cursor: pointer;
+    background-color: #4CAF50;
+    color: #fff;
     font-size: 16px;
-    width: 100%;
-    display: block;
-    box-sizing: border-box;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 
 input[type="submit"]:hover {
-    background-color: #0056b3;
+    background-color: #45a049;
+}
+
+.error {
+    color: #d9534f;
+    font-weight: bold;
+    margin-bottom: 10px;
 }
 
 a {
-    display: block; /* リンクをブロック要素に */
-    margin-top: 20px; /* フォームとの間に余白を作る */
+    display: block;
+    margin-top: 10px;
     color: #007BFF;
     text-decoration: none;
+    text-align: center;
 }
 
 a:hover {
     text-decoration: underline;
 }
 
-.success {
-    color: green;
-    font-weight: bold;
+/* SNSログインボタン */
+a.sns-login {
+    display: block;
+    margin: 10px auto;
+    padding: 10px;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 16px;
+    color: #fff;
+    text-decoration: none;
+    transition: background-color 0.3s;
 }
 
-.error {
-    color: red;
-    font-weight: bold;
+a.sns-login.twitter {
+    background-color: #1DA1F2;
+}
+
+a.sns-login.twitter:hover {
+    background-color: #0d95e8;
+}
+
+a.sns-login.line {
+    background-color: #00c300;
+}
+
+a.sns-login.line:hover {
+    background-color: #00a900;
+}
+
+a.sns-login.google {
+    background-color: #DB4437;
+}
+
+a.sns-login.google:hover {
+    background-color: #c33d2e;
 }
