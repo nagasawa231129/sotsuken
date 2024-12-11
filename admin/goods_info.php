@@ -5,22 +5,28 @@
 <?php
 // データベース接続
 include './../../db_open.php';
+include './function.php';
 // 商品情報を更新する処理
 if (isset($_POST['update'])) {
     $shop_id = $_POST['shop_id'];
     $goods = $_POST['goods'];
     $price = $_POST['price'];
-    $size = $_POST['size'];
-    $color = $_POST['color'];
-    $category = $_POST['category'];
-    $subcategory = $_POST['subcategory'];
-    $gender = $_POST['gender'];
+    $goods_info = $_POST['goods_info'];
+
+    // 配列で送信されるデータをカンマ区切りで文字列に変換
+    $size = isset($_POST['size']) ? implode(',', $_POST['size']) : null;
+    $color = isset($_POST['color']) ? implode(',', $_POST['color']) : null;
+    $category = isset($_POST['category']) ? implode(',', $_POST['category']) : null;
+    $subcategory = isset($_POST['subcategory']) ? implode(',', $_POST['subcategory']) : null;
+    $gender = isset($_POST['gender']) ? implode(',', $_POST['gender']) : null;
+    $goods_info  = isset($_POST['goods_info']) ? implode(',', $_POST['goods_info']) : null;
+
     $brand = $_POST['brand'];
 
     // 商品情報を更新するSQLクエリ
     $update_sql = "UPDATE shop 
                    SET goods = :goods, price = :price, size = :size, color = :color, category_id = :category, 
-                       subcategory_id = :subcategory, gender = :gender, brand_id = :brand 
+                       subcategory_id = :subcategory, gender = :gender, brand_id = :brand ,exp = :exp
                    WHERE shop_id = :shop_id";
 
     // SQLの準備
@@ -34,10 +40,12 @@ if (isset($_POST['update'])) {
     $stmt->bindParam(':gender', $gender);
     $stmt->bindParam(':brand', $brand);
     $stmt->bindParam(':shop_id', $shop_id);
+    $stmt->bindParam(':exp', $goods_info);
 
     // 実行
     $stmt->execute();
 }
+
 
 // 商品情報を削除する処理
 if (isset($_POST['delete'])) {
@@ -171,35 +179,34 @@ if (isset($_POST['reset_search'])) {
                                 ?>
                             </td>
                             <td>
-    <div class="input-group">
-        <?php
-        // 商品IDに基づいて、imageテーブルから画像を取得
-        $shop_id = $product['shop_id']; // 現在の商品ID
-        $img_sql = "SELECT img, image_id FROM image WHERE shop_id = :shop_id"; // 画像を取得するSQL（imageフィールドとimage_idを取得）
-        $img_stmt = $dbh->prepare($img_sql);
-        $img_stmt->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
-        $img_stmt->execute();
+                                <div class="input-group" style="position: relative;">
+                                    <?php
+                                    // 商品IDに基づいて、imageテーブルから画像を取得
+                                    $shop_id = $product['shop_id']; // 現在の商品ID
+                                    $img_sql = "SELECT img, image_id FROM image WHERE shop_id = :shop_id"; // 画像を取得するSQL（imageフィールドとimage_idを取得）
+                                    $img_stmt = $dbh->prepare($img_sql);
+                                    $img_stmt->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
+                                    $img_stmt->execute();
 
-        // 画像が存在する場合、画像を表示
-        if ($img_stmt->rowCount() > 0) {
-            $img_data = $img_stmt->fetch(PDO::FETCH_ASSOC);
-            $encodedImg = base64_encode($img_data['img']); // 画像データをBase64エンコード
-            $imageId = $img_data['image_id']; // image_idを取得
+                                    // 画像が存在する場合、画像を表示
+                                    if ($img_stmt->rowCount() > 0) {
+                                        while ($img_data = $img_stmt->fetch(PDO::FETCH_ASSOC)) {
+                                            $encodedImg = base64_encode($img_data['img']); // 画像データをBase64エンコード
+                                            $imageId = $img_data['image_id']; // image_idを取得
 
-            // 画像を表示し、クリックしたらファイル選択ダイアログを開く
-            echo "<img src='data:image/jpeg;base64,$encodedImg' alt='サブサムネイル' width='100' class='subthumbnail' 
-            data-shop-id='$shop_id' data-image-id='$imageId' id='shopImage$shop_id' onclick='triggerFileInput($shop_id)' />";
-        }
-        ?>
+                                            // 各画像を表示
+                                            echo "<div class='image-container' style='position: relative; display: inline-block; margin-right: 10px;'>";
+                                            echo "<img src='data:image/jpeg;base64,$encodedImg' alt='サブサムネイル' width='100' class='subthumbnail' 
+                    data-shop-id='$shop_id' data-image-id='$imageId' id='shopImage$shop_id' onclick='triggerFileInput($shop_id)' />";
 
-        <!-- 画像を選択するファイル入力（最初は非表示） -->
-        <input type="file" id="imageInput<?php echo $shop_id; ?>" style="display:none;" accept="image/jpeg, image/jpg, image/png" onchange="updateImage(<?php echo $shop_id; ?>)" />
-    </div>
-</td>
-
-
-
-
+                                            // 「×」ボタンを画像の右上に表示
+                                            echo "<button class='delete-button' onclick='deleteImage($shop_id, $imageId)'>×</button>";
+                                            echo "</div>";
+                                        }
+                                    }
+                                    ?>
+                                </div>
+                            </td>
 
 
 
@@ -296,25 +303,18 @@ if (isset($_POST['reset_search'])) {
                 </table>
             </div>
             </div>
+            <div class="form-container">
+                <!-- 商品情報の入力フォーム (省略) -->
+                <div class="button-container">
+                    <button type="submit" name="update">更新</button>
+                </div> <!-- 商品情報の入力フォーム (省略) -->
+                <div class="button-container">
+                    <button type="submit" name="delete">削除</button>
+                </div>
+            </div>
 
-
-            <!-- 
-                        <tr>
-
-
-                            <td>
-                                <button type="submit" name="update">更新</button>
-                            </td>
-                            <td>
-                                <button type="submit" name="delete">削除</button>
-                            </td> -->
         </form>
-        <!-- <div id="imageModal" class="modal">
-                        <div class="modal-content" id="modalContent"> -->
-        <!-- ここに画像が追加されます -->
-        <!-- </div>
-                        <span id="closeModal" class="close">&times;</span>
-                    </div> -->
+
 
         </tr>
     <?php endwhile; ?>

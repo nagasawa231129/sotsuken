@@ -25,44 +25,33 @@ function updateThumbnail(shop_id) {
     }
 }
 // 画像選択ダイアログを開くための関数
-function triggerFileInput(shopId) {
-    // 対応するinputファイルをクリック
-    document.getElementById('imageInput' + shopId).click();
-}
+// 画像を削除する関数
+function deleteImage(shop_id, image_id) {
+    if (confirm("本当にこの画像を削除しますか？")) {
+        var formData = new FormData();
+        formData.append('image_id', image_id);
 
-// 画像を更新するための関数
-function updateImage(shopId) {
-    var fileInput = document.getElementById('imageInput' + shopId);
-    var file = fileInput.files[0]; // 選択されたファイル
-    var formData = new FormData();
+        // AJAXで削除リクエストを送信
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'delete_image.php', true);
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                // 成功した場合は画像をページから削除
+                var imgElement = document.getElementById('shopImage' + shop_id);
+                imgElement.parentElement.removeChild(imgElement); // 画像を削除
 
-    formData.append('subimage', file); // 画像データをFormDataに追加
-    formData.append('shop_id', shopId); // 商品ID
-    formData.append('image_id', document.querySelector(`#shopImage${shopId}`).getAttribute('data-image-id')); // 現在の画像IDを追加
-
-    // 画像の更新処理をサーバーに送信
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', 'update_subimage.php', true);
-    
-    xhr.onload = function() {
-        if (xhr.status === 200) {
-            // 画像が正常に更新された場合、サムネイル画像を更新
-            var response = xhr.responseText;
-            if (response === "サブサムネイルが正常に更新されました。") {
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('shopImage' + shopId).src = e.target.result; // 新しい画像を表示
-                };
-                reader.readAsDataURL(file); // 選択された画像をbase64エンコードして表示
+                // 「×」ボタンも削除
+                var deleteButton = document.querySelector('.delete-button');
+                if (deleteButton) {
+                    deleteButton.parentElement.removeChild(deleteButton);
+                }
+                alert("画像が削除されました。");
             } else {
-                alert('画像の更新に失敗しました。');
+                alert("画像の削除に失敗しました。");
             }
-        } else {
-            alert('エラーが発生しました。');
-        }
-    };
-
-    xhr.send(formData); // FormDataを送信
+        };
+        xhr.send(formData);
+    }
 }
 
 
