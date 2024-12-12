@@ -1,28 +1,26 @@
 <!DOCTYPE html>
 <html lang="ja">
 <link rel="stylesheet" href="order_management.css">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    
     <title>購入状況管理</title>
-    <style>
-
-    </style>
+    
 </head>
 
 <body>
     <div class="tabs">
-        <a href="admin_toppage.php" class="tab">トップページ</a>
-        <a href="order_management.php" class="tab active">全て表示</a>
+    <a href="admin_toppage.php" class="tab">トップページ</a>
+        <a href="order_management.php" class="tab">全て表示</a>
         <a href="waiting_for_payment.php" class="tab">入金待ち</a>
-        <a href="waiting_for_shipment.php" class="tab">発送待ち</a>
+        <a href="waiting_for_shipment.php" class="tab active">発送待ち </a>
+        
         <a href="send_shipped.php" class="tab">発送済み</a>
     </div>
 
-    <!-- モーダル -->
-    <div id="imageModal" class="modal" style="display: none;">
+
+ <div id="imageModal" class="modal" style ="display: none;">
         <span class="close">&times;</span>
         <img class="modal-content" id="modalImage">
     </div>
@@ -54,7 +52,7 @@ LEFT JOIN brand b ON shop.brand_id = b.brand_id
 LEFT JOIN size s ON shop.size = s.size_id
 LEFT JOIN color c ON shop.color = c.color_id
 LEFT JOIN user user ON cart.user_id = user.user_id
-WHERE cart.trade_situation IN (1, 2)
+WHERE cart.trade_situation = 2
 ORDER BY cart.order_date, cart.user_id, cart.cart_id");
 
     $stmt->execute();

@@ -1,0 +1,185 @@
+/* 基本的なレイアウト */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+
+/* トップページリンク */
+a {
+    display: inline-block;
+    margin-bottom: 20px;
+    text-decoration: none;
+    color: #333;
+    font-size: 16px;
+}
+
+/* 注文データの枠 */
+.order-data {
+    background-color: #ffffff;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* 注文時間、カナ、宛名を見やすく表示 */
+h2 {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.data-label {
+    font-weight: bold;
+}
+
+.data-value {
+    margin-left: 10px;
+}
+
+/* 商品情報の枠 */
+.product-data {
+    background-color: #f9f9f9;
+    padding: 15px;
+    margin-top: 15px;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* 商品ごとの情報を行ごとに表示 */
+.product-data p {
+    margin: 5px 0;
+}
+
+/* 商品情報内のラベルと値の間隔 */
+.product-data .data-label {
+    font-weight: bold;
+}
+
+/* 複数の商品情報を一緒に表示 */
+.product-data span.data-value {
+    color: #555;
+}
+
+/* 取引状況を強調表示 */
+.product-data p:last-child {
+    font-weight: bold;
+    color: #007bff;
+}
+
+/* 注文情報の境界線 */
+.order-data .product-data:first-child {
+    border-top: 2px solid #e0e0e0;
+}
+
+/* 取引状況のラベルを目立たせる */
+.order-data .product-data p:last-child {
+    font-weight: bold;
+    color: #ff9800; /* 取引状況に応じて色を変更することも可能 */
+}
+        /* タブのスタイル */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .tab {
+            margin: 0 10px;
+            padding: 10px 20px;
+            text-decoration: none;
+            color: #555;
+            font-weight: bold;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .tab:hover {
+            background-color: #0078d7;
+            color: #fff;
+        }
+
+        .tab.active {
+            background-color: #0078d7;
+            color: #fff;
+        }
+
+        /* コンテンツスタイル */
+        .order-data {
+            margin: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+
+        .data-label {
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        .product-data {
+            margin-left: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+
+        input[type="submit"] {
+            background-color: #0078d7;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #005bb5;
+        }
+
+        /* モーダルの基本スタイル */
+/* モーダルの基本スタイル */
+.modal {
+    display: none; /* 初期状態で非表示にする */
+    position: fixed;
+    z-index: 1000;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%); /* 完全な中央揃え */
+    width: 70%; /* 必要に応じて調整可能 */
+    max-width: 600px; /* 最大幅を設定 */
+    background-color: rgba(0, 0, 0, 0.8); /* 背景の黒さを少し抑える */
+    padding: 20px;
+    border-radius: 10px; /* 角丸で柔らかい印象に */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* モーダル内の画像スタイル */
+.modal-content {
+    max-width: 100%;
+    max-height: 80vh;
+    border: 2px solid white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* モーダルの閉じるボタン */
+.close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    color: white;
+    font-size: 25px;
+    font-weight: bold;
+    cursor: pointer;
+}

@@ -5,53 +5,16 @@
 <?php
 // データベース接続
 include './../../db_open.php';
+include './function.php';
 // 商品情報を更新する処理
 if (isset($_POST['update'])) {
-    $shop_id = $_POST['shop_id'];
-    $goods = $_POST['goods'];
-    $price = $_POST['price'];
-    $size = $_POST['size'];
-    $color = $_POST['color'];
-    $category = $_POST['category'];
-    $subcategory = $_POST['subcategory'];
-    $gender = $_POST['gender'];
-    $brand = $_POST['brand'];
-
-    // 商品情報を更新するSQLクエリ
-    $update_sql = "UPDATE shop 
-                   SET goods = :goods, price = :price, size = :size, color = :color, category_id = :category, 
-                       subcategory_id = :subcategory, gender = :gender, brand_id = :brand 
-                   WHERE shop_id = :shop_id";
-
-    // SQLの準備
-    $stmt = $dbh->prepare($update_sql);
-    $stmt->bindParam(':goods', $goods);
-    $stmt->bindParam(':price', $price);
-    $stmt->bindParam(':size', $size);
-    $stmt->bindParam(':color', $color);
-    $stmt->bindParam(':category', $category);
-    $stmt->bindParam(':subcategory', $subcategory);
-    $stmt->bindParam(':gender', $gender);
-    $stmt->bindParam(':brand', $brand);
-    $stmt->bindParam(':shop_id', $shop_id);
-
-    // 実行
-    $stmt->execute();
+    update();
 }
+
 
 // 商品情報を削除する処理
 if (isset($_POST['delete'])) {
-    $shop_id = $_POST['shop_id'];
-
-    // 商品を削除するSQLクエリ
-    $delete_sql = "DELETE FROM shop WHERE shop_id = :shop_id";
-
-    // SQLの準備
-    $stmt = $dbh->prepare($delete_sql);
-    $stmt->bindParam(':shop_id', $shop_id);
-
-    // 実行
-    $stmt->execute();
+    delete();
 }
 
 // 検索条件が送信された場合
@@ -65,6 +28,7 @@ $sql = "SELECT
             shop.shop_id,
             shop.goods,
             shop.price,
+            shop.exp,
             shop.size AS size_id,
             shop.color AS color_id,
             shop.category_id AS category_id,
@@ -105,73 +69,104 @@ $stmt->execute();
         <!-- 全て表示するボタン -->
         <button type="submit" name="reset_search">全て表示する</button>
     </form>
+</div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>サムネ</th>
-                <th>ブランド</th>
-                <th>商品名</th>
-                <th>価格(円)</th>
-                <th>サイズ</th>
-                <th>色</th>
-                <th>カテゴリ</th>
-                <th>サブカテゴリー</th>
-                <th>性別</th>
-                <th>操作</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-            // 「全て表示する」ボタンが押された場合、検索条件をリセット
-            if (isset($_POST['reset_search'])) {
-                $search_query = '';  // 検索クエリを空にしてすべての商品を表示
-                $stmt = $dbh->prepare("SELECT 
-                                        shop.shop_id,
-                                        shop.goods,
-                                        shop.price,
-                                        shop.size AS size_id,
-                                        shop.color AS color_id,
-                                        shop.category_id AS category_id,
-                                        shop.gender AS gender_id,
-                                        brand.brand_id, 
-                                        brand.brand_name,          
-                                        color.ja_color AS color_name,  
-                                        gender.gender AS gender_name,
-                                        size.size,
-                                        subcategory.subcategory_name,
-                                        category.category_name,
-                                        shop.subcategory_id AS subcategory_id,
-                                   
-                                    FROM shop
-                                    LEFT JOIN brand ON shop.brand_id = brand.brand_id  
-                                    LEFT JOIN color ON shop.color = color.color_id  
-                                    LEFT JOIN category ON shop.category_id = category.category_id  
-                                    LEFT JOIN gender ON shop.gender = gender.gender_id
-                                    LEFT JOIN subcategory ON shop.subcategory_id = subcategory.subcategory_id
-                                    LEFT JOIN size ON shop.size = size.size_id");
-                $stmt->execute();
-            }
-            ?>
+<?php
+// 「全て表示する」ボタンが押された場合、検索条件をリセット
+if (isset($_POST['reset_search'])) {
+    s_reset();
+}
+?>
 
-            <?php if ($stmt->rowCount() > 0): ?>
-                <?php while ($product = $stmt->fetch(PDO::FETCH_ASSOC)): ?>
+<?php if ($stmt->rowCount() > 0): ?>
+    <?php while ($product = $stmt->fetch(PDO::FETCH_ASSOC)): ?>
 
-                    <form method="post" action="">
-                        <input type="hidden" name="shop_id" value="<?= htmlspecialchars($product['shop_id']) ?>">
+        <form method="post" action="" enctype="multipart/form-data"> <!-- enctypeを追加 -->
+
+            <input type="hidden" name="shop_id" value="<?= htmlspecialchars($product['shop_id']) ?>">
+
+            <div class="form-container">
+
+                <table id="goods-table">
+                    <thead>
                         <tr>
-
+                            <th class="thumbnail">サムネ</th>
+                            <th class="thumbnail">サブimg</th>
+                            <th class="goods_info">商品の説明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
                             <td>
                                 <?php
-                                $imgBlob = $product['thumbnail']; // サムネイルのBLOBデータ
+                                $thumbimgBlob = $product['thumbnail']; // サムネイルのBLOBデータ
                                 $shopId = $product['shop_id'];    // shop_idを取得
-                                if ($imgBlob) {
-                                    $encodedImg = base64_encode($imgBlob); // Base64エンコード
-                                    // 画像をクリックするとモーダルが開くように設定
-                                    echo "<img src='data:image/jpeg;base64,$encodedImg' alt='サムネイル' width='100' class='thumbnail' data-shop-id='$shopId' />";
+                                if ($thumbimgBlob) {
+                                    $thumbencodedImg = base64_encode($thumbimgBlob); // Base64エンコード
+                                    // 画像をクリックするとサムネイル用のファイル選択ダイアログを開く
+                                    echo "<img src='data:image/jpeg;base64,$thumbencodedImg' alt='サムネイル' width='100' class='thumbnail' data-shop-id='$shopId' onclick='document.getElementById(\"thumbnailInput$shopId\").click();' id='shopImage$shopId' />";
+                                    echo "<input type='file' id='thumbnailInput$shopId' style='display:none;' accept='image/jpeg, image/jpg, image/png' onchange='updateThumbnail($shopId)' />";
                                 }
                                 ?>
                             </td>
+                            <td>
+                                <div class="input-group" style="position: relative;">
+                                    <?php
+                                    // 商品IDに基づいて、imageテーブルから画像を取得
+                                    $shop_id = $product['shop_id']; // 現在の商品ID
+                                    $img_sql = "SELECT img, image_id FROM image WHERE shop_id = :shop_id"; // 画像を取得するSQL（imageフィールドとimage_idを取得）
+                                    $img_stmt = $dbh->prepare($img_sql);
+                                    $img_stmt->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
+                                    $img_stmt->execute();
+
+                                    // 画像が存在する場合、画像を表示
+                                    if ($img_stmt->rowCount() > 0) {
+                                        while ($img_data = $img_stmt->fetch(PDO::FETCH_ASSOC)) {
+                                            $subencodedImg = base64_encode($img_data['img']); // 画像データをBase64エンコード
+                                            $imageId = $img_data['image_id']; // image_idを取得
+
+                                            // 各画像を表示
+                                            echo "<div class='image-container' style='position: relative; display: inline-block; margin-right: 10px;'>";
+                                            echo "<img src='data:image/jpeg;base64,$subencodedImg' alt='サブサムネイル' width='100' class='subthumbnail' 
+                    data-shop-id='$shop_id' data-image-id='$imageId' id='shopImage$shop_id' >";
+
+                                            // 「×」ボタンを画像の右上に表示
+                                            echo "<button type='button' class='delete-button' onclick='deleteImage($shop_id, $imageId)'>×</button>";
+                                            echo "</div>";
+                                        }
+                                    }
+                                    ?>
+
+                                    <div class="input-group">
+                                        <input type="file" name="subthumbnail[]" accept="image/jpeg, image/jpg, image/png" multiple />
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="input-group">
+                                    <textarea name="goods_info" rows="4" cols="50" required><?= htmlspecialchars($product['exp']) ?></textarea>
+                                </div>
+                            </td>
+
+                        </tr>
+                    </tbody>
+                </table>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="brand">ブランド</th>
+                            <th class="goods">商品名</th>
+                            <th class="price">価格(円)</th>
+                            <th>サイズ</th>
+                            <th>色</th>
+                            <th class="category">カテゴリ</th>
+                            <th>サブカテゴリ</th>
+                            <th>性別</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
                             <td>
                                 <select name="brand" required>
                                     <?php
@@ -186,23 +181,23 @@ $stmt->execute();
                             <td><input type="text" name="goods" value="<?= htmlspecialchars($product['goods']) ?>" required></td>
                             <td class="price-select"><input type="number" name="price" value="<?= htmlspecialchars($product['price']) ?>" required></td>
                             <td>
-                                <select name="size" class="size-select" required>
+                                <select name="size" class="wide-select" required>
                                     <?php
                                     $size_sql = "SELECT size_id, size FROM size";
-                                    foreach ($dbh->query($size_sql) as $size_option) {
-                                        $selected = ($product['size_id'] == $size_option['size_id']) ? 'selected' : '';
-                                        echo "<option value='{$size_option['size_id']}' {$selected}>{$size_option['size']}</option>";
+                                    foreach ($dbh->query($size_sql) as $size) {
+                                        $selected = ($product['size_id'] == $size['size_id']) ? 'selected' : ''; // 選択されたサイズを設定
+                                        echo "<option value='{$size['size_id']}' {$selected}>{$size['size']}</option>";
                                     }
                                     ?>
                                 </select>
                             </td>
-                            <td>
-                                <select name="color" required>
+                            <td class="color">
+                                <select name="color" class="wide-select" required>
                                     <?php
                                     $color_sql = "SELECT color_id, ja_color FROM color";
-                                    foreach ($dbh->query($color_sql) as $color_option) {
-                                        $selected = ($product['color_id'] == $color_option['color_id']) ? 'selected' : '';
-                                        echo "<option value='{$color_option['color_id']}' {$selected}>{$color_option['ja_color']}</option>";
+                                    foreach ($dbh->query($color_sql) as $color) {
+                                        $selected = ($product['color_id'] == $color['color_id']) ? 'selected' : ''; // 選択された色を設定
+                                        echo "<option value='{$color['color_id']}' {$selected}>{$color['ja_color']}</option>";
                                     }
                                     ?>
                                 </select>
@@ -211,9 +206,9 @@ $stmt->execute();
                                 <select name="category" class="category" required onchange="updateSubcategory(this)">
                                     <?php
                                     $category_sql = "SELECT category_id, category_name FROM category";
-                                    foreach ($dbh->query($category_sql) as $category_option) {
-                                        $selected = ($product['category_id'] == $category_option['category_id']) ? 'selected' : '';
-                                        echo "<option value='{$category_option['category_id']}' {$selected}>{$category_option['category_name']}</option>";
+                                    foreach ($dbh->query($category_sql) as $category) {
+                                        $selected = ($product['category_id'] == $category['category_id']) ? 'selected' : ''; // 選択されたカテゴリを設定
+                                        echo "<option value='{$category['category_id']}' {$selected}>{$category['category_name']}</option>";
                                     }
                                     ?>
                                 </select>
@@ -221,13 +216,10 @@ $stmt->execute();
                             <td>
                                 <select name="subcategory" class="subcategory" required>
                                     <?php
-                                    // サブカテゴリーを取得して選択肢を表示
-                                    $subcategory_sql = "SELECT subcategory_id, subcategory_name FROM subcategory WHERE category_id = ?";
-                                    $stmt_subcategory = $dbh->prepare($subcategory_sql);
-                                    $stmt_subcategory->execute([$product['category_id']]);
-                                    while ($subcategory_option = $stmt_subcategory->fetch(PDO::FETCH_ASSOC)) {
-                                        $selected = ($product['subcategory_id'] == $subcategory_option['subcategory_id']) ? 'selected' : '';
-                                        echo "<option value='{$subcategory_option['subcategory_id']}' {$selected}>{$subcategory_option['subcategory_name']}</option>";
+                                    $subcategory_sql = "SELECT subcategory_id, subcategory_name FROM subcategory";
+                                    foreach ($dbh->query($subcategory_sql) as $subcategory) {
+                                        $subselected = ($product['subcategory_id'] == $subcategory['subcategory_id']) ? 'selected' : ''; // 選択されたカテゴリを設定
+                                        echo "<option value='{$subcategory['subcategory_id']}'{$subselected}>{$subcategory['subcategory_name']}</option>";
                                     }
                                     ?>
                                 </select>
@@ -236,98 +228,40 @@ $stmt->execute();
                                 <select name="gender" required>
                                     <?php
                                     $gender_sql = "SELECT gender_id, gender FROM gender";
-                                    foreach ($dbh->query($gender_sql) as $gender_option) {
-                                        $selected = ($product['gender_id'] == $gender_option['gender_id']) ? 'selected' : '';
-                                        echo "<option value='{$gender_option['gender_id']}' {$selected}>{$gender_option['gender']}</option>";
+                                    foreach ($dbh->query($gender_sql) as $gender) {
+                                        $gselected = ($product['gender_id'] == $gender['gender_id']) ? 'selected' : ''; // 選択された色を設定
+                                        echo "<option value='{$gender['gender_id']}'{$gselected}>{$gender['gender']}</option>";
                                     }
                                     ?>
                                 </select>
                             </td>
-                            <td>
-                                <button type="submit" name="update">更新</button>
-                            </td>
-                            <td>
-                                <button type="submit" name="delete">削除</button>
-                            </td>
-                    </form>
-                    <div id="imageModal" class="modal">
-                        <div class="modal-content" id="modalContent">
-                            <!-- ここに画像が追加されます -->
-                        </div>
-                        <span id="closeModal" class="close">&times;</span>
-                    </div>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            </div>
+            <div class="form-container">
+                <!-- 商品情報の入力フォーム (省略) -->
+                <div class="button-container">
+                    <button type="submit" name="update">更新</button>
+                </div> <!-- 商品情報の入力フォーム (省略) -->
+                <div class="button-container">
+                    <button type="submit" name="delete">削除</button>
+                </div>
+            </div>
 
-                    </tr>
-                <?php endwhile; ?>
-            <?php else: ?>
-                <tr>
-                    <td colspan="8">商品情報が見つかりません。</td>
-                </tr>
-            <?php endif; ?>
-        </tbody>
-    </table>
+        </form>
+
+
+        </tr>
+    <?php endwhile; ?>
+<?php else: ?>
+    <tr>
+        <td colspan="8">商品情報が見つかりません。</td>
+    </tr>
+<?php endif; ?>
+</tbody>
+</table>
 </div>
 
-<script>
-    // categoryが選択された時にsubcategoriesを更新
-    function updateSubcategory(categoryElement) {
-        var categoryId = categoryElement.value;
-        var subcategorySelect = categoryElement.closest('tr').querySelector('.subcategory');
-
-        // AJAXを使用してサーバーにリクエストを送信
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', 'get_subcategories.php?category_id=' + categoryId, true);
-        xhr.onload = function() {
-            if (xhr.status === 200) {
-                // サブカテゴリーを更新
-                subcategorySelect.innerHTML = xhr.responseText;
-            }
-        };
-        xhr.send();
-    }
-    const thumbnails = document.querySelectorAll('.thumbnail');
-    const modal = document.getElementById('imageModal');
-    const modalContent = document.getElementById('modalContent');
-    const closeModal = document.getElementById('closeModal');
-
-    thumbnails.forEach(thumbnail => {
-        thumbnail.addEventListener('click', function() {
-            const shopId = this.dataset.shopId; // クリックしたサムネイルのshop_idを取得
-            fetch(`show_images.php?shop_id=${shopId}`) // shop_idを渡して画像を取得
-                .then(response => response.json()) // 画像のBase64エンコードされた配列を取得
-                .then(images => {
-                    // モーダル内のコンテンツをクリア
-                    modalContent.innerHTML = '';
-
-                    if (images.length > 0) {
-                        // 画像を順にモーダルに追加
-                        images.forEach(encodedImg => {
-                            const imgElement = document.createElement('img');
-                            imgElement.src = encodedImg; // Base64エンコードされた画像をセット
-                            imgElement.alt = '商品画像';
-                            modalContent.appendChild(imgElement); // モーダル内に画像を追加
-                        });
-                        modal.style.display = 'flex'; // モーダルを表示
-                    } else {
-                        modalContent.innerHTML = "画像が見つかりません"; // 画像がない場合
-                        modal.style.display = 'flex'; // モーダルを表示
-                    }
-                })
-                .catch(error => {
-                    console.error("画像の取得に失敗しました:", error);
-                });
-        });
-    });
-
-    // モーダルを閉じる処理
-    closeModal.addEventListener('click', function() {
-        modal.style.display = 'none';
-    });
-
-    // モーダルの外側をクリックすると閉じる
-    window.addEventListener('click', function(event) {
-        if (event.target === modal) {
-            modal.style.display = 'none';
-        }
-    });
-</script>
+<script src="goods_info.js"> </script>

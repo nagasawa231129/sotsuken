@@ -1,253 +1,243 @@
-/* 全体のフォントと背景 */
-body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f7f7f7;  /* 背景色を柔らかいグレーに変更 */
-    color: #333;
-    margin: 0;
+/* 画像コンテナ */
+.image-container {
+    position: relative;
+    display: inline-block;
+    margin-right: 10px;
+}
+
+/* 画像スタイル */
+.subthumbnail {
+    width: 50px; /* 画像の幅 */
+    height: auto; /* アスペクト比を維持 */
+    cursor: pointer; /* クリック可能にする */
+}
+
+/* 削除ボタン */
+.delete-button {
+    position: absolute;
+    top: 5px; /* 画像の上部から少し離す */
+    right: 5px; /* 画像の右端から少し離す */
+    background-color: rgba(0, 0, 0, 0.5); /* 半透明の背景 */
+    color: white;
+    border: none;
+    font-size: 16px;
+    padding: 5px;
+    cursor: pointer;
+    border-radius: 50%; /* 丸い形にする */
+}
+
+/* 削除ボタンホバー時のスタイル */
+.delete-button:hover {
+    background-color: rgba(255, 0, 0, 0.7); /* 赤色の背景に変える */
+}
+
+  
+/* フォーム全体のスタイル */
+form, .single-form {
+    margin: 10px;
     padding: 20px;
-    line-height: 1.6;  /* 行間を少し広げて読みやすく */
+    background-color: #fff;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* フォーム内の各項目の間にスペース */
+/* form > div, .single-form > form > div {
+    margin-bottom: 20px;
+} */
+
+/* フォームタイトル */
+form h2, .single-form h2 {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+/* ラベルのスタイル */
+label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+    color: #555;
+}
+
+/* 入力フィールドのスタイル */
+input[type="text"],
+input[type="number"],
+input[type="file"],
+textarea,
+select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1em;
+    box-sizing: border-box;
+}
+
+/* 入力フィールドにホバーしたときのスタイル */
+input[type="text"]:hover,
+input[type="number"]:hover,
+input[type="file"]:hover,
+textarea:hover,
+select:hover {
+    border-color: #66afe9;
+}
+
+/* フォームのボタン */
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+/* エラーメッセージ */
+.error-message {
+    color: #e74c3c;
+    margin-top: 10px;
+}
+
+/* フォームの入力エラー時のスタイル */
+input:invalid {
+    border-color: #e74c3c;
+}
+
+input:valid {
+    border-color: #2ecc71;
+}
+
+/* 商品追加フォームのテーブルのスタイル */
+#goods-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#goods-table th, #goods-table td {
+    padding: 8px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+#goods-table td {
+    vertical-align: middle;
+}
+
+/* 画像のサムネイルとサブ画像の横並び */
+.image-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+/* 幅を広げるセレクトボックス */
+select.wide-select {
+    width: 100px;
+}
+
+select.brand-select {
+    width: 100px;
+}
+
+th.brand {
+    width: 150px;
+}
+
+th.price {
+    width: 100px;
+}
+th.category {
+    width: 120px;
+}
+th.color {
+    width: 120px;
+}
+th.thumbnail {
+    width: 300px;
+}
+td.color{}
+/* サイズ固定のテキストエリア */
+.input-group textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    resize: none;
+    box-sizing: border-box;
 }
 
 /* テーブルのスタイル */
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 20px;
-    background-color: #fff;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);  /* ボックスシャドウを強調 */
-    border-radius: 8px;
-    overflow: hidden;
 }
 
-/* テーブルヘッダー */
+th, td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
 th {
-    background-color: #4CAF50;  /* ヘッダーの背景色をグリーン */
+    background-color: #f4f4f4;
+}
+
+.delete-row {
+    background-color: red;
     color: white;
-    text-align: left;
-    padding: 12px;
-    font-size: 16px;  /* フォントサイズを少し大きく */
-    border-bottom: 2px solid #ddd;
+    padding: 5px 10px;
+    cursor: pointer;
 }
 
-/* テーブルのセル */
-td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-    font-size: 14px;
-    height: 50px;
-    vertical-align: middle;
-    background-color: #f9f9f9;  /* セルの背景色を柔らかく */
+.delete-row:hover {
+    background-color: darkred;
 }
 
-tr:hover {
-    background-color: #f1f1f1;  /* 行をホバーしたときの色 */
-}
-
-/* フォーム要素のスタイル */
-input[type="text"], input[type="number"], select {
+/* セレクトボックスと入力フィールドの幅 */
+select, input[type="text"], input[type="number"] {
     width: 100%;
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 14px;
-    height: 40px;
-    line-height: 20px;
-    box-sizing: border-box;  /* パディングを含むサイズ */
-}
-
-/* 更新ボタン */
-.update-btn {
-    padding: 10px 20px;
-    background-color: #007BFF;  /* ブルー系の色 */
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.update-btn:hover {
-    background-color: #0056b3;  /* ホバー時の色を少し暗く */
-}
-
-/* メッセージ表示 */
-.message {
-    color: #28a745;
-    font-size: 14px;
-    margin-bottom: 20px;
-}
-
-.error {
-    color: #dc3545;
-    font-size: 14px;
-    margin-bottom: 20px;
-}
-
-/* 価格入力のスタイル */
-.price-input {
-    width: 100px;
+    padding: 8px;
     box-sizing: border-box;
-    height: 40px;
 }
 
-/* テーブル内のセル内の要素の中央揃え */
-td {
-    vertical-align: middle;
+/* カテゴリとサブカテゴリのセレクトボックス */
+.category, .subcategory {
+    width: 100%;
 }
 
-/* 新規追加ボタンのスタイル */
-#add-button {
-    padding: 12px 24px;  /* ボタンの内側の余白を調整 */
-    background-color: #28a745;  /* 緑色 */
-    color: white;
-    border: none;
-    border-radius: 8px;  /* ボタンを丸く */
+/* ボタンのコンテナ */
+.button-container {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.button-container button {
+    margin-right: 10px;
+}
+
+/* 追加されたフォームのボタン */
+button {
+    padding: 10px 20px;
     font-size: 16px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    position: absolute;
-    right: 20px;
-    top: 20px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);  /* ボタンに影を追加 */
 }
 
-#add-button:hover {
-    background-color: #218838;  /* ホバー時に色を変更 */
-    transform: scale(1.05);  /* ボタンを少し拡大 */
+button:hover {
+    background-color: #0056b3;
 }
-
-#add-button:active {
-    background-color: #1e7e34;  /* 押下時の色 */
-    transform: scale(0.98);  /* 押下時に少し縮小 */
-}
-
-/* エラーメッセージのスタイル */
-.error-message {
-    color: #dc3545;
-    background-color: #f8d7da;
-    padding: 10px;
-    border-radius: 5px;
-    font-size: 14px;
-    margin-bottom: 20px;
-}
-
-/* 成功メッセージのスタイル */
-.success-message {
-    color: #155724;
-    background-color: #d4edda;
-    padding: 10px;
-    border-radius: 5px;
-    font-size: 14px;
-    margin-bottom: 20px;
-}
-/* <select> 要素の幅を広げる */
-select {
-    width: 100%;  /* 親要素に合わせて幅を広げる */
-    box-sizing: border-box;  /* 幅の計算にパディングを含める */
-    padding: 8px;  /* 内側のスペースを調整 */
-}
-
-/* <option> 要素のフォントサイズやパディングを調整 */
-select option {
-    padding: 8px;  /* アイテム間のスペースを確保 */
-    font-size: 14px;  /* フォントサイズの調整 */
-    white-space: nowrap;  /* テキストの折り返しを防ぐ */
-}
-
-/* 必要に応じて、特定の <select> に対して幅を制限 */
-.custom-select {
-    width: 250px;  /* 適切な幅を指定 */
-}
-.select {
-    display: flex; /* フレックスボックスを使用 */
-    justify-content: flex-end; /* 子要素を右端に配置 */
-    align-items: center; /* 垂直方向に中央揃え */
-    gap: 20px; /* ボタン間の間隔を調整 */
-    height: 100px; /* 高さを固定 */
-}
-
-#add-button, #sale-button {
-    padding: 10px 20px; /* ボタンの余白 */
-    font-size: 16px; /* ボタンの文字サイズ */
-    background-color: #007BFF; /* 背景色 */
-    color: #fff; /* 文字色 */
-    border: none; /* 枠線を削除 */
-    border-radius: 5px; /* 角丸を適用 */
-    cursor: pointer; /* マウスオーバー時にポインタを表示 */
-}
-
-#add-button:hover, #sale-button:hover {
-    background-color: #0056b3; /* ホバー時の背景色 */
-}
-select.size-select {
-    width: 60px; /* 幅を250pxに設定（調整可能） */
-}
-td.price-select {
-    width: 90px; /* 幅を250pxに設定（調整可能） */
-}
-        /* モーダルのスタイル */
-        .modal {
-            display: none; /* 初期状態では非表示 */
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7); /* 半透明の背景 */
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-        }
-
-        .modal img {
-            max-width: 100%;
-            max-height: 80vh;
-            margin: 0 auto;
-        }
-
-        .close {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 30px;
-            color: #fff;
-            background-color: #000;
-            border: none;
-            padding: 10px;
-            cursor: pointer;
-        }
-
-    /* .modal-content img {
-        max-width: 80%;
-        max-height: 60vh;
-        margin: 10px auto;
-        display: block;
-        object-fit: contain;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-    } */
-    .modal-content {
-    display: flex; /* フレックスレイアウトに設定 */
-    gap: 10px; /* 画像間の余白 */
-    flex-wrap: nowrap; /* 折り返しを防止 */
-    overflow-x: auto; /* 横スクロールを有効化 */
-    padding: 10px; /* 内側に余白を追加 */
-}
-
-.modal-content img {
-    max-width: 200px; /* 画像の横幅を固定 */
-    height: auto; /* 縦横比を維持 */
-    border: 1px solid #ccc; /* 枠線を追加 */
-    border-radius: 8px; /* 角を丸くする */
-    object-fit: contain; /* 画像の表示を調整 */
-}
-
 
