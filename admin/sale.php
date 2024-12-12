@@ -55,7 +55,7 @@ if (isset($_GET['sale_select']) && $_GET['sale_select'] !== '') {
 
 
 // 商品検索結果の取得
-$stmt = $dbh->prepare("SELECT shop_id, goods, price, size, color, brand_id, category_id, subcategory_id,sale_id, gender FROM shop $search_query");
+$stmt = $dbh->prepare("SELECT shop_id, goods,price, original_price, size, color, brand_id, category_id, subcategory_id,sale_id, gender FROM shop $search_query");
 $stmt->execute($search_params);
 
 // POSTされた割引IDと選択された商品

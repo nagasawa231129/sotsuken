@@ -7,12 +7,11 @@
     <link rel="stylesheet" href="add_goods.css">
     <title>商品追加フォーム</title>
 </head>
-
 <body>
     <a href="admin_toppage.php">トップページ</a>
     <h1>商品追加フォーム</h1>
-    <form method="post" action="add_goods_process.php" enctype="multipart/form-data" id="goods-form">
-        <div class="form-container">
+    <div class="form-container" id="form-container">
+        <form method="post" action="add_goods_process.php" enctype="multipart/form-data" class="goods-form">
             <div class="single-form">
                 <table id="goods-table">
                     <thead>
@@ -125,47 +124,76 @@
                     </tbody>
                 </table>
             </div>
-        </div>
+        </form>
+    </div>
 
-        <div class="button-container">
-            <button type="button" id="add-row">＋ 1行追加</button>
-            <button type="submit">追加</button>
-        </div>
-    </form>
+    <div class="button-container">
+        <button type="button" id="add-row">＋ 1行追加</button>
+        <button type="button" onclick="submitForms()">追加</button>
+    </div>
 
     <script>
-            function updateSubcategory(categoryElement) {
-        var categoryId = categoryElement.value;
-        var subcategorySelect = categoryElement.closest('tr').querySelector('.subcategory');
+        function updateSubcategory(categoryElement) {
+            var categoryId = categoryElement.value;
+            var subcategorySelect = categoryElement.closest('tr').querySelector('.subcategory');
 
-        // AJAXを使用してサーバーにリクエストを送信
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', 'get_subcategories.php?category_id=' + categoryId, true);
-        xhr.onload = function() {
-            if (xhr.status === 200) {
-                // サブカテゴリーを更新
-                subcategorySelect.innerHTML = xhr.responseText;
-            }
-        };
-        xhr.send();
-    }
-        // フォームを1つ追加
-        function addForms() {
-            const formContainer = document.querySelector('.form-container');
-            const firstForm = formContainer.querySelector('.single-form'); // 最初のフォームを取得
-            const newForm = firstForm.cloneNode(true); // フォームをコピー
-
-            // 新しいフォームの入力フィールドをクリア
-            newForm.querySelectorAll('input').forEach(input => input.value = '');
-            newForm.querySelectorAll('textarea').forEach(textarea => textarea.value = '');
-            newForm.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
-
-            formContainer.appendChild(newForm); // 新しいフォームを追加
+            // AJAXを使用してサーバーにリクエストを送信
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', 'get_subcategories.php?category_id=' + categoryId, true);
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    // サブカテゴリーを更新
+                    subcategorySelect.innerHTML = xhr.responseText;
+                }
+            };
+            xhr.send();
         }
 
-        // ボタンにイベントリスナーを追加
-        document.getElementById('add-row').addEventListener('click', addForms);
+        document.getElementById('add-row').addEventListener('click', function() {
+            var formContainer = document.getElementById('form-container');
+            var newForm = document.querySelector('.goods-form').cloneNode(true);
+            newForm.reset();
+            formContainer.appendChild(newForm);
+        });
+
+        function submitForms() {
+            var forms = document.querySelectorAll('.goods-form');
+            forms.forEach(function(form, index) {
+                var formData = new FormData(form);
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', 'add_goods_process.php', true);
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        console.log('フォーム ' + (index + 1) + ' が正常に送信されました。');
+                        alert('正常に追加されました。');
+                    } else {
+                        console.error('フォーム ' + (index + 1) + ' の送信に失敗しました。');
+                    }
+                };
+                xhr.send(formData);
+            });
+        }
+
+        function submitForms() {
+    const form = document.querySelector('.goods-form');
+    const inputs = form.querySelectorAll('input[required], select[required], textarea[required]');
+    let allFilled = true;
+
+    inputs.forEach(input => {
+        if (!input.value) {
+            allFilled = false;
+            input.style.border = '2px solid red'; // 未入力のフィールドを強調表示
+        } else {
+            input.style.border = ''; // 入力済みのフィールドの強調表示を解除
+        }
+    });
+
+    if (allFilled) {
+        form.submit();
+    } else {
+        alert('全ての必須フィールドを入力してください。');
+    }
+}
     </script>
 </body>
-
 </html>

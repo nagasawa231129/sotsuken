@@ -1,9 +1,10 @@
 <?php
 function update() {
     global $dbh; // データベース接続をグローバルに取得
+    $price = 0;
     $shop_id = $_POST['shop_id'];
     $goods = $_POST['goods'];
-    $price = $_POST['price'];
+    $original_price = $_POST['price'];
     $goods_info = $_POST['goods_info'];
 
     // その他のフォームデータを取得
@@ -14,16 +15,25 @@ function update() {
     $gender = $_POST['gender'];
     $brand = $_POST['brand'];
 
+    $sale_stmt = $dbh->prepare("SELECT sale_id FROM shop WHERE shop_id = :shop_id");
+    $sale_stmt->bindValue(':shop_id', $shop_id, PDO::PARAM_INT);
+    $sale_stmt->execute();
+            $sale = $sale_stmt->fetch(PDO::FETCH_ASSOC);
+            $sale_id = $sale['sale_id'];
+
+    $price =  (1-$sale_id /10) * $original_price; 
+
     // 商品情報を更新するSQLクエリ
     $update_sql = "UPDATE shop 
-                   SET goods = :goods, price = :price, size = :size, color = :color, category_id = :category, 
+                   SET goods = :goods, price = :price , original_price = :original_price, size = :size, color = :color, category_id = :category, 
                        subcategory_id = :subcategory, gender = :gender, brand_id = :brand, exp = :exp
                    WHERE shop_id = :shop_id";
 
     // SQLの準備
     $stmt = $dbh->prepare($update_sql);
+    $stmt->bindParam(':price', $price );
     $stmt->bindParam(':goods', $goods);
-    $stmt->bindParam(':price', $price);
+    $stmt->bindParam(':original_price', $original_price);
     $stmt->bindParam(':size', $size);
     $stmt->bindParam(':color', $color);
     $stmt->bindParam(':category', $category);
@@ -91,7 +101,7 @@ function s_reset(){
     $stmt = $dbh->prepare("SELECT 
                                     shop.shop_id,
             shop.goods,
-            shop.price,
+            shop.original_price,
             shop.exp,
             shop.size AS size_id,
             shop.color AS color_id,

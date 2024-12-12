@@ -27,7 +27,7 @@ if (isset($_POST['search'])) {
 $sql = "SELECT 
             shop.shop_id,
             shop.goods,
-            shop.price,
+            shop.original_price,
             shop.exp,
             shop.size AS size_id,
             shop.color AS color_id,
@@ -179,7 +179,7 @@ if (isset($_POST['reset_search'])) {
                                 </select>
                             </td>
                             <td><input type="text" name="goods" value="<?= htmlspecialchars($product['goods']) ?>" required></td>
-                            <td class="price-select"><input type="number" name="price" value="<?= htmlspecialchars($product['price']) ?>" required></td>
+                            <td class="price-select"><input type="number" name="price" value="<?= htmlspecialchars($product['original_price']) ?>" required></td>
                             <td>
                                 <select name="size" class="wide-select" required>
                                     <?php
