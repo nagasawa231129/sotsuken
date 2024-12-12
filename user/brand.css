@@ -75,25 +75,18 @@ h1 {
     font-weight: bold;
 }
 
-.brand-list {
-    margin-top: 20px;
-}
+/* brand.css */
 
-.brand-list h3,
-#brand-list li {
-    letter-spacing: 0.05em;
-    /* 文字間に余白を追加 */
-}
-
-.brand-list h3 {
-    font-size: 1.5em;
-    margin-bottom: 10px;
-}
-
-#brand-list {
-    list-style: none;
-    padding: 0;
-}
+.brand-list .brand-group ul {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  
+  .brand-list .brand-group li {
+    width: calc(33% - 10px); /* 各ブランドの幅を調整 */
+    margin-bottom: 10px; /* ブランド間の余白 */
+  }
 
 .brand {
     padding: 10px;

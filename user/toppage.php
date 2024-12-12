@@ -141,33 +141,35 @@ $totalPages = ceil($totalItems / $itemsPerPage);
         </ul>
     </aside>
     <div class="products-wrapper">
-        <h3><?php echo $translations['Old Items'] ?></h3>
+        <!-- 新しい順 -->
 
-        <div class="products-container">
-            <div class="product-scroll">
-
+        <h2><?php echo $translations['New Items'] ?></h2>
+        <div class="sale-products-container">
+            <div class="sale-product-scroll">
                 <?php
                 $sql = "SELECT shop.*, 
-               brand.brand_name, 
-               sale.sale, 
-               image.img
-        FROM shop
-        LEFT OUTER JOIN brand ON brand.brand_id = shop.brand_id
-        LEFT OUTER JOIN image ON image.shop_id = shop.shop_id
-        LEFT OUTER JOIN sale ON sale.sale_id = shop.sale_id
-        GROUP BY shop.shop_id
-        LIMIT :limit OFFSET :offset";
+                brand.brand_name, 
+                sale.sale_id, 
+                image.img
+                FROM shop
+                LEFT OUTER JOIN brand ON brand.brand_id = shop.brand_id
+                LEFT OUTER JOIN image ON image.shop_id = shop.shop_id
+                LEFT OUTER JOIN sale ON sale.sale_id = shop.sale_id
+                WHERE shop.sale_id != 10  -- saleカラムが10以外の商品を表示
+                ORDER BY shop.arrival DESC  -- arrivalが新しい順に並べ替え
+                LIMIT :limit OFFSET :offset";
+
+
 
                 $stmt = $dbh->prepare($sql);
                 $stmt->bindValue(':limit', $itemsPerPage, PDO::PARAM_INT);
                 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
                 $stmt->execute();
-
                 if ($stmt->rowCount() > 0) {
                     while ($rec = $stmt->fetch()) {
                         // BLOB型の画像データをBase64エンコードして表示
                         $imgBlob = $rec['thumbnail'];
-                        $mimeType = 'image/png,image/jpg,image/svg'; // MIMEタイプはデフォルトを設定（例としてPNG）
+                        $mimeType = 'image/png'; // MIMEタイプはデフォルトを設定（例としてPNG）
 
                         // MIMEタイプを動的に取得
                         $finfo = new finfo(FILEINFO_MIME_TYPE);
@@ -181,20 +183,22 @@ $totalPages = ceil($totalItems / $itemsPerPage);
 
                         // 商品情報を全体リンクで表示
                         echo "<a href='{$productLink}' style='text-decoration: none; color: inherit;'>";
-                        echo "<div class='product-item'>";
+                        echo "<div class='sale-product-item'>";
+                        echo "<div class='product-image-block'>";
 
                         // 画像表示
-                        echo "<img src='data:{$mimeType};base64,{$encodedImg}' alt='goods img' class='product-image'>";
-
+                        echo "<img src='data:{$mimeType};base64,{$encodedImg}' alt='goods img' class='sale-product-image'>";
+                        echo "</div>";
                         echo "<div class='product-info'>";
+
                         // ブランド名
-                        echo "<p class='product-brand' data-i18n='brand'>" . $translations['Brand'] . "： {$rec['brand_name']}</p>";
+                        echo "<p class='sale-product-brand' data-i18n='brand'>" . $translations['Brand'] . "： {$rec['brand_name']}</p>";
 
                         // 商品名
-                        echo "<p class='product-name' data-i18n='goods_name'>" . $translations['Product Name'] . " ：{$rec['goods']}</p>";
+                        echo "<p class='sale-product-name' data-i18n='goods_name'>" . $translations['Product Name'] . " ：{$rec['goods']}</p>";
 
                         // 価格
-                        echo "<p class='product-price' data-i18n='price'>" . $translations['Price'] . "：{$rec['original_price']}円</p>";
+                        echo "<p class='sale-product-price' data-i18n='price'>" . $translations['Price'] . "：{$rec['original_price']}円</p>";
 
                         // 割引計算と表示
                         if ($rec['sale_id']) {
@@ -211,8 +215,6 @@ $totalPages = ceil($totalItems / $itemsPerPage);
                                 echo "<p class='product-discount' data-i18n='discounted_price'>" . $translations['Discounted Price'] . "：{$discounted_price}円</p>";
                             }
                         }
-
-
                         echo "</div>";
                         echo "</div>";
                         echo "</a>";
@@ -307,26 +309,23 @@ $totalPages = ceil($totalItems / $itemsPerPage);
             </div>
         </div>
 
-        <!-- 新しい順 -->
+        <!-- ランキング順 -->
 
-        <h2><?php echo $translations['New Items'] ?></h2>
+        <h2><?php echo $translations['Popular Ranking'] ?></h2>
         <div class="sale-products-container">
             <div class="sale-product-scroll">
                 <?php
                 $sql = "SELECT shop.*, 
                 brand.brand_name, 
                 sale.sale_id, 
-                image.img
+                shop.thumbnail
                 FROM shop
                 LEFT OUTER JOIN brand ON brand.brand_id = shop.brand_id
                 LEFT OUTER JOIN image ON image.shop_id = shop.shop_id
                 LEFT OUTER JOIN sale ON sale.sale_id = shop.sale_id
-                WHERE shop.sale_id != 10  -- saleカラムが10以外の商品を表示
-                ORDER BY shop.arrival DESC  -- arrivalが新しい順に並べ替え
+                ORDER BY shop.buy DESC  -- arrivalが新しい順に並べ替え
                 LIMIT :limit OFFSET :offset";
-
-
-
+                
                 $stmt = $dbh->prepare($sql);
                 $stmt->bindValue(':limit', $itemsPerPage, PDO::PARAM_INT);
                 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);

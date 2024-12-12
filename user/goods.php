@@ -41,10 +41,13 @@ if ($shop_id) {
         echo "<h1>{$goodsResult['goods']}</h1>";
 
         // ブランド名の表示
-        echo "<p>".$translations['Brand']."：{$goodsResult['brand_name']}</p>";
+        $brand_url = "brand_detail.php?brand=" . $goodsResult['brand_id'];
+        echo "<a href='$brand_url' class='brand-link' {$goodsResult['brand_id']}'>
+                    <h2>{$goodsResult['brand_name']}</h2>
+                </a>";
 
         // 商品情報の他の部分を表示
-        echo "<p>".$translations['Price']."：{$goodsResult['original_price']}</p>";
+        echo "<p>" . $translations['Price'] . "：{$goodsResult['original_price']}</p>";
 
         // 商品価格がセール中の場合、セール価格を計算
         if ($goodsResult['sale_id']) {
@@ -58,7 +61,7 @@ if ($shop_id) {
 
             if ($sale) {
                 // $discounted_price = ceil($goodsResult['original_price'] * (1 - $sale['sale'] / 100)); // 小数点切り上げ
-                echo "<p>".$translations['Discounted Price']."：{$sale['price']}円</p>";
+                echo "<p>" . $translations['Discounted Price'] . "：{$sale['price']}円</p>";
             }
         }
 
