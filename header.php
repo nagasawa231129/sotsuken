@@ -206,31 +206,31 @@ $unread_count = $notification_count_stmt->fetchColumn();
         </div>
     </div>
     <div class="icon">
-    <?php if ($userId): ?>
-        <!-- ログイン中: ユーザー名を表示し、ドロップダウンメニューを表示 -->
-        <div class="user-menu">
-            <span class="user-name"><?php echo htmlspecialchars($user_name); ?></span>
-            <div class="dropdown-menu">
-                <a href="/sotsuken/sotsuken/user/account.php" data-i18n="info"><?php echo $translations['Info'] ?></a>
-                <a href="/sotsuken/sotsuken/user/order.php" data-i18n="order"><?php echo $translations['Order'] ?></a>
-                <a href="/sotsuken/sotsuken/user/logout.php" data-i18n="logout"><?php echo $translations['Logout'] ?></a>
+        <?php if ($userId): ?>
+            <!-- ログイン中: ユーザー名を表示し、ドロップダウンメニューを表示 -->
+            <div class="user-menu">
+                <span class="user-name"><?php echo htmlspecialchars($user_name); ?></span>
+                <div class="dropdown-menu">
+                    <a href="/sotsuken/sotsuken/user/account.php" data-i18n="info"><?php echo $translations['Info'] ?></a>
+                    <a href="/sotsuken/sotsuken/user/order.php" data-i18n="order"><?php echo $translations['Order'] ?></a>
+                    <a href="/sotsuken/sotsuken/user/logout.php" data-i18n="logout"><?php echo $translations['Logout'] ?></a>
+                </div>
             </div>
-        </div>
-    <?php else: ?>
-        <!-- ログインしていない場合: ログインリンク -->
-        <a href="/sotsuken/sotsuken/user/login.php" data-i18n="login"><?php echo $translations['Login'] ?></a>
-    <?php endif; ?>
-    
-    <a href="/sotsuken/sotsuken/user/notification.php" data-i18n="🔔">
-        <?php echo $translations['🔔']; ?>
-        <?php if ($unread_count > 0): ?>
-            <span class="notification-count"><?php echo $unread_count; ?></span>
+        <?php else: ?>
+            <!-- ログインしていない場合: ログインリンク -->
+            <a href="/sotsuken/sotsuken/user/login.php" data-i18n="login"><?php echo $translations['Login'] ?></a>
         <?php endif; ?>
-    </a>
-    
-    <a href="/sotsuken/sotsuken/user/cart.php" data-i18n="cart"><?php echo $translations['Cart'] ?></a>
-    <a href="/sotsuken/sotsuken/user/favorite.php" data-i18n="♡"><?php echo $translations['♡'] ?></a>
-</div>
+
+        <a href="/sotsuken/sotsuken/user/notification.php" data-i18n="🔔">
+            <?php echo $translations['🔔']; ?>
+            <?php if ($unread_count > 0): ?>
+                <span class="notification-count"><?php echo $unread_count; ?></span>
+            <?php endif; ?>
+        </a>
+
+        <a href="/sotsuken/sotsuken/user/cart.php" data-i18n="cart"><?php echo $translations['Cart'] ?></a>
+        <a href="/sotsuken/sotsuken/user/favorite.php" data-i18n="♡"><?php echo $translations['♡'] ?></a>
+    </div>
 
 
 </header>

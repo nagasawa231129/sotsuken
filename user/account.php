@@ -150,11 +150,11 @@ if (file_exists($lang_file)) {
                             <tr>
                                 <td>LINE</td>
                                 <td>
-                                    <?php echo $user['line_user_id'] ? '連携済み' : '未連携'; ?>
+                                    <?php echo $user['line_user_id'] ? $translations['Already linked'] : $translations['Not linked']; ?>
                                 </td>
                                 <td>
                                     <button onclick="handleLineUnlink()" class='button-container'>
-                                        <?php echo $user['line_user_id'] ? '解除' : '連携'; ?>
+                                        <?php echo $user['line_user_id'] ? $translations['Cancellation'] : $translations['Alignment']; ?>
                                     </button>
                                 </td>
                             </tr>
@@ -202,11 +202,11 @@ if (file_exists($lang_file)) {
                             <tr>
                                 <td>Twitter</td>
                                 <td>
-                                    <?php echo $user['twitter_user_id'] ? '連携済み' : '未連携'; ?>
+                                    <?php echo $user['twitter_user_id'] ? $translations['Already linked'] : $translations['Not linked']; ?>
                                 </td>
                                 <td>
                                     <button onclick="window.location.href='<?php echo $user['twitter_user_id'] ? 'twitter_logout.php' : 'twitter_link.php'; ?>'" class='button-container'>
-                                        <?php echo $user['twitter_user_id'] ? '解除' : '連携'; ?>
+                                        <?php echo $user['twitter_user_id'] ? $translations['Cancellation'] : $translations['Alignment']; ?>
                                     </button>
                                 </td>
                             </tr>

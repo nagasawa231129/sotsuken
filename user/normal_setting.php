@@ -153,62 +153,62 @@ function formatPhoneNumber($phoneNumber)
 </head>
 
 <body>
-    <h1>アカウント情報変更</h1>
+    <h1><?php echo $translations['Change Account Information'] ?></h1>
 
     <form method="post" action="normal_setting.php">
         <table>
             <tr>
-                <td>ニックネーム</td>
+                <td><?php echo $translations['Nickname'] ?></td>
                 <td><input type="text" name="display" value="<?php echo htmlspecialchars($user['display_name']); ?>" required></td>
             </tr>
             <tr>
-                <td>お名前</td>
+                <td><?php echo $translations['Name'] ?></td>
                 <td><input type="text" name="sei" value="<?php echo htmlspecialchars($user['sei']); ?>" required>
                     <input type="text" name="mei" value="<?php echo htmlspecialchars($user['mei']); ?>" required>
                 </td>
             </tr>
             <tr>
-                <td>お名前（カナ）</td>
+                <td><?php echo $translations['Name Kana'] ?></td>
                 <td><input type="text" name="kanasei" value="<?php echo htmlspecialchars($user['kanasei']); ?>" required>
                     <input type="text" name="kanamei" value="<?php echo htmlspecialchars($user['kanamei']); ?>" required>
                 </td>
             </tr>
             <tr>
-                <td>性別</td>
+                <td><?php echo $translations['Gender'] ?></td>
                 <td>
                     <label>
-                        <input type="radio" name="gender" value="1" <?php if ($user['gender_id'] == 1) echo 'checked'; ?>> 男性
+                        <input type="radio" name="gender" value="1" <?php if ($user['gender_id'] == 1) echo 'checked'; ?>> <?php echo $translations['Man'] ?>
                     </label>
                     <label>
-                        <input type="radio" name="gender" value="2" <?php if ($user['gender_id'] == 2) echo 'checked'; ?>> 女性
+                        <input type="radio" name="gender" value="2" <?php if ($user['gender_id'] == 2) echo 'checked'; ?>> <?php echo $translations['Woman'] ?>
                     </label>
                 </td>
             </tr>
 
             <!-- 郵便番号1と住所1が存在する場合のみ表示 -->
             <tr>
-                <td>郵便番号1</td>
+                <td><?php echo $translations['Post Code'] ?></td>
                 <td>
                     <input type="text" id="zipcode1" name="zipcode" maxlength="7" placeholder="郵便番号（例: 1234567）" value="<?php echo htmlspecialchars($user['postcode']); ?>" required>
-                    <button type="button" onclick="getAddressFromZipcode('zipcode1', 'address1')">検索</button>
+                    <button type="button" onclick="getAddressFromZipcode('zipcode1', 'address1')"><?php echo $translations['Search'] ?></button>
                 </td>
             </tr>
             <tr>
-                <td>住所1</td>
+                <td><?php echo $translations['Address'] ?></td>
                 <td><input type="text" id="address1" name="address1" placeholder="住所" value="<?php echo htmlspecialchars($user['address']); ?>" required></td>
             </tr>
 
             <!-- 郵便番号2と住所2が存在する場合のみ表示 -->
             <?php if (!empty($user['postcode2']) && $user['postcode2'] != '0'): ?>
                 <tr>
-                    <td>郵便番号2</td>
+                    <td><?php echo $translations['Post Code'] ?></td>
                     <td>
                         <input type="text" id="zipcode2" name="zipcode2" maxlength="7" placeholder="郵便番号（例: 1234567）" value="<?php echo htmlspecialchars($user['postcode2']); ?>">
-                        <button type="button" onclick="getAddressFromZipcode('zipcode2', 'address2')">検索</button>
+                        <button type="button" onclick="getAddressFromZipcode('zipcode2', 'address2')"><?php echo $translations['Search'] ?></button>
                     </td>
                 </tr>
                 <tr>
-                    <td>住所2</td>
+                    <td><?php echo $translations['Address'] ?></td>
                     <td><input type="text" id="address2" name="address2" placeholder="住所2" value="<?php echo htmlspecialchars($user['address2']); ?>"></td>
                 </tr>
             <?php endif; ?>
@@ -216,14 +216,14 @@ function formatPhoneNumber($phoneNumber)
             <!-- 郵便番号3と住所3が存在する場合のみ表示 -->
             <?php if (!empty($user['postcode3']) && $user['postcode3'] != '0'): ?>
                 <tr>
-                    <td>郵便番号3</td>
+                    <td><?php echo $translations['Post Code'] ?></td>
                     <td>
                         <input type="text" id="zipcode3" name="zipcode3" maxlength="7" placeholder="郵便番号（例: 1234567）" value="<?php echo htmlspecialchars($user['postcode3']); ?>">
-                        <button type="button" onclick="getAddressFromZipcode('zipcode3', 'address3')">検索</button>
+                        <button type="button" onclick="getAddressFromZipcode('zipcode3', 'address3')"><?php echo $translations['Search'] ?></button>
                     </td>
                 </tr>
                 <tr>
-                    <td>住所3</td>
+                    <td><?php echo $translations['Address'] ?></td>
                     <td><input type="text" id="address3" name="address3" placeholder="住所3" value="<?php echo htmlspecialchars($user['address3']); ?>"></td>
                 </tr>
             <?php endif; ?>
@@ -234,19 +234,19 @@ function formatPhoneNumber($phoneNumber)
 
 
             <tr>
-                <td>電話番号</td>
+                <td><?php echo $translations['Phone Number'] ?></td>
                 <td><input type="text" name="phone" value="<?php echo htmlspecialchars(formatPhoneNumber($user['phone'])); ?>" required></td>
             </tr>
         </table>
         <tr>
     <td colspan="2">
-        <button type="button" id="add-address-button" onclick="addAddressField()">住所を追加</button>
+        <button type="button" id="add-address-button" onclick="addAddressField()"><?php echo $translations['Add Address'] ?></button>
     </td>
 </tr>
-        <button type="submit">情報を更新</button>
+        <button type="submit"><?php echo $translations['Update Information'] ?></button>
     </form>
 
-    <a href="account.php">アカウント情報に戻る</a>
+    <a href="account.php"><?php echo $translations['Return to the Membership Information page'] ?></a>
 </body>
 
 </html>
