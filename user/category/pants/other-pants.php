@@ -18,7 +18,7 @@ SELECT * FROM shop
 JOIN subcategory ON shop.subcategory_id = subcategory.subcategory_id
 JOIN brand ON shop.brand_id = brand.brand_id
 JOIN sale ON shop.sale_id = sale.sale_id
-WHERE subcategory.subcategory_name =  'ブルゾン'";
+WHERE subcategory.subcategory_name = 'その他パンツ'";
 
 // ソート条件に応じてクエリを追加
 switch ($sort) {
@@ -58,16 +58,15 @@ $brands = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
     <meta charset="UTF-8">
-    <title><?php echo $translations['Blouson'] ?></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>その他パンツ商品一覧</title>
 </head>
-
 <body>
-    <div class="main-content">
+<div class="main-content">
         <aside class="sidebar">
-            <h2 data-i18n="search"><?php echo $translations['Search'] ?></h2>
+        <h2 data-i18n="search"><?php echo $translations['Search'] ?></h2>
         <ul>
                 <li><a href="../../brand.php" data-i18n="Search_By_brand"><?php echo $translations['Search By Brand'] ?></a></li>
                 <li><a href="../category.php" data-i18n="Search_By_category"><?php echo $translations['Search By Category'] ?></a></li>
@@ -102,31 +101,31 @@ $brands = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <li class="category-item">
                     <a href="../jacket-outerwear.php" data-i18n="jacket/outer"><?php echo $translations['Outerwear'] ?></a>
                     <ul class="sub-category">
-                        <li><a href="collarless-coat.php" data-i18n="collarless-coat"><?php echo $translations['Collarless Coat'] ?></a></li>
-                        <li><a href="collarless-jacket.php" data-i18n="collarless-jacket"><?php echo $translations['Collarless Jacket'] ?></a></li>
-                        <li><a href="denim-jacket.php" data-i18n="denim-jacket"><?php echo $translations['Denim Jacket'] ?></a></li>
-                        <li><a href="down-jacket.php" data-i18n="down-jacket"><?php echo $translations['Down Jacket'] ?></a></li>
-                        <li><a href="down-vest.php" data-i18n="down-vest"><?php echo $translations['Down Vest'] ?></a></li>
-                        <li><a href="duffle-coat.php" data-i18n="duffle-coat"><?php echo $translations['Duffle Coat'] ?></a></li>
-                        <li><a href="jacket.php" data-i18n="jacket"><?php echo $translations['Blouson'] ?></a></li>
-                        <li><a href="military-jacket.php" data-i18n="millitary-jacket"><?php echo $translations['Military Jacket'] ?></a></li>
-                        <li><a href="mods-coat.php" data-i18n="mods-coat"><?php echo $translations['Mods Coat'] ?></a></li>
-                        <li><a href="nylon-jacket.php" data-i18n="nylon-jacket"><?php echo $translations['Nylon Jacket'] ?></a></li>
-                        <li><a href="riders-jacket.php" data-i18n="riders-jacket"><?php echo $translations['Riders Jacket'] ?></a></li>
-                        <li><a href="tailored-jacket.php" data-i18n="tailored-jacket"><?php echo $translations['Tailored Jacket'] ?></a></li>
-                        <li><a href="trench-coat.php" data-i18n="trench-coat"><?php echo $translations['Trench Coat'] ?></a></li>
-                        <li><a href="other-jacket.php" data-i18n="other-jacket"><?php echo $translations['Other Outerwear'] ?></a></li>
+                        <li><a href="../jacket-outerwear/collarless-coat.php" data-i18n="collarless-coat"><?php echo $translations['Collarless Coat'] ?></a></li>
+                        <li><a href="../jacket-outerwear/collarless-jacket.php" data-i18n="collarless-jacket"><?php echo $translations['Collarless Jacket'] ?></a></li>
+                        <li><a href="../jacket-outerwear/denim-jacket.php" data-i18n="denim-jacket"><?php echo $translations['Denim Jacket'] ?></a></li>
+                        <li><a href="../jacket-outerwear/down-jacket.php" data-i18n="down-jacket"><?php echo $translations['Down Jacket'] ?></a></li>
+                        <li><a href="../jacket-outerwear/down-vest.php" data-i18n="down-vest"><?php echo $translations['Down Vest'] ?></a></li>
+                        <li><a href="../jacket-outerwear/duffle-coat.php" data-i18n="duffle-coat"><?php echo $translations['Duffle Coat'] ?></a></li>
+                        <li><a href="../jacket-outerwear/jacket.php" data-i18n="jacket"><?php echo $translations['Blouson'] ?></a></li>
+                        <li><a href="../jacket-outerwear/military-jacket.php" data-i18n="millitary-jacket"><?php echo $translations['Military Jacket'] ?></a></li>
+                        <li><a href="../jacket-outerwear/mods-coat.php" data-i18n="mods-coat"><?php echo $translations['Mods Coat'] ?></a></li>
+                        <li><a href="../jacket-outerwear/nylon-jacket.php" data-i18n="nylon-jacket"><?php echo $translations['Nylon Jacket'] ?></a></li>
+                        <li><a href="../jacket-outerwear/riders-jacket.php" data-i18n="riders-jacket"><?php echo $translations['Riders Jacket'] ?></a></li>
+                        <li><a href="../jacket-outerwear/tailored-jacket.php" data-i18n="tailored-jacket"><?php echo $translations['Tailored Jacket'] ?></a></li>
+                        <li><a href="../jacket-outerwear/trench-coat.php" data-i18n="trench-coat"><?php echo $translations['Trench Coat'] ?></a></li>
+                        <li><a href="../jacket-outerwear/other-jacket.php" data-i18n="other-jacket"><?php echo $translations['Other Outerwear'] ?></a></li>
                     </ul>
                 </li>
                 <li class="category-item">
                     <a href="../pants.php" data-i18n="pants"><?php echo $translations['Pants'] ?></a>
                     <ul class="sub-category">
-                        <li><a href="../pants/cargo-pants.php" data-i18n="cargo-pants"><?php echo $translations['Cargo Pants'] ?></a></li>
-                        <li><a href="../pants/chino-pants.php" data-i18n="chino-pants"><?php echo $translations['Chino Pants'] ?></a></li>
-                        <li><a href="../pants/denim-pants.php" data-i18n="denim-pants"><?php echo $translations['Denim Pants'] ?></a></li>
-                        <li><a href="../pants/slacks.php" data-i18n="slacks"><?php echo $translations['Slacks'] ?></a></li>
-                        <li><a href="../pants/sweat-pants.php" data-i18n="sweat-pants"><?php echo $translations['Sweat Pants'] ?></a></li>
-                        <li><a href="../pants/other-pants.php" data-i18n="other-pants"><?php echo $translations['Other Pants'] ?></a></li>
+                        <li><a href="cargo-pants.php" data-i18n="cargo-pants"><?php echo $translations['Cargo Pants'] ?></a></li>
+                        <li><a href="chino-pants.php" data-i18n="chino-pants"><?php echo $translations['Chino Pants'] ?></a></li>
+                        <li><a href="denim-pants.php" data-i18n="denim-pants"><?php echo $translations['Denim Pants'] ?></a></li>
+                        <li><a href="slacks.php" data-i18n="slacks"><?php echo $translations['Slacks'] ?></a></li>
+                        <li><a href="sweat-pants.php" data-i18n="sweat-pants"><?php echo $translations['Sweat Pants'] ?></a></li>
+                        <li><a href="other-pants.php" data-i18n="other-pants"><?php echo $translations['Other Pants'] ?></a></li>
                     </ul>
                 </li>
                 <li class="category-item">
@@ -177,8 +176,8 @@ $brands = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     ?>
                 </select>
             </form>
-            <h1>デニムスカート 商品一覧</h1>
-             <div class="products-container">
+    <h1><?php echo $translations['Other Pants'] ?></h1>
+     <div class="products-container">
                 <ul>
                     <?php if (!empty($products)): ?>
                         <?php foreach ($products as $product): ?>

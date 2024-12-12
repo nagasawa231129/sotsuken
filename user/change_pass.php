@@ -13,6 +13,18 @@ if (isset($_SESSION['id'])) {
     exit;
 }
 
+$lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ja';
+
+// // 言語ファイルのパスを設定
+$lang_file = __DIR__ . "/{$lang}.php";
+
+// // 言語ファイルを読み込み
+if (file_exists($lang_file)) {
+    include($lang_file);
+} else {
+    die("Error: Language file not found.");
+}
+
 // 現在のパスワードが送信された場合
 if (isset($_POST['current_password'], $_POST['new_password'], $_POST['confirm_password'])) {
     // フォームから送信された情報を取得
@@ -61,7 +73,7 @@ if (isset($_POST['current_password'], $_POST['new_password'], $_POST['confirm_pa
     <title>パスワード変更</title>
 </head>
 <body>
-    <h1>パスワード変更</h1>
+    <h1><?php echo $translation['Change Password'] ?></h1>
     <form method="post" action="change_pass.php">
         <label for="current_password">現在のパスワード:</label>
         <input type="password" name="current_password" id="current_password" required><br>

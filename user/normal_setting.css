@@ -105,7 +105,7 @@ table tr {
 a {
     display: inline-block;
     text-align: center;
-    margin-top: 20px;
+    /* margin-top: 20px; */
     color: #007bff;
     text-decoration: none;
 }

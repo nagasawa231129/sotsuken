@@ -1,6 +1,8 @@
+/* 商品ページのタブスタイル */
 .tabs {
     display: flex;
     cursor: pointer;
+    margin-bottom: 20px;
 }
 
 .tab-button {
@@ -8,21 +10,155 @@
     border: 1px solid #ddd;
     margin-right: 5px;
     cursor: pointer;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    font-size: 16px;
+}
+
+.tab-button.active {
+    font-weight: bold;
+    background-color: #f0f0f0;
+    border-color: #bbb;
+}
+
+.tab-button:hover {
+    background-color: #e0e0e0;
 }
 
 .tab-content {
     display: none;
+    margin-top: 20px;
 }
 
 .active-tab {
     display: block;
 }
 
-.tab-button.active {
-    font-weight: bold;
-    background-color: #f0f0f0;
+/* 商品詳細ページのボタンコンテナ */
+.button-container {
+    display: flex;
+    gap: 20px; /* ボタンの間隔 */
+    margin-top: 20px;
 }
 
-.tab-button:hover {
-    background-color: #e0e0e0;
+/* 商品詳細ページのボタン */
+button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+    flex-shrink: 0; /* ボタンが縮まないように設定 */
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* お気に入りボタン */
+.favorite-button {
+    font-size: 24px;
+    background: none;
+    border: none;
+    color: #ccc;
+    cursor: pointer;
+    transition: color 0.3s ease, transform 0.2s ease;
+    margin-left: 10px;
+}
+
+.favorite-button.filled {
+    color: red; /* お気に入り済みなら赤く表示 */
+}
+
+.favorite-button:hover {
+    color: #f00; /* ホバー時の色 */
+    transform: scale(1.1); /* 少し大きくする */
+}
+
+.favorite-button:disabled {
+    color: #ddd; /* ログインしていない場合の色 */
+    cursor: not-allowed; /* ポインターを無効に */
+}
+
+
+/* 商品詳細ページ */
+.product-detail-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 40px;
+}
+
+.product-detail-container h1 {
+    font-size: 2em;
+    margin-bottom: 15px;
+}
+
+.product-detail-container p {
+    font-size: 1.2em;
+    line-height: 1.6;
+    margin-bottom: 10px;
+}
+
+#main-thumbnail {
+    width: 300px; /* メイン画像の大きさ */
+    height: auto;
+    display: inline-block;
+}
+
+/* サブ画像を横並びに表示 */
+.sub-images {
+    display: flex;
+    flex-direction: row;  /* サブ画像は縦並び */
+    gap: 10px; /* サブ画像間のスペース */
+    margin-left: 20px; /* メイン画像とサブ画像の間隔 */
+    margin-bottom: 20px; /* メイン画像とサブ画像の間隔 */
+}
+
+/* サブ画像のスタイル */
+.sub-thumbnail {
+    width: 80px; /* サブ画像の幅 */
+    height: 80px; /* サブ画像の高さ */
+    object-fit: cover; /* 画像が枠に収まるように調整 */
+    cursor: pointer; /* クリック時にポインターカーソル */
+    border: 1px solid #ccc; /* 画像に枠をつける */
+    transition: transform 0.3s ease-in-out; /* ホバー時に拡大 */
+}
+
+/* サブ画像ホバー時に拡大 */
+.sub-thumbnail:hover {
+    transform: scale(1.1); /* ホバー時に少し拡大 */
+}
+
+/* 画像を横並びに表示するためのスタイル */
+.image-container {
+    display: flex;
+    justify-content: flex-start; /* 左寄せ */
+    align-items: flex-start;
+}
+
+.star {
+    font-size: 1.5em;
+    color: #ddd; /* 空の星 */
+}
+
+.star.selected {
+    color: gold; /* 完全な星 */
+}
+
+.star.half-selected {
+    color: gold;
+    position: relative;
+}
+
+.star.half-selected::after {
+    content: '\2605'; /* 半分の星 */
+    position: absolute;
+    left: 0;
+    width: 50%;
+    overflow: hidden;
+    color: #ddd; /* 半分の星の色 */
 }

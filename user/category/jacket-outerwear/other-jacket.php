@@ -18,7 +18,7 @@ SELECT * FROM shop
 JOIN subcategory ON shop.subcategory_id = subcategory.subcategory_id
 JOIN brand ON shop.brand_id = brand.brand_id
 JOIN sale ON shop.sale_id = sale.sale_id
-WHERE subcategory.subcategory_name =  'ブルゾン'";
+WHERE subcategory.subcategory_name =  'その他アウター'";
 
 // ソート条件に応じてクエリを追加
 switch ($sort) {
@@ -61,7 +61,7 @@ $brands = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <head>
     <meta charset="UTF-8">
-    <title><?php echo $translations['Blouson'] ?></title>
+    <title>デニムスカート商品一覧</title>
 </head>
 
 <body>
@@ -177,7 +177,7 @@ $brands = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     ?>
                 </select>
             </form>
-            <h1>デニムスカート 商品一覧</h1>
+            <h1><?php echo $translations['Other Jacket'] ?></h1>
              <div class="products-container">
                 <ul>
                     <?php if (!empty($products)): ?>

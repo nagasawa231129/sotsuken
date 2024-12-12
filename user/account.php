@@ -1,7 +1,7 @@
 <?php
+include "../../db_open.php";
 include "../head.php";
 include "../header.php";
-include "../../db_open.php";
 echo "<link rel='stylesheet' href='header.css'>";
 echo "<link rel='stylesheet' href='account.css'>";
 // ユーザーIDをセッションから取得
@@ -11,7 +11,7 @@ if (isset($_SESSION['id'])) {
     header("Location: login.php"); // 再読み込みして設定完了
     exit;
 }
-
+// var_dump($userId);
 if (isset($_POST['lang'])) {
     $_SESSION['lang'] = $_POST['lang'];
     header("Location: account.php"); // 再読み込みして設定完了
@@ -46,37 +46,28 @@ if (file_exists($lang_file)) {
 <!DOCTYPE html>
 <html lang="ja">
 
-<!-- <link rel='stylesheet' href='header.css'>
-
-<link rel='stylesheet' href='account.css'> -->
-
 <body>
     <div class="container">
         <!-- サブ項目 -->
         <aside>
-            <h2>メニュー</h2>
+            <h2><?php echo $translations['Menu'] ?></h2>
             <ul>
                 <!-- メインカテゴリ -->
-                <li><strong>会員情報</strong></li>
-                <li><a href="#profile">会員登録情報</a></li>
-                <li><a href="#id-link">ID連携</a></li>
-                <li><a href="#lang_link">言語設定</a></li>
+                <li><strong><?php echo $translations['Membership Information'] ?></strong></li>
+                <li><a href="#profile"><?php echo $translations['User Information'] ?></a></li>
+                <li><a href="#id-link"><?php echo $translations['ID Collaboration'] ?></a></li>
+                <li><a href="#lang_link"><?php echo $translations['Language'] ?></a></li>
                 <hr>
                 <!-- 注文履歴 -->
-                <li><strong>注文履歴</strong></li>
-                <li><a href="order.php">注文履歴</a></li>
-                <li><a href="order">発送前商品</a></li>
-                <li><a href="order">発送済み商品</a></li>
-                <li><a href="review.php">レビュー</a></li>
-                <hr>
-                <!-- セキュリティ -->
-                <li><strong>セキュリティ</strong></li>
-                <li><a href="security.php">ログイン通知の設定</a></li>
-                <li><a href="login-history.php">ログイン履歴</a></li>
+                <li><strong><?php echo $translations['Order'] ?></strong></li>
+                <li><a href="order.php#history"><?php echo $translations['Order History'] ?></a></li>
+                <li><a href="order.php#pending"><?php echo $translations['Items Pending Shipment'] ?></a></li>
+                <li><a href="order.php#shipped"><?php echo $translations['Shipped Items'] ?></a></li>
+                <li><a href="order.php#review"><?php echo $translations['Review'] ?></a></li>
                 <hr>
                 <!-- 退会 -->
-                <li><strong>退会</strong></li>
-                <li><a href="unsubscribe.php">退会手続き</a></li>
+                <li><strong><?php echo $translations['Unsubscribe'] ?></strong></li>
+                <li><a href="unsubscribe.php"><?php echo $translations['Unsubscription Process'] ?></a></li>
             </ul>
         </aside>
 
@@ -85,8 +76,11 @@ if (file_exists($lang_file)) {
             <div>
                 <div id="profile">
 
-                    <h2>会員登録情報</h2>
+                    <h2><?php echo $translations['User Information'] ?></h2>
                     <table>
+                        <tr>
+                            <td><?php echo htmlspecialchars($user['display_name']); ?></td>
+                        </tr>
                         <tr>
                             <td><?php echo htmlspecialchars($user['sei']); ?><?php echo htmlspecialchars($user['mei']); ?></td>
                         </tr>
@@ -96,49 +90,71 @@ if (file_exists($lang_file)) {
                         <tr>
                             <td><?php echo htmlspecialchars($user['gender']); ?></td>
                         </tr>
-                        <tr>
-                            <td><?php echo htmlspecialchars(strval($user['postcode'])); ?></td>
-                        </tr>
-                        <tr>
-                            <td><?php echo htmlspecialchars($user['address']); ?></td>
-                        </tr>
+
+                        <?php if (!empty($user['postcode']) && $user['postcode'] != '0'): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars(strval($user['postcode'])); ?></td>
+                            </tr>
+                            <tr>
+                                <td><?php echo htmlspecialchars($user['address']); ?></td>
+                            </tr>
+                        <?php endif; ?>
+
+                        <?php if (!empty($user['postcode2']) && $user['postcode2'] != '0'): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars(strval($user['postcode2'])); ?></td>
+                            </tr>
+                            <tr>
+                                <td><?php echo htmlspecialchars($user['address2']); ?></td>
+                            </tr>
+                        <?php endif; ?>
+
+                        <?php if (!empty($user['postcode3']) && $user['postcode3'] != '0'): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars(strval($user['postcode3'])); ?></td>
+                            </tr>
+                            <tr>
+                                <td><?php echo htmlspecialchars($user['address3']); ?></td>
+                            </tr>
+                        <?php endif; ?>
+
                         <tr>
                             <td><?php echo htmlspecialchars(formatPhoneNumber($user['phone'])); ?></td>
                         </tr>
-                        <button onclick="window.location.href='normal_setting.php'" class="button-container">変更</button>
+                        <button onclick="window.location.href='normal_setting.php'" class="button-container"><?php echo $translations['Change']; ?></button>
                     </table>
                 </div>
                 <div>
-                    <h2>メールアドレス</h2>
+                    <h2><?php echo $translations['Mail Address'] ?></h2>
                     <table>
                         <tr>
                             <td><?php echo htmlspecialchars($user['mail']); ?></td>
                         </tr>
-                        <button onclick="window.location.href='mail_setting.php'" class="button-container">変更</button>
+                        <button onclick="window.location.href='mail_setting.php'" class="button-container"><?php echo $translations['Change']; ?></button>
                     </table>
                 </div>
                 <div>
-                    <h2>パスワード</h2>
+                    <h2><?php echo $translations['Password'] ?></h2>
                     <table>
                         <tr>
                             <td>********</td>
                         </tr>
-                        <button onclick="window.location.href='pass_setting.php'" class="button-container">変更</button>
+                        <button onclick="window.location.href='pass_setting.php'" class="button-container"><?php echo $translations['Change']; ?></button>
                     </table>
                 </div>
                 <div>
                     <div id="id-link">
 
-                        <h2>ID連携</h2>
+                        <h2><?php echo $translations['ID Collaboration'] ?></h2>
                         <table>
                             <tr>
                                 <td>LINE</td>
                                 <td>
-                                    <?php echo $user['line_user_id'] ? '連携済み' : '未連携'; ?>
+                                    <?php echo $user['line_user_id'] ? $translations['Already linked'] : $translations['Not linked']; ?>
                                 </td>
                                 <td>
                                     <button onclick="handleLineUnlink()" class='button-container'>
-                                        <?php echo $user['line_user_id'] ? '解除' : '連携'; ?>
+                                        <?php echo $user['line_user_id'] ? $translations['Cancellation'] : $translations['Alignment']; ?>
                                     </button>
                                 </td>
                             </tr>
@@ -186,11 +202,11 @@ if (file_exists($lang_file)) {
                             <tr>
                                 <td>Twitter</td>
                                 <td>
-                                    <?php echo $user['twitter_user_id'] ? '連携済み' : '未連携'; ?>
+                                    <?php echo $user['twitter_user_id'] ? $translations['Already linked'] : $translations['Not linked']; ?>
                                 </td>
                                 <td>
                                     <button onclick="window.location.href='<?php echo $user['twitter_user_id'] ? 'twitter_logout.php' : 'twitter_link.php'; ?>'" class='button-container'>
-                                        <?php echo $user['twitter_user_id'] ? '解除' : '連携'; ?>
+                                        <?php echo $user['twitter_user_id'] ? $translations['Cancellation'] : $translations['Alignment']; ?>
                                     </button>
                                 </td>
                             </tr>
@@ -199,11 +215,11 @@ if (file_exists($lang_file)) {
                 </div>
                 <div>
                     <div id="lang_link">
-                        <h2>言語設定</h2>
+                        <h2><?php echo $translations['Language'] ?></h2>
                         <form method="post" action="account.php">
                             <table>
                                 <tr>
-                                    <td><?php echo $translations['language_select']; ?>:</td>
+                                    <td><?php echo $translations['Language Select']; ?>:</td>
                                     <td>
                                         <label for="ja">
                                             <input type="radio" id="ja" name="lang" value="ja" <?php if ($lang == 'ja') echo 'checked'; ?>>
@@ -217,7 +233,7 @@ if (file_exists($lang_file)) {
                                         </label>
                                     </td>
                                 </tr>
-                                <button type="submit" class="button-container"><?php echo $translations['change']; ?></button>
+                                <button type="submit" class="button-container"><?php echo $translations['Change']; ?></button>
                             </table>
                         </form>
                     </div>

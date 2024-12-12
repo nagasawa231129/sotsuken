@@ -21,10 +21,10 @@ include "../head.php";
 <?php
 $shop_id = isset($_GET['shop_id']) ? $_GET['shop_id'] : '';
 if ($shop_id) {
-    // 商品情報とブランド情報を取得
-    // $sql = "SELECT shop.*, brand.brand_name FROM shop
-    //     LEFT OUTER JOIN brand ON brand.brand_id = shop.brand_id
-    //     WHERE shop.shop_id = :shop_id";
+    $sql_update_look = "UPDATE shop SET look = look + 1 WHERE shop_id = :shop_id";
+    $stmt_update_look = $dbh->prepare($sql_update_look);
+    $stmt_update_look->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
+    $stmt_update_look->execute();
 
     $sql = "SELECT shop.*, brand.brand_name, sale.sale FROM shop
     LEFT OUTER JOIN brand ON brand.brand_id = shop.brand_id
@@ -41,24 +41,24 @@ if ($shop_id) {
         echo "<h1>{$goodsResult['goods']}</h1>";
 
         // ブランド名の表示
-        echo "<p>ブランド名：{$goodsResult['brand_name']}</p>";
+        echo "<p>".$translations['Brand']."：{$goodsResult['brand_name']}</p>";
 
         // 商品情報の他の部分を表示
-        echo "<p>値段：{$goodsResult['original_price']}</p>";
+        echo "<p>".$translations['Price']."：{$goodsResult['original_price']}</p>";
 
         // 商品価格がセール中の場合、セール価格を計算
         if ($goodsResult['sale_id']) {
             $sale_id = $goodsResult['sale_id'];
             // saleテーブルから割引率を取得
-            $sql_sale = "SELECT sale FROM sale WHERE sale_id = :sale_id";
+            $sql_sale = "SELECT sale.*, shop.* FROM sale LEFT OUTER JOIN shop ON shop.sale_id = sale.sale_id WHERE sale.sale_id = :sale_id";
             $stmt_sale = $dbh->prepare($sql_sale);
             $stmt_sale->bindParam(':sale_id', $sale_id);
             $stmt_sale->execute();
             $sale = $stmt_sale->fetch(PDO::FETCH_ASSOC);
 
             if ($sale) {
-                $discounted_price = ceil($goodsResult['original_price'] * (1 - $sale['sale'] / 100)); // 小数点切り上げ
-                echo "<p>割引後価格：{$discounted_price}円</p>";
+                // $discounted_price = ceil($goodsResult['original_price'] * (1 - $sale['sale'] / 100)); // 小数点切り上げ
+                echo "<p>".$translations['Discounted Price']."：{$sale['price']}円</p>";
             }
         }
 
@@ -67,7 +67,7 @@ if ($shop_id) {
             <form action="add_to_cart.php" method="POST">
                 <input type="hidden" name="shop_id" value="<?php echo $goodsResult['shop_id']; ?>">
                 <input type="hidden" name="user_id" value="<?php echo $userId; ?>">
-                <button type="submit">カートに入れる</button>
+                <button type="submit"><?php echo $translations['Add to Cart'] ?></button>
             </form>
 
             <?php
@@ -222,9 +222,9 @@ if ($shop_id) {
 
 <body>
     <nav class="tabs">
-        <div class="tab-button active" data-target="info">アイテム説明</div>
-        <div class="tab-button" data-target="size">サイズ</div>
-        <div class="tab-button" data-target="review">レビュー</div>
+        <div class="tab-button active" data-target="info"><?php echo $translations['Description'] ?></div>
+        <div class="tab-button" data-target="size"><?php echo $translations['Size'] ?></div>
+        <div class="tab-button" data-target="review"><?php echo $translations['Review'] ?></div>
     </nav>
 
     <div id="info" class="tab-content active-tab">
@@ -237,7 +237,36 @@ if ($shop_id) {
         ?>
     </div>
     <div id="size" class="tab-content">
+        <?php
+        // 商品IDを取得
+        if ($shop_id) {
+            // サイズ情報を取得するクエリ
+            $sql = "SELECT size.size FROM shop LEFT OUTER JOIN size ON size.size_id = shop.size WHERE shop_id = :shop_id";
+            $stmt = $dbh->prepare($sql);
+            $stmt->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
+            $stmt->execute();
+            $sizes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } else {
+            $sizes = [];
+        }
+        ?>
+
+        <?php if (!empty($sizes)): ?>
+            <ul>
+                <?php foreach ($sizes as $size): ?>
+                    <li>
+                        <?php echo $translations['Size'] ?>: <?php echo htmlspecialchars($size['size'], ENT_QUOTES, 'UTF-8'); ?>
+                        <?php if (!empty($size['description'])): ?>
+                            （説明: <?php echo htmlspecialchars($size['description'], ENT_QUOTES, 'UTF-8'); ?>）
+                        <?php endif; ?>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php else: ?>
+            <p>この店舗にはサイズ情報が登録されていません。</p>
+        <?php endif; ?>
     </div>
+
     <div id="review" class="tab-content">
         <?php
         // 商品ページに関連するレビューを表示する部分

@@ -20,6 +20,18 @@ foreach ($brands as $brand) {
     }
     $brand_groups[$first_letter][] = $brand;
 }
+
+$lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ja';
+
+// // 言語ファイルのパスを設定
+$lang_file = __DIR__ . "/{$lang}.php";
+
+// // 言語ファイルを読み込み
+if (file_exists($lang_file)) {
+    include($lang_file);
+} else {
+    die("Error: Language file not found.");
+}
 ?>
 
 <!DOCTYPE html>
@@ -28,12 +40,12 @@ foreach ($brands as $brand) {
 <body>
     <div class="container">
         <header>
-            <h1 data-i18n="brand_search_title">ブランド検索</h1>
+            <h1 data-i18n="brand_search_title"><?php echo $translations['Search By Brand'] ?></h1>
         </header>
 
         <div class="filters">
             <div class="filter-alphabet">
-                <h3 data-i18n="filter_by_alphabet">アルファベットで絞り込む</h3>
+                <h3 data-i18n="filter_by_alphabet"><?php echo $translations['Filter By Alphabet'] ?></h3>
                 <div class="alphabet-buttons">
                     <?php foreach (range('A', 'Z') as $alphabet): ?>
                         <a href="#<?php echo $alphabet; ?>" data-i18n="alphabet_<?php echo $alphabet; ?>"><?php echo $alphabet; ?></a>
@@ -53,7 +65,7 @@ foreach ($brands as $brand) {
                             <?php foreach ($brand_groups[$letter] as $brand): ?>
                                 <?php
                                 // ブランドの詳細ページへのリンクURLを作成
-                                $brand_url = "brand_detail.php?brand_id=" . $brand['brand_id'];
+                                $brand_url = "brand_detail.php?brand=" . $brand['brand_id'];
                                 ?>
                                 <li class="brand-item">
                                     <a href="<?php echo $brand_url; ?>" class="brand-link"><?php echo $brand['brand_name']; ?></a>
