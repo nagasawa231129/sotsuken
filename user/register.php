@@ -1,5 +1,13 @@
 <?php
-include '../../db_open.php';  // db_open.phpをインクルードして、$dbhを利用できるようにする
+include '../../db_open.php';  // db_open.phpをインクルードして、$
+
+session_start();
+if (isset($_SESSION['id'])) {
+    $userId = $_SESSION['id'];
+} else {
+    header('Location: login.php');
+    $userId = null;
+}
 
 $sumPrice = 0;
 $cartItemsExist = false;
@@ -7,8 +15,11 @@ $cartItemsExist = false;
 // データベース接続が成功しているか確認（デバッグ用）
 if ($dbh) {
     // カートからデータを取得
-    $sql = "SELECT * FROM cart";
-    $result = $dbh->query($sql);
+    $sql = "SELECT * FROM cart WHERE user_id = :user_id";
+    $stmt = $dbh->prepare($sql);
+    $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+    $stmt->execute();
+    $result = $stmt; // 正しく取
 
     // クエリが失敗した場合
     if ($result === false) {
@@ -55,48 +66,28 @@ if ($dbh) {
                 echo "<p>shop_id: $shop_id に該当する商品はありません</p>";
             }
 
-            $addressSql = "SELECT address FROM user WHERE user_id = :user_id";
+            $addressSql = "SELECT address, address2, address3 FROM user WHERE user_id = :user_id";
             $stmt = $dbh->prepare($addressSql);
             $stmt->bindParam(':user_id',$user_id, PDO::PARAM_INT);
             $stmt->execute();
             
+            // 住所情報が正しく取得できているか確認
+// echo "<pre>";
+// var_dump($addressRow);  // 取得した住所情報を表示
+// echo "</pre>";
+
             $addressRow = $stmt->fetch(PDO::FETCH_ASSOC);
             $address = $addressRow['address'] ?? '住所情報がありません';  // 住所がない場合はデフォルトメッセージ
+            $address2 = $addressRow['address2'] ?? '';  // 追加住所
+            $address3 = $addressRow['address3'] ?? '';  // その他住所
 
         }
     }
+
 } else {
     echo 'データベース接続に失敗しました。';  // 接続失敗時のエラーメッセージ
 }
 
-// カート削除関数
-function deleteCart($dbh) {
-    $sql = "DELETE FROM cart";
-    $stmt = $dbh->prepare($sql);
-    $stmt->execute();
-}
-
-// カート詳細追加関数
-function detailCart($dbh, $goods, $user_id, $shop_id, $quantity, $trade_situation, $order_date) {
-    $sql = "INSERT INTO `cart_detail`(`cart_id`, `user_id`, `shop_id`, `quantity`, `trade_situation`, `order_date`) 
-            VALUES (:goods, :user_id, :shop_id, :quantity, :trade_situation, :order_date)";
-
-    $stmt = $dbh->prepare($sql);
-
-    // パラメータをバインド
-    $stmt->bindParam(':goods', $goods, PDO::PARAM_STR);
-    $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
-    $stmt->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
-    $stmt->bindParam(':quantity', $quantity, PDO::PARAM_INT);
-    $stmt->bindParam(':trade_situation', $trade_situation, PDO::PARAM_STR);
-    $stmt->bindParam(':order_date', $order_date, PDO::PARAM_STR);
-
-    // 実行
-    $stmt->execute();
-}
-
-// データベース接続を閉じる
-// $dbh = null;
 ?>
 
 <!DOCTYPE html>
@@ -106,34 +97,61 @@ function detailCart($dbh, $goods, $user_id, $shop_id, $quantity, $trade_situatio
     <link rel="stylesheet" href="register_style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>決済完了</title>
-    
 </head>
 <body>
     <p>合計金額: <span id="totalSum" class="info-text"><?php echo htmlspecialchars($sumPrice, ENT_QUOTES, 'UTF-8'); ?>円</span></p>
 
     <h3>お届け先住所を指定</h3>
-    <p><?php echo htmlspecialchars($address,ENT_QUOTES,'UTF-8') ?></p>
+    <p id="address"><?php echo htmlspecialchars($address, ENT_QUOTES, 'UTF-8'); ?></p>
     <button id="openModalButton">住所変更</button>
 
     <!-- モーダル -->
-    <div id="modal" class="modal">
-     <div class="modal-content">
-        <span class="close-btn" id="closeModalBtn">&times;</span>
-        
-        <!-- モーダル内にフォームを追加 -->
-        <form action="set_address.php" method="POST">
-            <h3>新しい住所を入力してください</h3>
-            <input type="text" id="new_address" name="new_address" value="<?php echo htmlspecialchars($address, ENT_QUOTES, 'UTF-8')?>" required>
-            <input type="submit" value="変更する">
-        </form>
-     </div>
+    <div id="modal" class="modal" style="display:none">
+        <div class="modal-content">
+            <span class="close-btn" id="closeModalBtn">&times;</span>
+
+            <h3>登録されている住所一覧</h3>
+            
+                <!-- 住所1 -->
+                
+                    <input type="radio" name="selected_address" value="<?php echo htmlspecialchars($address, ENT_QUOTES, 'UTF-8'); ?>" class="address-checkbox">
+                    <?php echo htmlspecialchars($address, ENT_QUOTES, 'UTF-8'); ?></br>
+                
+
+                <!-- 住所2 -->
+                <?php if ($address2): ?>
+                    
+                        <input type="radio" name="selected_address" value="<?php echo htmlspecialchars($address2, ENT_QUOTES, 'UTF-8'); ?>" class="address-checkbox">
+                        <?php echo htmlspecialchars($address2, ENT_QUOTES, 'UTF-8'); ?></br>
+                    
+                <?php endif; ?>
+
+                <!-- 住所3 -->
+                <?php if ($address3): ?>
+                    
+                        <input type="radio" name="selected_address" value="<?php echo htmlspecialchars($address3, ENT_QUOTES, 'UTF-8'); ?>" class="address-checkbox">
+                        <?php echo htmlspecialchars($address3, ENT_QUOTES, 'UTF-8'); ?>
+                <?php endif; ?>
+            
+
+            <button id="addNewAddressButton">住所の追加</button>
+
+            <div id="newAddressFormContainer" >
+                <p>新しい住所を追加(３つまで)</p>
+                <form action="add_address.php" method="POST">
+                    <input type="text" id="new_address" name="new_address" value="<?php echo htmlspecialchars($address,ENT_QUOTES,'UTF-8')?>" required>
+                    <input type="submit" value="追加する">
+                </form>
+            </div>
+        </div>
     </div>
 
     <div class="container">
         <h1>決済完了</h1>
 
-        <?php if($cartItemsExist):?>
-        <form action="payment_complete.php" method="post"  id="paymentForm">
+        <?php if($cartItemsExist): ?>
+        <form action="payment_complete.php" method="post" id="paymentForm">
+            <input type="hidden" name="selected_address" id="selectedAddressInput">
             <button id="paymentCompleteButton">決済完了</button>
         </form>
         <?php else: ?>
@@ -142,6 +160,27 @@ function detailCart($dbh, $goods, $user_id, $shop_id, $quantity, $trade_situatio
     </div>
 
     <script>
+         const addressCheckboxes = document.querySelectorAll('.address-checkbox');
+    const addressElement = document.getElementById('address');
+    const selectedAddressInput = document.getElementById('selectedAddressInput'); // 隠しフィールドを取得
+
+    addressCheckboxes.forEach(function(checkbox) {
+        checkbox.addEventListener('change', function() {
+            // チェックされた住所を取得して、ページに反映
+            let selectedAddress = '';
+            addressCheckboxes.forEach(function(cb) {
+                if (cb.checked) {
+                    selectedAddress = cb.value;
+                }
+            });
+
+            if (selectedAddress) {
+                addressElement.innerText = selectedAddress; // 住所を更新
+                selectedAddressInput.value = selectedAddress; // 隠しフィールドに住所をセット
+            }
+        });
+    });
+
         // モーダルの表示
         const modal = document.getElementById('modal');
         const openModalButton = document.getElementById('openModalButton');
@@ -165,3 +204,4 @@ function detailCart($dbh, $goods, $user_id, $shop_id, $quantity, $trade_situatio
     </script>
 </body>
 </html>
+
