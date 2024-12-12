@@ -15,20 +15,20 @@ $brands = $stmt->fetchAll();
 
 <form action="advanced_search.php" method="get">
     <!-- キーワード -->
-    <label for="keyword" data-i18n="keyword_label">キーワード</label>
-    <input type="text" name="keyword" placeholder="キーワード" value="<?php echo isset($_GET['keyword']) ? htmlspecialchars($_GET['keyword']) : ''; ?>" data-i18n="keyword_placeholder" />
+    <label for="keyword" data-i18n="keyword_label"><?php echo $translations['Keyword Label'] ?></label>
+    <input type="text" name="keyword" placeholder="<?php echo $translations['Keyword Placeholder'] ?>" value="<?php echo isset($_GET['keyword']) ? htmlspecialchars($_GET['keyword']) : ''; ?>" data-i18n="keyword_placeholder" />
 
     <!-- 性別 -->
-    <label for="gender" data-i18n="gender_label">性別：</label>
+    <label for="gender" data-i18n="gender_label"><?php echo $translations['Gender'] ?>：</label>
     <select name="gender" data-i18n="gender_label">
-        <option value="" data-i18n="all">すべて</option>
-        <option value="1" <?php echo (isset($_GET['gender']) && $_GET['gender'] === '1') ? 'selected' : ''; ?> data-i18n="men">男性</option>
-        <option value="0" <?php echo (isset($_GET['gender']) && $_GET['gender'] === '0') ? 'selected' : ''; ?> data-i18n="woman">女性</option>
+        <option value="" data-i18n="all"><?php echo $translations['All'] ?></option>
+        <option value="1" <?php echo (isset($_GET['gender']) && $_GET['gender'] === '1') ? 'selected' : ''; ?> data-i18n="man"><?php echo $translations['Man'] ?></option>
+        <option value="0" <?php echo (isset($_GET['gender']) && $_GET['gender'] === '0') ? 'selected' : ''; ?> data-i18n="woman"><?php echo $translations['Woman'] ?></option>
     </select>
 
-    <label for="brand" data-i18n="brand">ブランド：</label>
+    <label for="brand" data-i18n="brand"><?php echo $translations['Brand'] ?>：</label>
     <select name="brand" id="brand">
-        <option value="">すべて</option> <!-- デフォルトで「すべて」選択肢を表示 -->
+        <option value=""><?php echo $translations['All'] ?></option> <!-- デフォルトで「すべて」選択肢を表示 -->
         <?php
         // $brands 配列を使ってブランドを表示
         foreach ($brands as $brand) {
@@ -44,32 +44,32 @@ $brands = $stmt->fetchAll();
     </select>
 
     <!-- カテゴリー -->
-    <label for="category" data-i18n="category_label">カテゴリー：</label>
+    <label for="category" data-i18n="category_label"><?php echo $translations['Category Label'] ?>：</label>
     <select name="category" id="category" onchange="updateSubcategories()" data-i18n="category_label">
-        <option value="" data-i18n="all">すべて</option>
-        <option value="1" <?php echo (isset($_GET['category']) && $_GET['category'] === '1') ? 'selected' : ''; ?> data-i18n="tops">トップス</option>
-        <option value="2" <?php echo (isset($_GET['category']) && $_GET['category'] === '2') ? 'selected' : ''; ?> data-i18n="outerwear">ジャケット/アウター</option>
-        <option value="3" <?php echo (isset($_GET['category']) && $_GET['category'] === '3') ? 'selected' : ''; ?> data-i18n="pants">パンツ</option>
-        <option value="4" <?php echo (isset($_GET['category']) && $_GET['category'] === '4') ? 'selected' : ''; ?> data-i18n="skirt">スカート</option>
-        <option value="5" <?php echo (isset($_GET['category']) && $_GET['category'] === '5') ? 'selected' : ''; ?> data-i18n="onepiece">ワンピース</option>
+        <option value="" data-i18n="all"><?php echo $translations['All'] ?></option>
+        <option value="1" <?php echo (isset($_GET['category']) && $_GET['category'] === '1') ? 'selected' : ''; ?> data-i18n="tops"><?php echo $translations['Tops'] ?></option>
+        <option value="2" <?php echo (isset($_GET['category']) && $_GET['category'] === '2') ? 'selected' : ''; ?> data-i18n="outerwear"><?php echo $translations['Jacket'] ?></option>
+        <option value="3" <?php echo (isset($_GET['category']) && $_GET['category'] === '3') ? 'selected' : ''; ?> data-i18n="pants"><?php echo $translations['Pants'] ?></option>
+        <option value="4" <?php echo (isset($_GET['category']) && $_GET['category'] === '4') ? 'selected' : ''; ?> data-i18n="skirt"><?php echo $translations['Skirt'] ?></option>
+        <option value="5" <?php echo (isset($_GET['category']) && $_GET['category'] === '5') ? 'selected' : ''; ?> data-i18n="onepiece"><?php echo $translations['Onepiece'] ?></option>
     </select>
 
     <!-- サブカテゴリー -->
     <div id="subcategory-container" style="display: none;">
-        <label for="subcategory" data-i18n="subcategory_label">サブカテゴリー：</label>
+        <label for="subcategory" data-i18n="subcategory_label"><?php echo $translations['Subcategory Label'] ?>：</label>
         <select name="subcategory" id="subcategory" data-i18n="subcategory_label">
             <!-- サブカテゴリーが動的に追加されます -->
         </select>
     </div>
 
     <!-- 価格帯 -->
-    <label for="min_price" data-i18n="price_range">価格帯：</label>
-    <input type="number" name="min_price" placeholder="最小価格" value="<?php echo isset($_GET['min_price']) ? htmlspecialchars($_GET['min_price']) : ''; ?>" data-i18n="min_price_placeholder" />
+    <label for="min_price" data-i18n="price_range"><?php echo $translations['Price Range'] ?>：</label>
+    <input type="number" name="min_price" placeholder="<?php echo $translations['Min Price Placeholder'] ?>" value="<?php echo isset($_GET['min_price']) ? htmlspecialchars($_GET['min_price']) : ''; ?>" data-i18n="min_price_placeholder" />
     ～
-    <input type="number" name="max_price" placeholder="最大価格" value="<?php echo isset($_GET['max_price']) ? htmlspecialchars($_GET['max_price']) : ''; ?>" data-i18n="max_price_placeholder" />
+    <input type="number" name="max_price" placeholder="<?php echo $translations['Max Price Placeholder'] ?>" value="<?php echo isset($_GET['max_price']) ? htmlspecialchars($_GET['max_price']) : ''; ?>" data-i18n="max_price_placeholder" />
 
     <!-- セール対象商品 -->
-    <label for="sale_subject" data-i18n="sale_label">セール対象：</label>
+    <label for="sale_subject" data-i18n="sale_label"><?php echo $translations['Sale'] ?>：</label>
     <select name="sale_subject" data-i18n="sale_label">
         <option value="" data-i18n="all">すべて</option>
         <option value="1" <?php echo (isset($_GET['sale_subject']) && $_GET['sale_subject'] === '1') ? 'selected' : ''; ?> data-i18n="sale">セール対象</option>
@@ -86,183 +86,183 @@ $brands = $stmt->fetchAll();
     const subcategories = {
         1: [{
                 value: '1',
-                text: 'Tシャツ/カットソー'
+                text: '<?php echo $translations['Tshirt Cutsew'] ?>'
             }, // t-shirt, cutsew
             {
                 value: '2',
-                text: 'シャツ/ブラウス'
+                text: '<?php echo $translations['Shirt Blouse'] ?>'
             }, // shirt, blouse
             {
                 value: '3',
-                text: 'ポロシャツ'
+                text: '<?php echo $translations['Polo Shirt'] ?>'
             }, // polo-shirt
             {
                 value: '4',
-                text: 'ニット/セーター'
+                text: '<?php echo $translations['Knit Sweater'] ?>'
             }, // knit, sweater
             {
                 value: '5',
-                text: 'ベスト'
+                text: '<?php echo $translations['Vest'] ?>'
             }, // vest
             {
                 value: '6',
-                text: 'パーカー'
-            }, // parka, sweat
+                text: '<?php echo $translations['Parka'] ?>'
+            }, // parka
             {
                 value: '7',
-                text: 'スウェット'
+                text: '<?php echo $translations['Sweat'] ?>'
             }, // sweat
             {
                 value: '8',
-                text: 'カーディガン/ボレロ'
+                text: '<?php echo $translations['Cardigan'] ?>'
             }, // cardigan, bolero
             {
                 value: '9',
-                text: 'アンサンブル'
+                text: '<?php echo $translations['Ensemble'] ?>'
             }, // ensemble
             {
                 value: '10',
-                text: 'ジャージ'
+                text: '<?php echo $translations['Jersey'] ?>'
             }, // jersey
             {
                 value: '11',
-                text: 'タンクトップ'
+                text: '<?php echo $translations['Tanktop'] ?>'
             }, // tanktop
             {
                 value: '12',
-                text: 'キャミソール'
+                text: '<?php echo $translations['Camisole'] ?>'
             }, // camisole
             {
                 value: '13',
-                text: 'チューブトップス'
+                text: '<?php echo $translations['Tubetop'] ?>'
             }, // tubetop
             {
                 value: '14',
-                text: 'その他トップス'
+                text: '<?php echo $translations['Other Tops'] ?>'
             }, // other-tops
         ],
         2: [{
                 value: '15',
-                text: 'ノーカラーコート'
+                text: '<?php echo $translations['Collarless Coat'] ?>'
             }, // collarless coat
             {
                 value: '16',
-                text: 'ノーカラージャケット'
+                text: '<?php echo $translations['Collarless Jacket'] ?>'
             }, // collarless jacket
             {
                 value: '17',
-                text: 'デニムジャケット'
+                text: '<?php echo $translations['Denim Jacket'] ?>'
             }, // denim jacket
             {
                 value: '18',
-                text: 'ダウンジャケット'
+                text: '<?php echo $translations['Down Jacket'] ?>'
             }, // down jacket
             {
                 value: '19',
-                text: 'ダウンベスト'
+                text: '<?php echo $translations['Down Vest'] ?>'
             }, // down vest
             {
                 value: '20',
-                text: 'ダッフルコート'
+                text: '<?php echo $translations['Duffle Coat'] ?>'
             }, // duffle coat
             {
                 value: '21',
-                text: 'ブルゾン'
+                text: '<?php echo $translations['Blouson'] ?>'
             }, // blouson
             {
                 value: '22',
-                text: 'ミリタリージャケット'
+                text: '<?php echo $translations['Military Jacket'] ?>'
             }, // military jacket
             {
                 value: '23',
-                text: 'モッズコート'
+                text: '<?php echo $translations['Mods Coat'] ?>'
             }, // mods coat
             {
                 value: '24',
-                text: 'ナイロンジャケット'
+                text: '<?php echo $translations['Nylon Jacket'] ?>'
             }, // nylon jacket
             {
                 value: '25',
-                text: 'ライダースジャケット'
+                text: '<?php echo $translations['Riders Jacket'] ?>'
             }, // riders jacket
             {
                 value: '26',
-                text: 'テーラードジャケット'
+                text: '<?php echo $translations['Tailored Jacket'] ?>'
             }, // tailored jacket
             {
                 value: '27',
-                text: 'トレンチコート'
+                text: '<?php echo $translations['Trench Coat'] ?>'
             }, // trench coat
             {
                 value: '28',
-                text: 'その他アウター'
+                text: '<?php echo $translations['Other Outerwear'] ?>'
             }, // other outerwear
         ],
         3: [{
                 value: '29',
-                text: 'カーゴパンツ'
+                text: '<?php echo $translations['Cargo Pants'] ?>'
             }, // cargo pants
             {
                 value: '30',
-                text: 'チノパン'
+                text: '<?php echo $translations['Chino Pants'] ?>'
             }, // chino pants
             {
                 value: '31',
-                text: 'デニムパンツ'
+                text: '<?php echo $translations['Denim Pants'] ?>'
             }, // denim pants
             {
                 value: '32',
-                text: 'スラックス'
+                text: '<?php echo $translations['Slacks'] ?>'
             }, // slacks
             {
                 value: '33',
-                text: 'スウェットパンツ'
+                text: '<?php echo $translations['Sweat Pants'] ?>'
             }, // sweat pants
             {
                 value: '34',
-                text: 'その他パンツ'
+                text: '<?php echo $translations['Other Pants'] ?>'
             }, // other pants
         ],
         4: [{
                 value: '35',
-                text: 'デニムスカート'
+                text: '<?php echo $translations['Denim Skirt'] ?>'
             }, // denim skirt
             {
                 value: '36',
-                text: 'ミニスカート'
+                text: '<?php echo $translations['Mini Skirt'] ?>'
             }, // mini skirt
             {
                 value: '37',
-                text: 'ミディスカート'
+                text: '<?php echo $translations['Midi Skirt'] ?>'
             }, // midi skirt
             {
                 value: '38',
-                text: 'ロングスカート'
+                text: '<?php echo $translations['Long Skirt'] ?>'
             }, // long skirt
         ],
         5: [{
                 value: '39',
-                text: 'ドレス'
+                text: '<?php echo $translations['Dress'] ?>'
             }, //dress
             {
                 value: '40',
-                text: 'ジャンパースカート'
+                text: '<?php echo $translations['Jumper Skirt'] ?>'
             }, // jumper skirt
             {
                 value: '41',
-                text: 'ワンピース'
+                text: '<?php echo $translations['Onepiece'] ?>'
             }, // onepiece dress
             {
                 value: '42',
-                text: 'パンツドレス'
+                text: '<?php echo $translations['Pants Dress'] ?>'
             }, // pants dress
             {
                 value: '43',
-                text: 'シャツワンピース'
+                text: '<?php echo $translations['Shirt Onepiece'] ?>'
             }, // shirt dress
             {
                 value: '44',
-                text: 'チュニック'
+                text: '<?php echo $translations['Tunic'] ?>'
             }, // tunic
         ],
     };

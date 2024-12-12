@@ -69,17 +69,16 @@ $result_review = $stmt_review->fetchAll(PDO::FETCH_ASSOC);
 </head>
 
 <body>
-    <h1>注文履歴</h1>
+    <h1><?php echo $translations['Order History'] ?></h1>
 
     <div class="tabs">
-        <div class="tab <?php echo isset($_GET['tab']) && $_GET['tab'] == 'history' ? 'active' : ''; ?>" id="history-tab" onclick="showTab('history')">注文履歴</div>
-        <div class="tab <?php echo isset($_GET['tab']) && $_GET['tab'] == 'pending' ? 'active' : ''; ?>" id="pending-tab" onclick="showTab('pending')">発送前商品</div>
-        <div class="tab <?php echo isset($_GET['tab']) && $_GET['tab'] == 'shipped' ? 'active' : ''; ?>" id="shipped-tab" onclick="showTab('shipped')">発送済み商品</div>
-        <div class="tab <?php echo isset($_GET['tab']) && $_GET['tab'] == 'review' ? 'active' : ''; ?>" id="review-tab" onclick="showTab('review')">レビュー</div>
+        <div class="tab <?php echo isset($_GET['tab']) && $_GET['tab'] == 'history' ? 'active' : ''; ?>" id="history-tab" onclick="showTab('history')"><?php echo $translations['Order History'] ?></div>
+        <div class="tab <?php echo isset($_GET['tab']) && $_GET['tab'] == 'pending' ? 'active' : ''; ?>" id="pending-tab" onclick="showTab('pending')"><?php echo $translations['Items Pending Shipment'] ?></div>
+        <div class="tab <?php echo isset($_GET['tab']) && $_GET['tab'] == 'shipped' ? 'active' : ''; ?>" id="shipped-tab" onclick="showTab('shipped')"><?php echo $translations['Shipped Items'] ?></div>
+        <div class="tab <?php echo isset($_GET['tab']) && $_GET['tab'] == 'review' ? 'active' : ''; ?>" id="review-tab" onclick="showTab('review')"><?php echo $translations['Review'] ?></div>
     </div>
 
     <div id="history-content" class="tab-content <?php echo isset($_GET['tab']) && $_GET['tab'] == 'history' ? 'active' : ''; ?>">
-        <h2>注文履歴</h2>
         <?php
         if (count($result_history) > 0) {
             foreach ($result_history as $row) {
@@ -97,13 +96,12 @@ $result_review = $stmt_review->fetchAll(PDO::FETCH_ASSOC);
                 echo "</div><hr>";
             }
         } else {
-            echo "<p>注文履歴はありません。</p>";
+            echo $translations['No order history available'];
         }
         ?>
     </div>
 
     <div id="pending-content" class="tab-content <?php echo isset($_GET['tab']) && $_GET['tab'] == 'pending' ? 'active' : ''; ?>">
-        <h2>発送前商品</h2>
         <?php
         if (count($result_pending) > 0) {
             foreach ($result_pending as $row) {
@@ -120,13 +118,12 @@ $result_review = $stmt_review->fetchAll(PDO::FETCH_ASSOC);
                 echo "</div><hr>";
             }
         } else {
-            echo "<p>発送前の商品はありません。</p>";
+            echo $translations['No items pending shipment'];
         }
         ?>
     </div>
 
     <div id="shipped-content" class="tab-content <?php echo isset($_GET['tab']) && $_GET['tab'] == 'shipped' ? 'active' : ''; ?>">
-        <h2>発送済み商品</h2>
         <?php
         if (count($result_shipped) > 0) {
             foreach ($result_shipped as $row) {
@@ -143,14 +140,13 @@ $result_review = $stmt_review->fetchAll(PDO::FETCH_ASSOC);
                 echo "</div><hr>";
             }
         } else {
-            echo "<p>発送済みの商品はありません。</p>";
+            echo $translations['No items shipped'];
         }
         ?>
     </div>
 
     <!-- レビュタブ -->
     <div id="review-content" class="tab-content">
-        <h2>レビュー</h2>
         <?php
         if (count($result_review) > 0) {
             foreach ($result_review as $review) {
@@ -161,7 +157,7 @@ $result_review = $stmt_review->fetchAll(PDO::FETCH_ASSOC);
                 echo "</div><hr>";
             }
         } else {
-            echo "<p>投稿されたレビューはありません。</p>";
+            echo $translations['No reviews available'];
         }
         ?>
     </div>

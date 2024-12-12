@@ -216,6 +216,25 @@
     cursor: not-allowed; /* ポインターを無効に */
 }
 
+.product-image-block {
+    width: 100%; /* 幅を商品全体に合わせる */
+    display: flex;
+    justify-content: center; /* 中央揃え */
+    margin-bottom: 10px; /* 下部に余白 */
+}
+
+.product-image, .sale-product-image {
+    max-width: 100%; /*画像の幅をボックスに合わせる */
+    height: 170; /*縦横比を維持 */
+    border-radius: 4px; /*画像の角を丸める */
+    margin-bottom: 10px; /*画像下に余白を追加 */
+
+    /* width: 100%; カードの横幅に合わせる */
+    /* height: 160px; 固定の高さ */
+    object-fit: cover; /* アスペクト比を保持して枠内に収める */
+    /* border-bottom: 1px solid #eee; 画像下に区切り線 */
+}
+
 /* レスポンシブ調整 */
 @media (max-width: 768px) {
     .main-content {

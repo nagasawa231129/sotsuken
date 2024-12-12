@@ -50,24 +50,24 @@ if (file_exists($lang_file)) {
     <div class="container">
         <!-- サブ項目 -->
         <aside>
-            <h2>メニュー</h2>
+            <h2><?php echo $translations['Menu'] ?></h2>
             <ul>
                 <!-- メインカテゴリ -->
-                <li><strong>会員情報</strong></li>
-                <li><a href="#profile">会員登録情報</a></li>
-                <li><a href="#id-link">ID連携</a></li>
-                <li><a href="#lang_link">言語設定</a></li>
+                <li><strong><?php echo $translations['Membership Information'] ?></strong></li>
+                <li><a href="#profile"><?php echo $translations['User Information'] ?></a></li>
+                <li><a href="#id-link"><?php echo $translations['ID Collaboration'] ?></a></li>
+                <li><a href="#lang_link"><?php echo $translations['Language'] ?></a></li>
                 <hr>
                 <!-- 注文履歴 -->
-                <li><strong>注文履歴</strong></li>
-                <li><a href="order.php#history">注文履歴</a></li>
-                <li><a href="order.php#pending">発送前商品</a></li>
-                <li><a href="order.php#shipped">発送済み商品</a></li>
-                <li><a href="order.php#review">レビュー</a></li>
+                <li><strong><?php echo $translations['Order'] ?></strong></li>
+                <li><a href="order.php#history"><?php echo $translations['Order History'] ?></a></li>
+                <li><a href="order.php#pending"><?php echo $translations['Items Pending Shipment'] ?></a></li>
+                <li><a href="order.php#shipped"><?php echo $translations['Shipped Items'] ?></a></li>
+                <li><a href="order.php#review"><?php echo $translations['Review'] ?></a></li>
                 <hr>
                 <!-- 退会 -->
-                <li><strong>退会</strong></li>
-                <li><a href="unsubscribe.php">退会手続き</a></li>
+                <li><strong><?php echo $translations['Unsubscribe'] ?></strong></li>
+                <li><a href="unsubscribe.php"><?php echo $translations['Unsubscription Process'] ?></a></li>
             </ul>
         </aside>
 
@@ -76,7 +76,7 @@ if (file_exists($lang_file)) {
             <div>
                 <div id="profile">
 
-                    <h2>会員登録情報</h2>
+                    <h2><?php echo $translations['User Information'] ?></h2>
                     <table>
                         <tr>
                             <td><?php echo htmlspecialchars($user['display_name']); ?></td>
@@ -121,31 +121,31 @@ if (file_exists($lang_file)) {
                         <tr>
                             <td><?php echo htmlspecialchars(formatPhoneNumber($user['phone'])); ?></td>
                         </tr>
-                        <button onclick="window.location.href='normal_setting.php'" class="button-container">変更</button>
+                        <button onclick="window.location.href='normal_setting.php'" class="button-container"><?php echo $translations['Change']; ?></button>
                     </table>
                 </div>
                 <div>
-                    <h2>メールアドレス</h2>
+                    <h2><?php echo $translations['Mail Address'] ?></h2>
                     <table>
                         <tr>
                             <td><?php echo htmlspecialchars($user['mail']); ?></td>
                         </tr>
-                        <button onclick="window.location.href='mail_setting.php'" class="button-container">変更</button>
+                        <button onclick="window.location.href='mail_setting.php'" class="button-container"><?php echo $translations['Change']; ?></button>
                     </table>
                 </div>
                 <div>
-                    <h2>パスワード</h2>
+                    <h2><?php echo $translations['Password'] ?></h2>
                     <table>
                         <tr>
                             <td>********</td>
                         </tr>
-                        <button onclick="window.location.href='pass_setting.php'" class="button-container">変更</button>
+                        <button onclick="window.location.href='pass_setting.php'" class="button-container"><?php echo $translations['Change']; ?></button>
                     </table>
                 </div>
                 <div>
                     <div id="id-link">
 
-                        <h2>ID連携</h2>
+                        <h2><?php echo $translations['ID Collaboration'] ?></h2>
                         <table>
                             <tr>
                                 <td>LINE</td>
@@ -215,11 +215,11 @@ if (file_exists($lang_file)) {
                 </div>
                 <div>
                     <div id="lang_link">
-                        <h2>言語設定</h2>
+                        <h2><?php echo $translations['Language'] ?></h2>
                         <form method="post" action="account.php">
                             <table>
                                 <tr>
-                                    <td><?php echo $translations['language_select']; ?>:</td>
+                                    <td><?php echo $translations['Language Select']; ?>:</td>
                                     <td>
                                         <label for="ja">
                                             <input type="radio" id="ja" name="lang" value="ja" <?php if ($lang == 'ja') echo 'checked'; ?>>
@@ -233,7 +233,7 @@ if (file_exists($lang_file)) {
                                         </label>
                                     </td>
                                 </tr>
-                                <button type="submit" class="button-container"><?php echo $translations['change']; ?></button>
+                                <button type="submit" class="button-container"><?php echo $translations['Change']; ?></button>
                             </table>
                         </form>
                     </div>

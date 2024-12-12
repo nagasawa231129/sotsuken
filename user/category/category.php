@@ -28,49 +28,51 @@ if (file_exists($lang_file)) {
 <body>
     <div class="container">
         <header>
-            <h1>カテゴリー検索</h1>
+            <h1><?php echo $translations['Search By Category'] ?></h1>
         </header>
 
         <nav class="tabs">
             <a href="category.php" class="tab-button <?php echo basename($_SERVER['PHP_SELF']) == 'category.php' ? 'active' : ''; ?>" data-target="all">ALL</a>
-            <a href="./men-category/men-category.php" class="tab-button <?php echo basename($_SERVER['PHP_SELF']) == 'men-category.php' ? 'active' : ''; ?>" data-target="men">メンズ</a>
-            <a href="./woman-category/woman-category.php" class="tab-button <?php echo strpos($_SERVER['PHP_SELF'], 'woman-category.php') !== false ? 'active' : ''; ?>" data-target="woman">レディース</a>
-            <a href="./kids-category/kids-category.php" class="tab-button <?php echo basename($_SERVER['PHP_SELF']) == 'kids-category.php' ? 'active' : ''; ?>" data-target="kids">キッズ</a>
+            <a href="./men-category/men-category.php" class="tab-button <?php echo basename($_SERVER['PHP_SELF']) == 'men-category.php' ? 'active' : ''; ?>" data-target="men"><?php echo $translations['Mens'] ?></a>
+            <a href="./woman-category/woman-category.php" class="tab-button <?php echo strpos($_SERVER['PHP_SELF'], 'woman-category.php') !== false ? 'active' : ''; ?>" data-target="woman"><?php echo $translations['Ledies'] ?></a>
+            <a href="./kids-category/kids-category.php" class="tab-button <?php echo basename($_SERVER['PHP_SELF']) == 'kids-category.php' ? 'active' : ''; ?>" data-target="kids"><?php echo $translations['Kids'] ?></a>
         </nav>
 
 
 
         <div class="category-list">
             <ul class="category-name">
-                <li><a href="#tops">トップス</a></li>
-                <li><a href="#jacket">ジャケット/アウター</a></li>
-                <li><a href="#pants">パンツ</a></li>
-                <li><a href="#skirt">スカート</a></li>
-                <li><a href="#onepiece">ワンピース</a></li>
+                <li><a href="#tops"><?php echo $translations['Tops'] ?></a></li>
+                <li><a href="#jacket"><?php echo $translations['Jacket'] ?></a></li>
+                <li><a href="#pants"><?php echo $translations['Pants'] ?></a></li>
+                <li><a href="#skirt"><?php echo $translations['Skirt'] ?></a></li>
+                <li><a href="#onepiece"><?php echo $translations['Onepiece'] ?></a></li>
             </ul>
             <div>
                 <div id="tops">
-                    <a href="tops.php">トップス</a>
+                    <a href="tops.php"><?php echo $translations['Tops'] ?></a>
                     <?php
                     $stmt = $dbh->prepare("SELECT * FROM subcategory WHERE category_id = 1");
                     $stmt->execute();
 
-                    // データをフェッチして表示
+
                     $categories = $stmt->fetchAll();
 
+                    // データをフェッチして表示
                     if ($categories) {
                         echo "<ul>";  // リスト形式で表示
                         foreach ($categories as $category) {
                             echo "<li>";
 
                             // サブカテゴリ名に応じて遷移先を決定
-                            $subcategoryName = strtolower($category['subcategory_name']);
                             $subcategorycode = strtolower($category['subcategory_code']);
+                            $subcategoryName = $category['subcategory_name'];
 
-                            $url = '';
+                            // サブカテゴリ名を翻訳
+                            $translatedSubcategoryName = isset($translations[$subcategoryName]) ? $translations[$subcategoryName] : $subcategoryName;
                             $url = './tops/' . $subcategorycode . '.php';
 
-                            echo "<a href='{$url}'>" . htmlspecialchars($category['subcategory_name']) . "</a><br>";
+                            echo "<a href='{$url}'>" . htmlspecialchars($translatedSubcategoryName) . "</a><br>";
                             echo "</li>";
                         }
                         echo "</ul>";
@@ -81,7 +83,7 @@ if (file_exists($lang_file)) {
                 </div>
 
                 <div id="jacket">
-                    <a href="jacket-outerwear.php">ジャケット/アウター</a>
+                    <a href="jacket-outerwear.php"><?php echo $translations['Jacket'] ?></a>
 
                     <?php
                     $stmt = $dbh->prepare("SELECT * FROM subcategory WHERE category_id = 2");
@@ -96,13 +98,14 @@ if (file_exists($lang_file)) {
                             echo "<li>";
 
                             // サブカテゴリ名に応じて遷移先を決定
-                            $subcategoryName = strtolower($category['subcategory_name']);
                             $subcategorycode = strtolower($category['subcategory_code']);
+                            $subcategoryName = $category['subcategory_name'];
 
-                            $url = '';
+                            // サブカテゴリ名を翻訳
+                            $translatedSubcategoryName = isset($translations[$subcategoryName]) ? $translations[$subcategoryName] : $subcategoryName;
                             $url = './jacket-outerwear/' . $subcategorycode . '.php';
 
-                            echo "<a href='{$url}'>" . htmlspecialchars($category['subcategory_name']) . "</a><br>";
+                            echo "<a href='{$url}'>" . htmlspecialchars($translatedSubcategoryName) . "</a><br>";
                             echo "</li>";
                         }
                         echo "</ul>";
@@ -112,7 +115,7 @@ if (file_exists($lang_file)) {
                     ?>
                 </div>
                 <div id="pants">
-                    <a href="pants.php">パンツ</a>
+                    <a href="pants.php"><?php echo $translations['Pants'] ?></a>
 
                     <?php
                     $stmt = $dbh->prepare("SELECT * FROM subcategory WHERE category_id = 3");
@@ -127,13 +130,14 @@ if (file_exists($lang_file)) {
                             echo "<li>";
 
                             // サブカテゴリ名に応じて遷移先を決定
-                            $subcategoryName = strtolower($category['subcategory_name']);
                             $subcategorycode = strtolower($category['subcategory_code']);
+                            $subcategoryName = $category['subcategory_name'];
 
-                            $url = '';
+                            // サブカテゴリ名を翻訳
+                            $translatedSubcategoryName = isset($translations[$subcategoryName]) ? $translations[$subcategoryName] : $subcategoryName;
                             $url = './pants/' . $subcategorycode . '.php';
 
-                            echo "<a href='{$url}'>" . htmlspecialchars($category['subcategory_name']) . "</a><br>";
+                            echo "<a href='{$url}'>" . htmlspecialchars($translatedSubcategoryName) . "</a><br>";
                             echo "</li>";
                         }
                         echo "</ul>";
@@ -143,7 +147,7 @@ if (file_exists($lang_file)) {
                     ?>
                 </div>
                 <div id="skirt">
-                    <a href="skirt.php">スカート</a>
+                    <a href="skirt.php"><?php echo $translations['Skirt']; ?></a>
 
                     <?php
                     $stmt = $dbh->prepare("SELECT * FROM subcategory WHERE category_id = 4");
@@ -158,13 +162,14 @@ if (file_exists($lang_file)) {
                             echo "<li>";
 
                             // サブカテゴリ名に応じて遷移先を決定
-                            $subcategoryName = strtolower($category['subcategory_name']);
                             $subcategorycode = strtolower($category['subcategory_code']);
+                            $subcategoryName = $category['subcategory_name'];
 
-                            $url = '';
+                            // サブカテゴリ名を翻訳
+                            $translatedSubcategoryName = isset($translations[$subcategoryName]) ? $translations[$subcategoryName] : $subcategoryName;
                             $url = './skirt/' . $subcategorycode . '.php';
 
-                            echo "<a href='{$url}'>" . htmlspecialchars($category['subcategory_name']) . "</a><br>";
+                            echo "<a href='{$url}'>" . htmlspecialchars($translatedSubcategoryName) . "</a><br>";
                             echo "</li>";
                         }
                         echo "</ul>";
@@ -173,8 +178,10 @@ if (file_exists($lang_file)) {
                     }
                     ?>
                 </div>
+
+
                 <div id="onepiece">
-                    <a href="onepiece.php">ワンピース</a>
+                    <a href="onepiece.php"><?php echo $translations['Onepiece'] ?></a>
 
                     <?php
                     $stmt = $dbh->prepare("SELECT * FROM subcategory WHERE category_id = 5");
@@ -189,13 +196,14 @@ if (file_exists($lang_file)) {
                             echo "<li>";
 
                             // サブカテゴリ名に応じて遷移先を決定
-                            $subcategoryName = strtolower($category['subcategory_name']);
                             $subcategorycode = strtolower($category['subcategory_code']);
+                            $subcategoryName = $category['subcategory_name'];
 
-                            $url = '';
+                            // サブカテゴリ名を翻訳
+                            $translatedSubcategoryName = isset($translations[$subcategoryName]) ? $translations[$subcategoryName] : $subcategoryName;
                             $url = './onepiece/' . $subcategorycode . '.php';
 
-                            echo "<a href='{$url}'>" . htmlspecialchars($category['subcategory_name']) . "</a><br>";
+                            echo "<a href='{$url}'>" . htmlspecialchars($translatedSubcategoryName) . "</a><br>";
                             echo "</li>";
                         }
                         echo "</ul>";

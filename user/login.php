@@ -14,6 +14,15 @@ $message = ''; // エラーメッセージを初期化
     <link rel="stylesheet" href="login.css">
 </head>
 <body>
+<header>
+<!-- ヘッダー部分を追加 -->
+<div class="search-container">
+    <!-- 「卒研TOWN」を左側に移動 -->
+    <div class="search-bar">
+        <a class="site-name" href="/sotsuken/sotsuken/user/toppage.php">卒研TOWN</a>
+    </div>
+</div>
+</header>
 <?php
 if ($_SERVER["REQUEST_METHOD"] != "POST") {
     echo <<<HTML

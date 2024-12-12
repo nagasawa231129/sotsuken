@@ -14,6 +14,18 @@ if (isset($_SESSION['id'])) {
     exit;
 }
 
+$lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ja';
+
+// // 言語ファイルのパスを設定
+$lang_file = __DIR__ . "/{$lang}.php";
+
+// // 言語ファイルを読み込み
+if (file_exists($lang_file)) {
+    include($lang_file);
+} else {
+    die("Error: Language file not found.");
+}
+
 // 現在のパスワードが送信された場合
 if (isset($_POST['current_password'], $_POST['new_password'], $_POST['confirm_password'])) {
     // フォームから送信された情報を取得
@@ -62,19 +74,19 @@ if (isset($_POST['current_password'], $_POST['new_password'], $_POST['confirm_pa
     <title>パスワード変更</title>
 </head>
 <body>
-    <h1>パスワード変更</h1>
+    <h1><?php echo $translations['Change Password'] ?></h1>
     <form method="post" action="pass_setting.php">
-        <label for="current_password">現在のパスワード:</label>
+        <label for="current_password"><?php echo $translations['Current Password'] ?>:</label>
         <input type="password" name="current_password" id="current_password" required><br>
 
-        <label for="new_password">新しいパスワード:</label>
+        <label for="new_password"><?php echo $translations['New Password'] ?>:</label>
         <input type="password" name="new_password" id="new_password" required><br>
 
-        <label for="confirm_password">新しいパスワード（確認）:</label>
+        <label for="confirm_password"><?php echo $translations['Confirm New Password'] ?>:</label>
         <input type="password" name="confirm_password" id="confirm_password" required><br>
 
-        <button type="submit">パスワードを変更</button>
+        <button type="submit"><?php echo $translations['Change Password'] ?></button>
     </form>
-    <a href="account.php">アカウントページに戻る</a>
+    <a href="account.php"><?php echo $translations['Return to the Membership Information page'] ?></a>
 </body>
 </html>

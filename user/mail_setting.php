@@ -81,20 +81,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 
 <body>
-    <h1>メールアドレス変更</h1>
+    <h1><?php echo $translations['Change MailAddress'] ?></h1>
 
     <form method="post" action="mail_setting.php">
         <table>
             <tr>
-                <td>新しいメールアドレス
-                <input type="email" name="mail" placeholder="新しいメールアドレスを入力" required></td>
+                <td><?php echo $translations['New MailAddress'] ?>
+                <input type="email" name="mail" placeholder="<?php echo $translations['New MailAddress'] ?>" required></td>
             </tr>
         </table>
 
-        <button type="submit">認証メールを送信</button>
+        <button type="submit"><?php echo $translations['Send verification email'] ?></button>
     </form>
 
-    <a href="account.php">アカウント情報に戻る</a>
+    <a href="account.php"><?php echo $translations['Return to the Membership Information page'] ?></a>
 </body>
 
 </html>

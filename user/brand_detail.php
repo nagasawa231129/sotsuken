@@ -63,7 +63,7 @@ $brands = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <title>ブランド詳細</title>
 
 <body>
-<?php
+    <?php
     // ユーザーがログインしているかを確認
     if ($userId) {
         // ブランドごとにお気に入りをチェック
@@ -99,109 +99,110 @@ $brands = $stmt->fetchAll(PDO::FETCH_ASSOC);
         // ログインしていない場合はボタンを無効化
         echo "<button class='favorite-button' disabled>♡</button>"; // ログインしていない場合
     }
-?>
+    ?>
 
 
     <div class="main-content">
-    <aside class="sidebar">
-        <h2 data-i18n="search"><?php echo $translations['search']?></h2>
-        <ul>
-        <li><a href="brand.php" data-i18n="search_by_brand"><?php echo $translations['search_by_brand']?></a></li>
-            <li><a href="category/category.php" data-i18n="search_by_category"><?php echo $translations['search_by_category']?></a></li>
-            <li><a href="ranking.php" data-i18n="search_by_ranking"><?php echo $translations['search_by_ranking']?></a></li>
-            <li><a href="sale.php" data-i18n="search_by_sale"><?php echo $translations['search_by_sale']?></a></li>
-            <li><a href="diagnosis.php" data-i18n="search_by_diagnosis"><?php echo $translations['search_by_diagnosis']?></a></li>
-            <li><a href="advanced_search.php" data-i18n="advanced_search"><?php echo $translations['advanced_search']?></a></li>
-        </ul>
+        <aside class="sidebar">
+            <h2 data-i18n="search"><?php echo $translations['Search'] ?></h2>
+            <ul>
+                <ul>
+                    <li><a href="brand.php" data-i18n="Search_By_brand"><?php echo $translations['Search By Brand'] ?></a></li>
+                    <li><a href="category/category.php" data-i18n="Search_By_category"><?php echo $translations['Search By Category'] ?></a></li>
+                    <li><a href="ranking.php" data-i18n="Search_By_ranking"><?php echo $translations['Search By Ranking'] ?></a></li>
+                    <li><a href="sale.php" data-i18n="Search_By_sale"><?php echo $translations['Search By Sale'] ?></a></li>
+                    <li><a href="diagnosis.php" data-i18n="Search_By_diagnosis"><?php echo $translations['Search By Diagnosis'] ?></a></li>
+                    <li><a href="advanced_search.php" data-i18n="advanced_search"><?php echo $translations['Advanced Search'] ?></a></li>
+                </ul>
 
-        <h2 data-i18n="categories_from"><?php echo $translations['search_by_category']?></h2>
+                <h2 data-i18n="categories_from"><?php echo $translations['Search By Category'] ?></h2>
 
-        <ul class="category-list">
-            <li class="category-item">
-                <a href="./category/tops.php" data-i18n="tops"><?php echo $translations['tops']?></a>
-                <ul class="sub-category">
-                    <li><a href="./category/tops/tshirt-cutsew.php" data-i18n="Tshirt-cutsew"><?php echo $translations['tshirt-cutsew']?></a></li>
-                    <li><a href="./category/tops/shirt.php" data-i18n="shirt-blouse">シャツ/ブラウス</a></li>
-                    <li><a href="./category/tops/poloshirt.php" data-i18n="poloshirt">ポロシャツ</a></li>
-                    <li><a href="./category/tops/knit-sweater.php" data-i18n="knit/sweater">ニット/セーター</a></li>
-                    <li><a href="./category/tops/vest.php" data-i18n="vast">ベスト</a></li>
-                    <li><a href="./category/tops/parka.php" data-i18n="parka">パーカー</a></li>
-                    <li><a href="./category/tops/sweat.php" data-i18n="sweat">スウェット</a></li>
-                    <li><a href="./category/tops/cardigan.php" data-i18n="cardigan">カーディガン</a></li>
-                    <li><a href="./category/tops/ensemble.php" data-i18n="ensemble">アンサンブル</a></li>
-                    <li><a href="./category/tops/jersey.php" data-i18n="jersey">ジャージ</a></li>
-                    <li><a href="./category/tops/tanktop.php" data-i18n="tanktop">タンクトップ</a></li>
-                    <li><a href="./category/tops/camisole.php" data-i18n="camisole">キャミソール</a></li>
-                    <li><a href="./category/tops/tubetops.php" data-i18n="tubetops">チューブトップス</a></li>
-                    <li><a href="./category/tops/auter-tops.php" data-i18n="auter-tops">その他トップス</a></li>
+                <ul class="category-list">
+                    <li class="category-item">
+                        <a href="./category/tops.php" data-i18n="tops"><?php echo $translations['Tops'] ?></a>
+                        <ul class="sub-category">
+                            <li><a href="./category/tops/tshirt-cutsew.php" data-i18n="Tshirt-cutsew"><?php echo $translations['Tshirt Cutsew'] ?></a></li>
+                            <li><a href="./category/tops/shirt.php" data-i18n="shirt-blouse"><?php echo $translations['Shirt Blouse'] ?></a></li>
+                            <li><a href="./category/tops/poloshirt.php" data-i18n="poloshirt"><?php echo $translations['Polo Shirt'] ?></a></li>
+                            <li><a href="./category/tops/knit-sweater.php" data-i18n="knit/sweater"><?php echo $translations['Knit Sweater'] ?></a></li>
+                            <li><a href="./category/tops/vest.php" data-i18n="vast"><?php echo $translations['Vest'] ?></a></li>
+                            <li><a href="./category/tops/parka.php" data-i18n="parka"><?php echo $translations['Parka'] ?></a></li>
+                            <li><a href="./category/tops/sweat.php" data-i18n="sweat"><?php echo $translations['Sweat'] ?></a></li>
+                            <li><a href="./category/tops/cardigan.php" data-i18n="cardigan"><?php echo $translations['Cardigan'] ?></a></li>
+                            <li><a href="./category/tops/ensemble.php" data-i18n="ensemble"><?php echo $translations['Ensemble'] ?></a></li>
+                            <li><a href="./category/tops/jersey.php" data-i18n="jersey"><?php echo $translations['Jersey'] ?></a></li>
+                            <li><a href="./category/tops/tanktop.php" data-i18n="tanktop"><?php echo $translations['Tanktop'] ?></a></li>
+                            <li><a href="./category/tops/camisole.php" data-i18n="camisole"><?php echo $translations['Camisole'] ?></a></li>
+                            <li><a href="./category/tops/tubetops.php" data-i18n="tubetops"><?php echo $translations['Tubetop'] ?></a></li>
+                            <li><a href="./category/tops/other-tops.php" data-i18n="other-tops"><?php echo $translations['Other Tops'] ?></a></li>
+                        </ul>
+                    </li>
+                    <li class="category-item">
+                        <a href="./category/jacket.php" data-i18n="jacket/outer"><?php echo $translations['Outerwear'] ?></a>
+                        <ul class="sub-category">
+                            <li><a href="./category/jacket-outerwear/collarless-coat.php" data-i18n="collarless-coat"><?php echo $translations['Collarless Coat'] ?></a></li>
+                            <li><a href="./category/jacket-outerwear/collarless-jacket.php" data-i18n="collarless-jacket"><?php echo $translations['Collarless Jacket'] ?></a></li>
+                            <li><a href="./category/jacket-outerwear/denim-jacket.php" data-i18n="denim-jacket"><?php echo $translations['Denim Jacket'] ?></a></li>
+                            <li><a href="./category/jacket-outerwear/down-jacket.php" data-i18n="down-jacket"><?php echo $translations['Down Jacket'] ?></a></li>
+                            <li><a href="./category/jacket-outerwear/down-vest.php" data-i18n="down-vest"><?php echo $translations['Down Vest'] ?></a></li>
+                            <li><a href="./category/jacket-outerwear/duffle-coat.php" data-i18n="duffle-coat"><?php echo $translations['Duffle Coat'] ?></a></li>
+                            <li><a href="./category/jacket-outerwear/jacket.php" data-i18n="jacket"><?php echo $translations['Blouson'] ?></a></li>
+                            <li><a href="./category/jacket-outerwear/military-jacket.php" data-i18n="millitary-jacket"><?php echo $translations['Military Jacket'] ?></a></li>
+                            <li><a href="./category/jacket-outerwear/mods-coat.php" data-i18n="mods-coat"><?php echo $translations['Mods Coat'] ?></a></li>
+                            <li><a href="./category/jacket-outerwear/nylon-jacket.php" data-i18n="nylon-jacket"><?php echo $translations['Nylon Jacket'] ?></a></li>
+                            <li><a href="./category/jacket-outerwear/riders-jacket.php" data-i18n="riders-jacket"><?php echo $translations['Riders Jacket'] ?></a></li>
+                            <li><a href="./category/jacket-outerwear/tailored-jacket.php" data-i18n="tailored-jacket"><?php echo $translations['Tailored Jacket'] ?></a></li>
+                            <li><a href="./category/jacket-outerwear/trench-coat.php" data-i18n="trench-coat"><?php echo $translations['Trench Coat'] ?></a></li>
+                            <li><a href="./category/jacket-outerwear/other-jacket.php" data-i18n="other-jacket"><?php echo $translations['Other Outerwear'] ?></a></li>
+                        </ul>
+                    </li>
+                    <li class="category-item">
+                        <a href="./category/pants.php" data-i18n="pants"><?php echo $translations['Pants'] ?></a>
+                        <ul class="sub-category">
+                            <li><a href="./category/pants/cargo-pants.php" data-i18n="cargo-pants"><?php echo $translations['Cargo Pants'] ?></a></li>
+                            <li><a href="./category/pants/chino-pants.php" data-i18n="chino-pants"><?php echo $translations['Chino Pants'] ?></a></li>
+                            <li><a href="./category/pants/denim-pants.php" data-i18n="denim-pants"><?php echo $translations['Denim Pants'] ?></a></li>
+                            <li><a href="./category/pants/slacks.php" data-i18n="slacks"><?php echo $translations['Slacks'] ?></a></li>
+                            <li><a href="./category/pants/sweat-pants.php" data-i18n="sweat-pants"><?php echo $translations['Sweat Pants'] ?></a></li>
+                            <li><a href="./category/pants/other-pants.php" data-i18n="other-pants"><?php echo $translations['Other Pants'] ?></a></li>
+                        </ul>
+                    </li>
+                    <li class="category-item">
+                        <a href="./category/skirt.php" data-i18n="skirt"><?php echo $translations['Skirt'] ?></a>
+                        <ul class="sub-category">
+                            <li><a href="./category/skirt/mini-skirt.php" data-i18n="mini-skirt"><?php echo $translations['Mini Skirt'] ?></a></li>
+                            <li><a href="./category/skirt/midi-skirt.php" data-i18n="midi-skirt"><?php echo $translations['Midi Skirt'] ?></a></li>
+                            <li><a href="./category/skirt/long-skirt.php" data-i18n="long-skirt"><?php echo $translations['Long Skirt'] ?></a></li>
+                            <li><a href="./category/skirt/denim-skirt.php" data-i18n="denim-skirt"><?php echo $translations['Denim Skirt'] ?></a></li>
+                        </ul>
+                    </li>
+                    <li class="category-item">
+                        <a href="./category/onepiece.php" data-i18n="onepiece"><?php echo $translations['Onepiece'] ?></a>
+                        <ul class="sub-category">
+                            <li><a href="./category/onepiece/dress.php" data-i18n="dress"><?php echo $translations['Dress'] ?></a></li>
+                            <li><a href="./category/onepiece/jumper-skirt.php" data-i18n="jumper-skirt"><?php echo $translations['Jumper Skirt'] ?></a></li>
+                            <li><a href="./category/onepiece/onepiece-dress.php" data-i18n="onepiece-dress"><?php echo $translations['Onepiece'] ?></a></li>
+                            <li><a href="./category/onepiece/pants-dress.php" data-i18n="pants-dress"><?php echo $translations['Pants Dress'] ?></a></li>
+                            <li><a href="./category/onepiece/shirts-onepiece.php" data-i18n="shirts-onepiece"><?php echo $translations['Shirt Onepiece'] ?></a></li>
+                            <li><a href="./category/onepiece/tunic.php" data-i18n="tunic"><?php echo $translations['Tunic'] ?></a></li>
+                        </ul>
+                    </li>
                 </ul>
-            </li>
-            <li class="category-item">
-                <a href="./category/jacket.php" data-i18n="jacket/outer"><?php echo $translations['outerwear']?></a>
-                <ul class="sub-category">
-                    <li><a href="./category/jacket-outerwear/collarless-coat.php" data-i18n="collarless-coat">ノーカラーコート</a></li>
-                    <li><a href="./category/jacket-outerwear/collarless-jacket.php" data-i18n="collarless-jacket">ノーカラージャケット</a></li>
-                    <li><a href="./category/jacket-outerwear/denim-jacket.php" data-i18n="denim-jacket">デニムジャケット</a></li>
-                    <li><a href="./category/jacket-outerwear/down-jacket.php" data-i18n="down-jacket">ダウンジャケット</a></li>
-                    <li><a href="./category/jacket-outerwear/down-vest.php" data-i18n="down-vest">ダウンベスト</a></li>
-                    <li><a href="./category/jacket-outerwear/duffle-coat.php" data-i18n="duffle-coat">ダッフルコート</a></li>
-                    <li><a href="./category/jacket-outerwear/jacket.php" data-i18n="jacket">ブルゾン</a></li>
-                    <li><a href="./category/jacket-outerwear/military-jacket.php" data-i18n="millitary-jacket">ミリタリージャケット</a></li>
-                    <li><a href="./category/jacket-outerwear/mods-coat.php" data-i18n="mods-coat">モッズコート</a></li>
-                    <li><a href="./category/jacket-outerwear/nylon-jacket.php" data-i18n="nylon-jacket">ナイロンジャケット</a></li>
-                    <li><a href="./category/jacket-outerwear/riders-jacket.php" data-i18n="riders-jacket">ライダースジャケット</a></li>
-                    <li><a href="./category/jacket-outerwear/tailored-jacket.php" data-i18n="tailored-jacket">テーラードジャケット</a></li>
-                    <li><a href="./category/jacket-outerwear/trench-coat.php" data-i18n="trench-coat">トレンチコート</a></li>
-                    <li><a href="./category/jacket-outerwear/auter-jacket.php" data-i18n="auter-jacket">その他アウター</a></li>
-                </ul>
-            </li>
-            <li class="category-item">
-                <a href="./category/pants.php" data-i18n="pants"><?php echo $translations['pants']?></a>
-                <ul class="sub-category">
-                    <li><a href="./category/pants/cargo-pants.php" data-i18n="cargo-pants">カーゴパンツ</a></li>
-                    <li><a href="./category/pants/chino-pants.php" data-i18n="chino-pants">チノパン</a></li>
-                    <li><a href="./category/pants/denim-pants.php" data-i18n="denim-pants">デニムパンツ</a></li>
-                    <li><a href="./category/pants/slacks.php" data-i18n="slacks">スラックス</a></li>
-                    <li><a href="./category/pants/sweat-pants.php" data-i18n="sweat-pants">スウェットパンツ</a></li>
-                    <li><a href="./category/pants/auter-pants.php" data-i18n="auter-pants">その他パンツ</a></li>
-                </ul>
-            </li>
-            <li class="category-item">
-                <a href="./category/skirt.php" data-i18n="skirt"><?php echo $translations['skirt']?></a>
-                <ul class="sub-category">
-                    <li><a href="./category/skirt/mini-skirt.php" data-i18n="mini-skirt">ミニスカート</a></li>
-                    <li><a href="./category/skirt/midi-skirt.php" data-i18n="midi-skirt">ミディスカート</a></li>
-                    <li><a href="./category/skirt/long-skirt.php" data-i18n="long-skirt">ロングカート</a></li>
-                    <li><a href="./category/skirt/denim-skirt.php" data-i18n="denim-skirt">デニムスカート</a></li>
-                </ul>
-            </li>
-            <li class="category-item">
-                <a href="./category/onepiece.php" data-i18n="onepiece"><?php echo $translations['onepiece']?></a>
-                <ul class="sub-category">
-                    <li><a href="./category/onepiece/dress.php" data-i18n="dress">ドレス</a></li>
-                    <li><a href="./category/onepiece/jumper-skirt.php" data-i18n="jumper-skirt">ジャンパースカート</a></li>
-                    <li><a href="./category/onepiece/onepiece-dress.php" data-i18n="onepiece-dress">ワンピース</a></li>
-                    <li><a href="./category/onepiece/pants-dress.php" data-i18n="pants-dress">パンツドレス</a></li>
-                    <li><a href="./category/onepiece/shirts-onepiece.php" data-i18n="shirts-onepiece">シャツワンピース</a></li>
-                    <li><a href="./category/onepiece/tunic.php" data-i18n="tunic">チュニック</a></li>
-                </ul>
-            </li>
-        </ul>
-    </aside>
+        </aside>
 
         <div class="products-section">
             <form method="get" class="sort-form">
-                
+
                 <select name="sort" id="sort" onchange="this.form.submit()">
-                    <option value="sale" <?php echo $sort === 'sale' ? 'selected' : ''; ?>>おすすめ順</option>
-                    <option value="favorite" <?php echo $sort === 'favorite' ? 'selected' : ''; ?>>人気順</option>
-                    <option value="price_asc" <?php echo $sort === 'price_asc' ? 'selected' : ''; ?>>価格の安い順</option>
-                    <option value="price_desc" <?php echo $sort === 'price_desc' ? 'selected' : ''; ?>>価格の高い順</option>
-                    <option value="new_arrivals" <?php echo $sort === 'new_arrivals' ? 'selected' : ''; ?>>新着順</option>
+                    <option value="sale" <?php echo $sort === 'sale' ? 'selected' : ''; ?>><?php echo $translations['Recommendation'] ?></option>
+                    <option value="favorite" <?php echo $sort === 'favorite' ? 'selected' : ''; ?>><?php echo $translations['Popular'] ?></option>
+                    <option value="price_asc" <?php echo $sort === 'price_asc' ? 'selected' : ''; ?>><?php echo $translations['Cheap'] ?></option>
+                    <option value="price_desc" <?php echo $sort === 'price_desc' ? 'selected' : ''; ?>><?php echo $translations['Expensive'] ?></option>
+                    <option value="new_arrivals" <?php echo $sort === 'new_arrivals' ? 'selected' : ''; ?>><?php echo $translations['New Items'] ?></option>
                 </select>
 
                 <select name="brand" id="brand" onchange="this.form.submit()">
-                    <option value="">すべて</option> <!-- デフォルトで「すべて」選択肢を表示 -->
+                    <option value=""><?php echo $translations['All'] ?></option> <!-- デフォルトで「すべて」選択肢を表示 -->
                     <?php
                     // ブランドを表示
                     foreach ($brands as $brand_option) {
@@ -216,21 +217,33 @@ $brands = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </select>
             </form>
 
-            <h2>商品一覧</h2>
+            <h2><?php echo $translations['Product List'] ?></h2>
             <div class="products-container">
                 <ul>
                     <?php if (count($products) > 0): ?>
                         <?php foreach ($products as $product): ?>
                             <li>
                                 <a href="goods.php?shop_id=<?php echo htmlspecialchars($product['shop_id'], ENT_QUOTES, 'UTF-8'); ?>">
+                                <?php
+                                $imgBlob = $product['thumbnail'];
+                                $mimeType = 'image/png,image/jpg,image/svg'; // MIMEタイプはデフォルトを設定（例としてPNG）
+
+                                // MIMEタイプを動的に取得
+                                $finfo = new finfo(FILEINFO_MIME_TYPE);
+                                $mimeType = $finfo->buffer($imgBlob); // BLOBデータからMIMEタイプを取得
+
+                                // Base64にエンコード
+                                $encodedImg = base64_encode($imgBlob);
+                                ?>
+                                <!-- 商品の詳細ページへのリンク -->
+                                    <img src="data:<?php echo $mimeType; ?>;base64,<?php echo $encodedImg; ?>" alt="goods img" class="product-image">
                                     <div><?php echo htmlspecialchars($product['goods'], ENT_QUOTES, 'UTF-8'); ?></div>
-                                    <div>価格: ¥<?php echo number_format($product['price']); ?></div>
-                                    <div>人気: <?php echo htmlspecialchars($product['buy'], ENT_QUOTES, 'UTF-8'); ?></div>
+                                    <div><?php echo $translations['Price'] ?>: ¥<?php echo number_format($product['price']); ?></div>
                                 </a>
                             </li>
                         <?php endforeach; ?>
                     <?php else: ?>
-                        <p>このブランドの商品は現在登録されていません。</p>
+                        <p><?php echo $translations['No products from this brand are currently registered'] ?></p>
                     <?php endif; ?>
                 </ul>
             </div>

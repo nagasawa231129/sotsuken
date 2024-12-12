@@ -19,7 +19,7 @@ if (file_exists($lang_file)) {
 
 try {
     // sale_idが10未満の商品を取得 (割引が適用されている商品)
-    $sql = "SELECT * FROM shop WHERE sale_id < 10";
+    $sql = "SELECT * FROM shop WHERE sale_id > 0";
     $stmt = $dbh->query($sql);
     $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
@@ -56,8 +56,8 @@ try {
                 // Base64にエンコード
                 $encodedImg = base64_encode($imgBlob);
                 // sale_idに基づいて割引率を計算
-                $discount_rate = $product['sale_id'] * 10; // sale_idが1なら10%割引
-                $sale_price = $product['price'] * (1 - $discount_rate / 100);
+                // $discount_rate = $product['sale_id'] * 10; // sale_idが1なら10%割引
+                // $sale_price = $product['price'] * (1 - $discount_rate / 100);
                 ?>
                 <div class="product-card">
                     <a href="goods.php?shop_id=<?= htmlspecialchars($product['shop_id']) ?>" class="product-link">
@@ -66,8 +66,8 @@ try {
                             alt="goods img"
                             style="height: 100px; width: 100px; object-fit: cover; display: block; margin: 0 auto;">
                         <div class="product-name"><?= htmlspecialchars($product['goods']) ?></div>
-                        <div class="product-price">¥<?= number_format($sale_price) ?></div>
-                        <div class="original-price">¥<?= number_format($product['price']) ?></div>
+                        <div class="product-price">¥<?= number_format($product['price']) ?></div>
+                        <div class="original-price">¥<?= number_format($product['original_price']) ?></div>
                     </a>
                 </div>
             <?php endforeach; ?>
