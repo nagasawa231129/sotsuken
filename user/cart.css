@@ -90,3 +90,31 @@ input[type="submit"] {
 input[type="submit"]:hover {
     background-color: #0056b3;
 }
+
+/* ヘッダーを固定するスタイル */
+.search-container {
+    position: fixed;  /* ヘッダーを画面上部に固定 */
+    top: 0;           /* 画面の最上部 */
+    left: 0;
+    width: 100%;      /* 幅を100%に設定して、画面いっぱいに広がるようにする */
+    background-color: #fff; /* 背景色を白に設定（必要に応じて変更） */
+    z-index: 1000;    /* 他の要素より前面に表示されるように */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* ヘッダーに軽い影をつけて目立たせる */
+}
+
+.search-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.site-name {
+    
+    font-size: 18px;
+    color: #333;
+    font-weight: bold;
+    white-space: nowrap; /* 改行しないように設定 */
+}
