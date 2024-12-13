@@ -32,7 +32,7 @@
     // 検索処理
     if (isset($_GET['query']) && !empty($_GET['query'])) {
         $query = htmlspecialchars($_GET['query'], ENT_QUOTES, 'UTF-8');
-        $stmt = $dbh->prepare("SELECT s.shop_id, s.goods, s.price, s.material, sz.size, c.color, b.brand_name, s.thumbnail
+        $stmt = $dbh->prepare("SELECT s.shop_id, s.goods, s.price,s.sale_id, s.material, sz.size, c.color, b.brand_name, s.thumbnail
                                FROM shop s
                                LEFT JOIN size sz ON s.size = sz.size_id
                                LEFT JOIN color c ON s.color = c.color_id
@@ -43,7 +43,7 @@
         $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         if (count($products) === 0) {
-            $stmt = $dbh->prepare("SELECT s.shop_id, s.goods, s.price, s.material, sz.size, c.color, b.brand_name, s.thumbnail
+            $stmt = $dbh->prepare("SELECT s.shop_id, s.goods, s.sale_id, s.price, s.material, sz.size, c.color, b.brand_name, s.thumbnail
                                    FROM shop s
                                    LEFT JOIN size sz ON s.size = sz.size_id
                                    LEFT JOIN color c ON s.color = c.color_id
@@ -55,7 +55,7 @@
         }
     } else {
         $query = '';
-        $stmt = $dbh->prepare("SELECT s.shop_id, s.goods, s.price, s.material, sz.size, c.color, s.thumbnail, b.brand_name
+        $stmt = $dbh->prepare("SELECT s.shop_id, s.goods,s.sale_id, s.price, s.material, sz.size, c.color, s.thumbnail, b.brand_name
                                FROM shop s
                                LEFT JOIN size sz ON s.size = sz.size_id
                                LEFT JOIN color c ON s.color = c.color_id
@@ -69,15 +69,15 @@
     // 在庫更新処理
     if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_stock'])) {
         $shop_id = $_POST['shop_id'];
-        $change_stock = isset($_POST['stock_change']) ? $_POST['stock_change'] : 0;
-
+        $change_stock = isset($_POST['stock_change']) ? (int)$_POST['stock_change'] : 0; // 明示的に整数にキャスト
+    
         $stmt = $dbh->prepare("SELECT material FROM shop WHERE shop_id = :shop_id");
         $stmt->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
         $stmt->execute();
-        $current_stock = $stmt->fetchColumn();
+        $current_stock = (int)$stmt->fetchColumn(); // 明示的に整数にキャスト
+    
+        $new_stock = max(0, $current_stock + $change_stock); // ここで型が正しくなる
 
-        $new_stock = max(0, $current_stock + $change_stock);
-  
         // 現在の日時を取得
         $current_time = date('Y-m-d H:i:s'); // フォーマット: YYYY-MM-DD HH:MM:SS
         
@@ -129,7 +129,44 @@
 
                 <td><?= htmlspecialchars($product['brand_name']) ?></td>
                 <td><?= htmlspecialchars($product['goods']) ?></td>
-                <td>¥<?= htmlspecialchars(number_format($product['price'])) ?></td>
+                <td>¥<?= htmlspecialchars(number_format($product['price'])) ?>
+            <?php
+                // sale_idに基づいて割引パーセンテージを表示
+                            if ($product['sale_id'] != null) {
+                                switch ($product['sale_id']) {
+                                    case 1:
+                                        echo ' <span style="color: red;">10%OFF中</span>';
+                                        break;
+                                    case 2:
+                                        echo ' <span style="color: red;">20%OFF中</span>';
+                                        break;
+                                    case 3:
+                                        echo ' <span style="color: red;">30%OFF中</span>';
+                                        break;
+                                    case 4:
+                                        echo ' <span style="color: red;">40%OFF中</span>';
+                                        break;
+                                    case 5:
+                                        echo ' <span style="color: red;">50%OFF中</span>';
+                                        break;
+                                    case 6:
+                                        echo ' <span style="color: red;">60%OFF中</span>';
+                                        break;
+                                    case 7:
+                                        echo ' <span style="color: red;">70%OFF中</span>';
+                                        break;
+                                    case 8:
+                                        echo ' <span style="color: red;">80%OFF中</span>';
+                                        break;
+                                    case 9:
+                                        echo ' <span style="color: red;">90%OFF中</span>';
+                                        break;
+                                    default:
+                                        // 他のsale_idの場合は表示しない
+                                        break;
+                                }
+                            }
+                            ?></td>
                 <td><?= htmlspecialchars($product['material']) ?></td>
                 <td><?= htmlspecialchars($product['size']) ?></td>
                 <td><?= htmlspecialchars($product['color']) ?></td>

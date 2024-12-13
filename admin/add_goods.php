@@ -133,6 +133,20 @@
     </div>
 
     <script>
+
+        // ページのスクロール位置を保存
+        window.addEventListener("beforeunload", () => {
+            localStorage.setItem("scrollPosition", window.scrollY);
+        });
+
+        // ページ読み込み時にスクロール位置を復元
+        window.addEventListener("load", () => {
+            const scrollPosition = localStorage.getItem("scrollPosition");
+            if (scrollPosition) {
+                window.scrollTo(0, parseInt(scrollPosition));
+            }
+        });
+
         function updateSubcategory(categoryElement) {
             var categoryId = categoryElement.value;
             var subcategorySelect = categoryElement.closest('tr').querySelector('.subcategory');

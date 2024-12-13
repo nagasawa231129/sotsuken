@@ -1,3 +1,15 @@
+// ページを離れる前にスクロール位置を保存
+// window.onbeforeunload = function(){
+//     localStorage.setItem("scrollPosition", window.scrollY);
+//   };
+//   // // スクロール位置保存に戻る
+//   window.onload = function(){
+//     if (localStorage.getItem("scrollPosition") !== null) {
+//       window.scrollTo(0, localStorage.getItem("scrollPosition"));
+//     }
+//   };
+
+
 function updateThumbnail(shop_id) {
     var fileInput = document.getElementById('thumbnailInput' + shop_id);
     var file = fileInput.files[0];
@@ -5,24 +17,25 @@ function updateThumbnail(shop_id) {
     if (file) {
         var formData = new FormData();
         formData.append('thumbnail', file);
-        formData.append('shop_id', shop_id); // shop_idをサーバーに送信
+        formData.append('shop_id', shop_id);
 
         // AJAXでサムネイル画像をサーバーに送信して更新
         var xhr = new XMLHttpRequest();
         xhr.open('POST', 'update_thumbnail.php', true);
         xhr.onload = function () {
             if (xhr.status === 200) {
-                // 画像更新成功後、新しいサムネイルを表示
-                var reader = new FileReader();
-                reader.onload = function (e) {
-                    document.getElementById('shopImage' + shop_id).src = e.target.result;
-                };
-                reader.readAsDataURL(file);
+                // 成功時に新しいサムネイル画像を表示
+                document.getElementById('thumbnailImage' + shop_id).src = xhr.responseText;
+            } else {
+                alert('サムネイルの更新に失敗しました。');
             }
         };
         xhr.send(formData);
     }
 }
+
+
+
 document.addEventListener('DOMContentLoaded', function() {
     // 他の初期化コードをここに追加
 });
