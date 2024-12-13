@@ -99,42 +99,35 @@ if (isset($_POST['reset_search'])) {
                         <tr>
                             <td>
                                 <?php
-                                $thumbimgBlob = $product['thumbnail']; // サムネイルのBLOBデータ
-                                $shopId = $product['shop_id'];    // shop_idを取得
-                                if ($thumbimgBlob) {
-                                    $thumbencodedImg = base64_encode($thumbimgBlob); // Base64エンコード
-                                    // 画像をクリックするとサムネイル用のファイル選択ダイアログを開く
-                                    echo "<img src='data:image/jpeg;base64,$thumbencodedImg' alt='サムネイル' width='100' class='thumbnail' data-shop-id='$shopId' onclick='document.getElementById(\"thumbnailInput$shopId\").click();' id='shopImage$shopId' />";
-                                    echo "<input type='file' id='thumbnailInput$shopId' style='display:none;' accept='image/jpeg, image/jpg, image/png' onchange='updateThumbnail($shopId)' />";
-                                }
+                               $thumbimgBlob = $product['thumbnail'];
+                               $shopId = $product['shop_id'];
+                               if ($thumbimgBlob) {
+                                   $thumbencodedImg = base64_encode($thumbimgBlob);
+                                   echo "<img src='data:image/jpeg;base64,$thumbencodedImg' alt='サムネイル' width='100' class='thumbnail' data-shop-id='$shopId' onclick='document.getElementById(\"thumbnailInput$shopId\").click();' id='thumbnailImage$shopId' />";
+                                   echo "<input type='file' id='thumbnailInput$shopId' style='display:none;' accept='image/jpeg, image/jpg, image/png' onchange='updateThumbnail($shopId)' />";
+                               }
                                 ?>
                             </td>
                             <td>
                                 <div class="input-group" style="position: relative;">
                                     <?php
-                                    // 商品IDに基づいて、imageテーブルから画像を取得
-                                    $shop_id = $product['shop_id']; // 現在の商品ID
-                                    $img_sql = "SELECT img, image_id FROM image WHERE shop_id = :shop_id"; // 画像を取得するSQL（imageフィールドとimage_idを取得）
-                                    $img_stmt = $dbh->prepare($img_sql);
-                                    $img_stmt->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
-                                    $img_stmt->execute();
-
-                                    // 画像が存在する場合、画像を表示
-                                    if ($img_stmt->rowCount() > 0) {
-                                        while ($img_data = $img_stmt->fetch(PDO::FETCH_ASSOC)) {
-                                            $subencodedImg = base64_encode($img_data['img']); // 画像データをBase64エンコード
-                                            $imageId = $img_data['image_id']; // image_idを取得
-
-                                            // 各画像を表示
-                                            echo "<div class='image-container' style='position: relative; display: inline-block; margin-right: 10px;'>";
-                                            echo "<img src='data:image/jpeg;base64,$subencodedImg' alt='サブサムネイル' width='100' class='subthumbnail' 
-                    data-shop-id='$shop_id' data-image-id='$imageId' id='shopImage$shop_id' >";
-
-                                            // 「×」ボタンを画像の右上に表示
-                                            echo "<button type='button' class='delete-button' onclick='deleteImage($shop_id, $imageId)'>×</button>";
-                                            echo "</div>";
-                                        }
-                                    }
+                          $shop_id = $product['shop_id'];
+                          $img_sql = "SELECT img, image_id FROM image WHERE shop_id = :shop_id";
+                          $img_stmt = $dbh->prepare($img_sql);
+                          $img_stmt->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
+                          $img_stmt->execute();
+                          
+                          if ($img_stmt->rowCount() > 0) {
+                              while ($img_data = $img_stmt->fetch(PDO::FETCH_ASSOC)) {
+                                  $subencodedImg = base64_encode($img_data['img']);
+                                  $imageId = $img_data['image_id'];
+                                  echo "<div class='image-container' style='position: relative; display: inline-block; margin-right: 10px;' id='imageContainer$imageId'>";
+                                  echo "<img src='data:image/jpeg;base64,$subencodedImg' alt='サブサムネイル' width='100' class='subthumbnail' data-shop-id='$shop_id' data-image-id='$imageId' id='subthumbnailImage$imageId' />";
+                                  echo "<button type='button' class='delete-button' onclick='deleteImage($shop_id, $imageId)'>×</button>";
+                                  echo "</div>";
+                              }
+                          }
+                                         
                                     ?>
 
                                     <div class="input-group">

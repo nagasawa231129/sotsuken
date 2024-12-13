@@ -1,31 +1,25 @@
 <?php
-// delete_image.php
+// データベース接続
+include './../../db_open.php';
 
-// セッション開始（必要に応じて）
-session_start();
+try {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $shop_id = $_POST['shop_id'];
+        $image_id = $_POST['image_id'];
 
-// 必要なファイルのインクルード
-include "../../db_open.php"; // データベース接続ファイルをインクルード
-
-// POSTリクエストで image_id が送られてきていることを確認
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['image_id'])) {
-    $imageId = intval($_POST['image_id']); // 削除する画像のID
-
-    // データベース接続
-    try {
-        // 指定された image_id に対して画像を削除するSQL文
-        $sql = "DELETE FROM image WHERE image_id = :image_id";
+        // 画像を削除するSQL
+        $sql = 'DELETE FROM image WHERE shop_id = :shop_id AND image_id = :image_id';
         $stmt = $dbh->prepare($sql);
-        $stmt->bindParam(':image_id', $imageId, PDO::PARAM_INT);
-        $stmt->execute();
+        $stmt->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
+        $stmt->bindParam(':image_id', $image_id, PDO::PARAM_INT);
 
-        // 画像削除が成功したら、ページリロードのためのJSを出力
-        echo "<script>
-                alert('画像が正常に削除されました。$imageId ');
-                window.location.href = window.location.href; // 現在のページをリロード
-              </script>";
-    } catch (PDOException $e) {
-        echo "データベースエラーが発生しました: " . $e->getMessage();
+        if ($stmt->execute()) {
+            echo '画像が削除されました。';
+        } else {
+            echo '画像の削除に失敗しました。';
+        }
     }
+} catch (PDOException $e) {
+    echo 'データベース接続エラー: ' . $e->getMessage();
 }
 ?>

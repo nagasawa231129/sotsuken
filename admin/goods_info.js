@@ -1,4 +1,3 @@
-// サムネイル画像を更新する関数
 function updateThumbnail(shop_id) {
     var fileInput = document.getElementById('thumbnailInput' + shop_id);
     var file = fileInput.files[0];
@@ -24,37 +23,40 @@ function updateThumbnail(shop_id) {
         xhr.send(formData);
     }
 }
-// 画像選択ダイアログを開くための関数
-// 画像を削除する関数
-function deleteImage(shop_id, image_id) {
-    if (confirm("本当にこの画像を削除しますか？")) {
-        var formData = new FormData();
-        formData.append('image_id', image_id);
+document.addEventListener('DOMContentLoaded', function() {
+    // 他の初期化コードをここに追加
+});
 
-        // AJAXで削除リクエストを送信
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', 'delete_image.php', true);
-        xhr.onload = function() {
-            if (xhr.status === 200) {
-                // 成功した場合は画像をページから削除
-                var imgElement = document.getElementById('shopImage' + shop_id);
-                imgElement.parentElement.removeChild(imgElement); // 画像を削除
-
-                // 「×」ボタンも削除
-                var deleteButton = document.querySelector('.delete-button');
-                if (deleteButton) {
-                    deleteButton.parentElement.removeChild(deleteButton);
-                }
-                alert("画像が削除されました。");
-            } else {
-                alert("画像の削除に失敗しました。");
-            }
-        };
-        xhr.send(formData);
-    }
+var imageElement = document.getElementById('subthumbnailImage' + imageId);
+if (imageElement && imageElement.parentElement) {
+    imageElement.parentElement.remove();
+} else {
+    console.error('Element or parentElement not found');
 }
 
 
+
+function deleteImage(shopId, imageId) {
+    if (confirm('本当にこの画像を削除しますか？')) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'delete_image.php', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                // 画像の削除が成功した場合、画像要素を削除
+                var imageContainer = document.getElementById('imageContainer' + imageId);
+                if (imageContainer) {
+                    imageContainer.remove();
+                } else {
+                    console.error('Image container not found for imageId: ' + imageId);
+                }
+            } else {
+                alert('画像の削除に失敗しました。');
+            }
+        };
+        xhr.send('shop_id=' + shopId + '&image_id=' + imageId);
+    }
+}
 
    
    // categoryが選択された時にsubcategoriesを更新
