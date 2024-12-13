@@ -3,8 +3,10 @@ include "../../../../db_open.php"; // PDO接続のファイルをインクルー
 include "../../../head.php";
 include "../../../header.php";
 echo "<link rel='stylesheet' href='../../header.css'>";
+// echo "<link rel='stylesheet' href='../category.css'>";
+// echo "<link rel='stylesheet' href='../tops.css'>";
+// echo "<link rel='stylesheet' href='../../toppage.css'>";
 
-echo "<link rel='stylesheet' href='../tops.css'>";
 
 $sort = isset($_GET['sort']) ? $_GET['sort'] : 'default';
 $brand = isset($_GET['brand']) && $_GET['brand'] !== '' ? $_GET['brand'] : null;
@@ -62,6 +64,7 @@ $brands = $stmt->fetchAll(PDO::FETCH_ASSOC);?>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../tops.css">
     <title>その他トップス商品一覧</title>
 </head>
 
@@ -197,7 +200,7 @@ $brands = $stmt->fetchAll(PDO::FETCH_ASSOC);?>
                                 $encodedImg = base64_encode($imgBlob);
                                 ?>
                                 <!-- 商品の詳細ページへのリンク -->
-                                <a href="../goods.php?shop_id=<?php echo htmlspecialchars($product['shop_id'], ENT_QUOTES, 'UTF-8'); ?>">
+                                <a href="../../goods.php?shop_id=<?php echo htmlspecialchars($product['shop_id'], ENT_QUOTES, 'UTF-8'); ?>">
                                 <img src="data:<?php echo $mimeType; ?>;base64,<?php echo $encodedImg; ?>" alt="goods img" class="product-image">
 
                                     <div>

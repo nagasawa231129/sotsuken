@@ -45,7 +45,7 @@ $unread_count = $notification_count_stmt->fetchColumn();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>通知</title>
+    <title>お知らせ</title>
     <link rel="stylesheet" href="notification.css">
 </head>
 <body>
@@ -54,7 +54,7 @@ $unread_count = $notification_count_stmt->fetchColumn();
     <!-- 通知アイコン -->
     <div class="icon">
         <a href="notification.php">
-            <i class="bell-icon">🔔</i>
+            <!-- <i class="bell-icon">🔔</i> -->
             <?php if ($unread_count > 0): ?>
                 <span class="notification-count"><?php echo $unread_count; ?></span>
             <?php endif; ?>
@@ -63,7 +63,7 @@ $unread_count = $notification_count_stmt->fetchColumn();
 </header>
 
 <main>
-    <h1>通知一覧</h1>
+    <h1><?php echo $translations['Notice'] ?></h1>
 
     <?php if ($unread_notifications): ?>
         <ul class="notification-list">
@@ -80,7 +80,7 @@ $unread_count = $notification_count_stmt->fetchColumn();
             <?php endforeach; ?>
         </ul>
     <?php else: ?>
-        <p>新しい通知はありません。</p>
+        <p><?php echo $translations['There are no new notices'] ?></p>
     <?php endif; ?>
 </main>
 

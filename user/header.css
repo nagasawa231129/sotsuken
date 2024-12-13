@@ -160,7 +160,7 @@ header a[href="favorite.php"]::after {
 .notification-count {
     position: absolute;
     top: 10px;
-    right: 215px;
+    right: 155px;
     background-color: red;
     color: white;
     font-size: 12px;

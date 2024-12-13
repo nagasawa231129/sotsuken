@@ -5,6 +5,9 @@ include "../../header.php";
 echo "<link rel='stylesheet' href='../header.css'>";
 echo "<link rel='stylesheet' href='category.css'>";
 
+$gender = isset($_GET['gender']) ? $_GET['gender'] : 'ALL';  // デフォルトはALL
+
+
 $sql = "SELECT * FROM category";  // categoryテーブルのすべてのカテゴリーを取得
 $result = $dbh->prepare($sql);
 $result->execute();
@@ -32,11 +35,12 @@ if (file_exists($lang_file)) {
         </header>
 
         <nav class="tabs">
-            <a href="category.php" class="tab-button <?php echo basename($_SERVER['PHP_SELF']) == 'category.php' ? 'active' : ''; ?>" data-target="all">ALL</a>
-            <a href="./men-category/men-category.php" class="tab-button <?php echo basename($_SERVER['PHP_SELF']) == 'men-category.php' ? 'active' : ''; ?>" data-target="men"><?php echo $translations['Mens'] ?></a>
-            <a href="./woman-category/woman-category.php" class="tab-button <?php echo strpos($_SERVER['PHP_SELF'], 'woman-category.php') !== false ? 'active' : ''; ?>" data-target="woman"><?php echo $translations['Ledies'] ?></a>
-            <a href="./kids-category/kids-category.php" class="tab-button <?php echo basename($_SERVER['PHP_SELF']) == 'kids-category.php' ? 'active' : ''; ?>" data-target="kids"><?php echo $translations['Kids'] ?></a>
-        </nav>
+    <a href="category.php?gender=ALL" class="tab-button <?php echo basename($_SERVER['PHP_SELF']) == 'category.php' ? 'active' : ''; ?>" data-target="all"><?php echo $translations['All'] ?></a>
+    <a href="./men-category/men-category.php?gender=man" class="tab-button <?php echo basename($_SERVER['PHP_SELF']) == 'men-category.php' ? 'active' : ''; ?>" data-target="men"><?php echo $translations['Mens'] ?></a>
+    <a href="./woman-category/woman-category.php?gender=woman" class="tab-button <?php echo strpos($_SERVER['PHP_SELF'], 'woman-category.php') !== false ? 'active' : ''; ?>" data-target="woman"><?php echo $translations['Ledies'] ?></a>
+    <a href="./kids-category/kids-category.php?gender=kids" class="tab-button <?php echo basename($_SERVER['PHP_SELF']) == 'kids-category.php' ? 'active' : ''; ?>" data-target="kids"><?php echo $translations['Kids'] ?></a>
+</nav>
+
 
 
 

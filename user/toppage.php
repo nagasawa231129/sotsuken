@@ -147,24 +147,20 @@ $totalPages = ceil($totalItems / $itemsPerPage);
         <div class="sale-products-container">
             <div class="sale-product-scroll">
                 <?php
-                $sql = "SELECT shop.*, 
+                $sql = "SELECT  shop.*, 
                 brand.brand_name, 
-                sale.sale_id, 
-                image.img
-                FROM shop
-                LEFT OUTER JOIN brand ON brand.brand_id = shop.brand_id
-                LEFT OUTER JOIN image ON image.shop_id = shop.shop_id
-                LEFT OUTER JOIN sale ON sale.sale_id = shop.sale_id
-                WHERE shop.sale_id != 10  -- saleカラムが10以外の商品を表示
-                ORDER BY shop.arrival DESC  -- arrivalが新しい順に並べ替え
-                LIMIT :limit OFFSET :offset";
-
-
+                sale.sale_id
+        FROM shop
+        LEFT OUTER JOIN brand ON brand.brand_id = shop.brand_id
+        LEFT OUTER JOIN sale ON sale.sale_id = shop.sale_id
+        ORDER BY shop.arrival DESC  -- arrivalが新しい順に並べ替え
+        LIMIT :limit OFFSET :offset";
 
                 $stmt = $dbh->prepare($sql);
                 $stmt->bindValue(':limit', $itemsPerPage, PDO::PARAM_INT);
                 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
                 $stmt->execute();
+
                 if ($stmt->rowCount() > 0) {
                     while ($rec = $stmt->fetch()) {
                         // BLOB型の画像データをBase64エンコードして表示
@@ -232,22 +228,20 @@ $totalPages = ceil($totalItems / $itemsPerPage);
             <div class="sale-product-scroll">
                 <?php
                 $sql = "SELECT shop.*, 
-                brand.brand_name, 
-                sale.sale_id, 
-                image.img
-                FROM shop
-                LEFT OUTER JOIN brand ON brand.brand_id = shop.brand_id
-                LEFT OUTER JOIN image ON image.shop_id = shop.shop_id
-                LEFT OUTER JOIN sale ON sale.sale_id = shop.sale_id
-                WHERE shop.sale_id != 0  -- saleカラムが0以外の商品を表示
-                GROUP BY shop.shop_id
-                LIMIT :limit OFFSET :offset";
-
+               brand.brand_name, 
+               sale.sale_id
+       FROM shop
+       LEFT OUTER JOIN brand ON brand.brand_id = shop.brand_id
+       LEFT OUTER JOIN sale ON sale.sale_id = shop.sale_id
+       WHERE shop.sale_id != 0  -- saleカラムが0以外の商品を表示
+       GROUP BY shop.shop_id
+       LIMIT :limit OFFSET :offset";
 
                 $stmt = $dbh->prepare($sql);
                 $stmt->bindValue(':limit', $itemsPerPage, PDO::PARAM_INT);
                 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
                 $stmt->execute();
+
                 if ($stmt->rowCount() > 0) {
                     while ($rec = $stmt->fetch()) {
                         // BLOB型の画像データをBase64エンコードして表示
@@ -319,17 +313,17 @@ $totalPages = ceil($totalItems / $itemsPerPage);
                 brand.brand_name, 
                 sale.sale_id, 
                 shop.thumbnail
-                FROM shop
-                LEFT OUTER JOIN brand ON brand.brand_id = shop.brand_id
-                LEFT OUTER JOIN image ON image.shop_id = shop.shop_id
-                LEFT OUTER JOIN sale ON sale.sale_id = shop.sale_id
-                ORDER BY shop.buy DESC  -- arrivalが新しい順に並べ替え
-                LIMIT :limit OFFSET :offset";
-                
+        FROM shop
+        LEFT OUTER JOIN brand ON brand.brand_id = shop.brand_id
+        LEFT OUTER JOIN sale ON sale.sale_id = shop.sale_id
+        ORDER BY shop.buy DESC  -- buyが多い順に並べ替え
+        LIMIT :limit OFFSET :offset";
+
                 $stmt = $dbh->prepare($sql);
                 $stmt->bindValue(':limit', $itemsPerPage, PDO::PARAM_INT);
                 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
                 $stmt->execute();
+
                 if ($stmt->rowCount() > 0) {
                     while ($rec = $stmt->fetch()) {
                         // BLOB型の画像データをBase64エンコードして表示

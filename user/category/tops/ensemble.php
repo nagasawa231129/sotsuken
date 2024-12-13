@@ -190,7 +190,7 @@ $brands = $stmt->fetchAll(PDO::FETCH_ASSOC);?>
                                 $encodedImg = base64_encode($imgBlob);
                                 ?>
                                 <!-- 商品の詳細ページへのリンク -->
-                                <a href="../goods.php?shop_id=<?php echo htmlspecialchars($product['shop_id'], ENT_QUOTES, 'UTF-8'); ?>">
+                                <a href="../../goods.php?shop_id=<?php echo htmlspecialchars($product['shop_id'], ENT_QUOTES, 'UTF-8'); ?>">
                                 <img src="data:<?php echo $mimeType; ?>;base64,<?php echo $encodedImg; ?>" alt="goods img" class="product-image">
 
                                     <div>

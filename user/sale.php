@@ -18,8 +18,10 @@ if (file_exists($lang_file)) {
 }
 
 try {
-    // sale_idが10未満の商品を取得 (割引が適用されている商品)
-    $sql = "SELECT * FROM shop WHERE sale_id > 0";
+    // shopテーブルとsaleテーブルを結合し、sale_idによる割引を取得
+    $sql = "SELECT shop.*, sale.sale FROM shop
+            LEFT JOIN sale ON shop.sale_id = sale.sale_id
+            WHERE shop.sale_id > 0";  // sale_idが0より大きい商品（セール商品）を取得
     $stmt = $dbh->query($sql);
     $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
@@ -40,41 +42,133 @@ try {
 </head>
 
 <body>
-    <h1>セール商品一覧</h1>
+    <div class="main-content">
+        <aside class="sidebar">
+            <h2 data-i18n="search"><?php echo $translations['Search'] ?></h2>
+            <ul>
+                <li><a href="brand.php" data-i18n="Search_By_brand"><?php echo $translations['Search By Brand'] ?></a></li>
+                <li><a href="category/category.php" data-i18n="Search_By_category"><?php echo $translations['Search By Category'] ?></a></li>
+                <li><a href="ranking.php" data-i18n="Search_By_ranking"><?php echo $translations['Search By Ranking'] ?></a></li>
+                <li><a href="sale.php" data-i18n="Search_By_sale"><?php echo $translations['Search By Sale'] ?></a></li>
+                <li><a href="diagnosis.php" data-i18n="Search_By_diagnosis"><?php echo $translations['Search By Diagnosis'] ?></a></li>
+                <li><a href="advanced_search.php" data-i18n="advanced_search"><?php echo $translations['Advanced Search'] ?></a></li>
+            </ul>
 
-    <?php if (count($products) > 0): ?>
-        <div class="product-container">
-            <?php foreach ($products as $product): ?>
-                <?php
-                $imgBlob = $product['thumbnail'];
-                $mimeType = 'image/png'; // MIMEタイプはデフォルトを設定（例としてPNG）
+            <h2 data-i18n="categories_from"><?php echo $translations['Search By Category'] ?></h2>
 
-                // MIMEタイプを動的に取得
-                $finfo = new finfo(FILEINFO_MIME_TYPE);
-                $mimeType = $finfo->buffer($imgBlob); // BLOBデータからMIMEタイプを取得
+            <ul class="category-list">
+                <li class="category-item">
+                    <a href="./category/tops.php" data-i18n="tops"><?php echo $translations['Tops'] ?></a>
+                    <ul class="sub-category">
+                        <li><a href="./category/tops/tshirt-cutsew.php" data-i18n="Tshirt-cutsew"><?php echo $translations['Tshirt Cutsew'] ?></a></li>
+                        <li><a href="./category/tops/shirt.php" data-i18n="shirt-blouse"><?php echo $translations['Shirt Blouse'] ?></a></li>
+                        <li><a href="./category/tops/poloshirt.php" data-i18n="poloshirt"><?php echo $translations['Polo Shirt'] ?></a></li>
+                        <li><a href="./category/tops/knit-sweater.php" data-i18n="knit/sweater"><?php echo $translations['Knit Sweater'] ?></a></li>
+                        <li><a href="./category/tops/vest.php" data-i18n="vast"><?php echo $translations['Vest'] ?></a></li>
+                        <li><a href="./category/tops/parka.php" data-i18n="parka"><?php echo $translations['Parka'] ?></a></li>
+                        <li><a href="./category/tops/sweat.php" data-i18n="sweat"><?php echo $translations['Sweat'] ?></a></li>
+                        <li><a href="./category/tops/cardigan.php" data-i18n="cardigan"><?php echo $translations['Cardigan'] ?></a></li>
+                        <li><a href="./category/tops/ensemble.php" data-i18n="ensemble"><?php echo $translations['Ensemble'] ?></a></li>
+                        <li><a href="./category/tops/jersey.php" data-i18n="jersey"><?php echo $translations['Jersey'] ?></a></li>
+                        <li><a href="./category/tops/tanktop.php" data-i18n="tanktop"><?php echo $translations['Tanktop'] ?></a></li>
+                        <li><a href="./category/tops/camisole.php" data-i18n="camisole"><?php echo $translations['Camisole'] ?></a></li>
+                        <li><a href="./category/tops/tubetops.php" data-i18n="tubetops"><?php echo $translations['Tubetop'] ?></a></li>
+                        <li><a href="./category/tops/other-tops.php" data-i18n="other-tops"><?php echo $translations['Other Tops'] ?></a></li>
+                    </ul>
+                </li>
+                <li class="category-item">
+                    <a href="./category/jacket.php" data-i18n="jacket/outer"><?php echo $translations['Outerwear'] ?></a>
+                    <ul class="sub-category">
+                        <li><a href="./category/jacket-outerwear/collarless-coat.php" data-i18n="collarless-coat"><?php echo $translations['Collarless Coat'] ?></a></li>
+                        <li><a href="./category/jacket-outerwear/collarless-jacket.php" data-i18n="collarless-jacket"><?php echo $translations['Collarless Jacket'] ?></a></li>
+                        <li><a href="./category/jacket-outerwear/denim-jacket.php" data-i18n="denim-jacket"><?php echo $translations['Denim Jacket'] ?></a></li>
+                        <li><a href="./category/jacket-outerwear/down-jacket.php" data-i18n="down-jacket"><?php echo $translations['Down Jacket'] ?></a></li>
+                        <li><a href="./category/jacket-outerwear/down-vest.php" data-i18n="down-vest"><?php echo $translations['Down Vest'] ?></a></li>
+                        <li><a href="./category/jacket-outerwear/duffle-coat.php" data-i18n="duffle-coat"><?php echo $translations['Duffle Coat'] ?></a></li>
+                        <li><a href="./category/jacket-outerwear/jacket.php" data-i18n="jacket"><?php echo $translations['Blouson'] ?></a></li>
+                        <li><a href="./category/jacket-outerwear/military-jacket.php" data-i18n="millitary-jacket"><?php echo $translations['Military Jacket'] ?></a></li>
+                        <li><a href="./category/jacket-outerwear/mods-coat.php" data-i18n="mods-coat"><?php echo $translations['Mods Coat'] ?></a></li>
+                        <li><a href="./category/jacket-outerwear/nylon-jacket.php" data-i18n="nylon-jacket"><?php echo $translations['Nylon Jacket'] ?></a></li>
+                        <li><a href="./category/jacket-outerwear/riders-jacket.php" data-i18n="riders-jacket"><?php echo $translations['Riders Jacket'] ?></a></li>
+                        <li><a href="./category/jacket-outerwear/tailored-jacket.php" data-i18n="tailored-jacket"><?php echo $translations['Tailored Jacket'] ?></a></li>
+                        <li><a href="./category/jacket-outerwear/trench-coat.php" data-i18n="trench-coat"><?php echo $translations['Trench Coat'] ?></a></li>
+                        <li><a href="./category/jacket-outerwear/other-jacket.php" data-i18n="other-jacket"><?php echo $translations['Other Outerwear'] ?></a></li>
+                    </ul>
+                </li>
+                <li class="category-item">
+                    <a href="./category/pants.php" data-i18n="pants"><?php echo $translations['Pants'] ?></a>
+                    <ul class="sub-category">
+                        <li><a href="./category/pants/cargo-pants.php" data-i18n="cargo-pants"><?php echo $translations['Cargo Pants'] ?></a></li>
+                        <li><a href="./category/pants/chino-pants.php" data-i18n="chino-pants"><?php echo $translations['Chino Pants'] ?></a></li>
+                        <li><a href="./category/pants/denim-pants.php" data-i18n="denim-pants"><?php echo $translations['Denim Pants'] ?></a></li>
+                        <li><a href="./category/pants/slacks.php" data-i18n="slacks"><?php echo $translations['Slacks'] ?></a></li>
+                        <li><a href="./category/pants/sweat-pants.php" data-i18n="sweat-pants"><?php echo $translations['Sweat Pants'] ?></a></li>
+                        <li><a href="./category/pants/other-pants.php" data-i18n="other-pants"><?php echo $translations['Other Pants'] ?></a></li>
+                    </ul>
+                </li>
+                <li class="category-item">
+                    <a href="./category/skirt.php" data-i18n="skirt"><?php echo $translations['Skirt'] ?></a>
+                    <ul class="sub-category">
+                        <li><a href="./category/skirt/mini-skirt.php" data-i18n="mini-skirt"><?php echo $translations['Mini Skirt'] ?></a></li>
+                        <li><a href="./category/skirt/midi-skirt.php" data-i18n="midi-skirt"><?php echo $translations['Midi Skirt'] ?></a></li>
+                        <li><a href="./category/skirt/long-skirt.php" data-i18n="long-skirt"><?php echo $translations['Long Skirt'] ?></a></li>
+                        <li><a href="./category/skirt/denim-skirt.php" data-i18n="denim-skirt"><?php echo $translations['Denim Skirt'] ?></a></li>
+                    </ul>
+                </li>
+                <li class="category-item">
+                    <a href="./category/onepiece.php" data-i18n="onepiece"><?php echo $translations['Onepiece'] ?></a>
+                    <ul class="sub-category">
+                        <li><a href="./category/onepiece/dress.php" data-i18n="dress"><?php echo $translations['Dress'] ?></a></li>
+                        <li><a href="./category/onepiece/jumper-skirt.php" data-i18n="jumper-skirt"><?php echo $translations['Jumper Skirt'] ?></a></li>
+                        <li><a href="./category/onepiece/onepiece-dress.php" data-i18n="onepiece-dress"><?php echo $translations['Onepiece'] ?></a></li>
+                        <li><a href="./category/onepiece/pants-dress.php" data-i18n="pants-dress"><?php echo $translations['Pants Dress'] ?></a></li>
+                        <li><a href="./category/onepiece/shirts-onepiece.php" data-i18n="shirts-onepiece"><?php echo $translations['Shirt Onepiece'] ?></a></li>
+                        <li><a href="./category/onepiece/tunic.php" data-i18n="tunic"><?php echo $translations['Tunic'] ?></a></li>
+                    </ul>
+                </li>
+            </ul>
+        </aside>
+        <div class="products-wrapper">
 
-                // Base64にエンコード
-                $encodedImg = base64_encode($imgBlob);
-                // sale_idに基づいて割引率を計算
-                // $discount_rate = $product['sale_id'] * 10; // sale_idが1なら10%割引
-                // $sale_price = $product['price'] * (1 - $discount_rate / 100);
-                ?>
-                <div class="product-card">
-                    <a href="goods.php?shop_id=<?= htmlspecialchars($product['shop_id']) ?>" class="product-link">
-                        <img
-                            src="data:<?php echo htmlspecialchars($mimeType, ENT_QUOTES, 'UTF-8'); ?>;base64,<?php echo htmlspecialchars($encodedImg, ENT_QUOTES, 'UTF-8'); ?>"
-                            alt="goods img"
-                            style="height: 100px; width: 100px; object-fit: cover; display: block; margin: 0 auto;">
-                        <div class="product-name"><?= htmlspecialchars($product['goods']) ?></div>
-                        <div class="product-price">¥<?= number_format($product['price']) ?></div>
-                        <div class="original-price">¥<?= number_format($product['original_price']) ?></div>
-                    </a>
+            <h1><?php echo $translations['Sale'] ?></h1>
+
+            <?php if (count($products) > 0): ?>
+                <div class="product-container">
+                    <?php foreach ($products as $product): ?>
+                        <?php
+                        $imgBlob = $product['thumbnail'];
+                        $mimeType = 'image/png'; // MIMEタイプはデフォルトを設定（例としてPNG）
+
+                        // MIMEタイプを動的に取得
+                        $finfo = new finfo(FILEINFO_MIME_TYPE);
+                        $mimeType = $finfo->buffer($imgBlob); // BLOBデータからMIMEタイプを取得
+
+                        // Base64にエンコード
+                        $encodedImg = base64_encode($imgBlob);
+
+                        // 割引価格を計算 (sale.discount_rateが割引率として格納されていると仮定)
+                        $discountRate = $product['sale'];  // 例: 10（10%割引）
+                        $Price = $product['price'];  // 商品の元の価格
+                        // $discountPrice = $originalPrice * (1 - $discountRate / 100);  // 割引後の価格
+                        ?>
+                        <div class="product-card">
+                            <a href="goods.php?shop_id=<?= htmlspecialchars($product['shop_id']) ?>" class="product-link">
+                                <img
+                                    src="data:<?php echo htmlspecialchars($mimeType, ENT_QUOTES, 'UTF-8'); ?>;base64,<?php echo htmlspecialchars($encodedImg, ENT_QUOTES, 'UTF-8'); ?>"
+                                    alt="goods img"
+                                    style="height: 100px; width: 100px; object-fit: cover; display: block; margin: 0 auto;">
+                                <div class="product-name"><?= htmlspecialchars($product['goods']) ?></div>
+                                <div class="product-price">¥<?= number_format($Price) ?> (<?= htmlspecialchars($discountRate) ?>% OFF)</div>
+                                <div class="original-price">¥<?= number_format($product['original_price']) ?></div>
+                            </a>
+                        </div>
+                    <?php endforeach; ?>
                 </div>
-            <?php endforeach; ?>
+            <?php else: ?>
+                <p><?php echo $translations['No Sale'] ?></p>
+            <?php endif; ?>
         </div>
-    <?php else: ?>
-        <p>現在セール中の商品はありません。</p>
-    <?php endif; ?>
+    </div>
 </body>
 
 </html>

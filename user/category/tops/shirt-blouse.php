@@ -3,6 +3,7 @@ include "../../../../db_open.php"; // PDO接続のファイルをインクルー
 include "../../../head.php";
 include "../../../header.php";
 echo "<link rel='stylesheet' href='../../header.css'>";
+
 echo "<link rel='stylesheet' href='../tops.css'>";
 
 $sort = isset($_GET['sort']) ? $_GET['sort'] : 'default';
@@ -18,7 +19,7 @@ SELECT * FROM shop
 JOIN subcategory ON shop.subcategory_id = subcategory.subcategory_id
 JOIN brand ON shop.brand_id = brand.brand_id
 JOIN sale ON shop.sale_id = sale.sale_id
-WHERE subcategory.subcategory_name ='チューブトップス'";
+WHERE subcategory.subcategory_name =   'シャツ/ブラウス'";
 
 // ソート条件に応じてクエリを追加
 switch ($sort) {
@@ -48,7 +49,7 @@ if ($brand !== null) {
 $stmt = $dbh->query($sql);
 $stmt->execute($params);
 
-    $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $sql = "SELECT * FROM brand";
 $stmt = $dbh->prepare($sql);
@@ -57,16 +58,15 @@ $brands = $stmt->fetchAll(PDO::FETCH_ASSOC);?>
 
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>その他トップス商品一覧</title>
 </head>
-<body>
-<div class="main-content">
 
-<aside class="sidebar">
-<h2 data-i18n="search"><?php echo $translations['Search'] ?></h2>
+<body>
+    <div class="main-content">
+        <aside class="sidebar">
+        <h2 data-i18n="search"><?php echo $translations['Search'] ?></h2>
             <ul>
                 <li><a href="../../brand.php" data-i18n="Search_By_brand"><?php echo $translations['Search By Brand'] ?></a></li>
                 <li><a href="../category.php" data-i18n="Search_By_category"><?php echo $translations['Search By Category'] ?></a></li>
@@ -176,8 +176,8 @@ $brands = $stmt->fetchAll(PDO::FETCH_ASSOC);?>
                     ?>
                 </select>
             </form>
-    <h1><?php echo $translations['Tubetop'] ?></h1>
-    <div class="products-container">
+            <h1><?php echo $translations['Shirt Blouse'] ?></h1>
+            <div class="products-container">
                 <ul>
                     <?php if (!empty($products)): ?>
                         <?php foreach ($products as $product): ?>
@@ -194,7 +194,7 @@ $brands = $stmt->fetchAll(PDO::FETCH_ASSOC);?>
                                 $encodedImg = base64_encode($imgBlob);
                                 ?>
                                 <!-- 商品の詳細ページへのリンク -->
-                                <a href="../goods.php?shop_id=<?php echo htmlspecialchars($product['shop_id'], ENT_QUOTES, 'UTF-8'); ?>">
+                                <a href="../../goods.php?shop_id=<?php echo htmlspecialchars($product['shop_id'], ENT_QUOTES, 'UTF-8'); ?>">
                                 <img src="data:<?php echo $mimeType; ?>;base64,<?php echo $encodedImg; ?>" alt="goods img" class="product-image">
 
                                     <div>
@@ -215,4 +215,5 @@ $brands = $stmt->fetchAll(PDO::FETCH_ASSOC);?>
         </div>
     </div>
 </body>
+
 </html>
