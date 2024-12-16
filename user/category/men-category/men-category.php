@@ -24,9 +24,9 @@ $result->execute();
 
         <nav class="tabs">
             <a href="../category.php?gender=ALL" class="tab-button <?php echo basename($_SERVER['PHP_SELF']) == '../category.php' ? 'active' : ''; ?>" data-target="all"><?php echo $translations['All'] ?></a>
-            <a href="men-category.php?gender=man" class="tab-button <?php echo basename($_SERVER['PHP_SELF']) == 'men-category.php' ? 'active' : ''; ?>" data-target="men"><?php echo $translations['Mens'] ?></a>
-            <a href="../woman-category/woman-category.php?gender=woman" class="tab-button <?php echo basename($_SERVER['PHP_SELF']) == '../woman-category/woman-category.php' ? 'active' : ''; ?>" data-target="woman"><?php echo $translations['Ledies'] ?></a>
-            <a href="../kids-category/kids-category.php?gender=kids" class="tab-button <?php echo basename($_SERVER['PHP_SELF']) == '../kids-category/kids-category.php' ? 'active' : ''; ?>" data-target="kids"><?php echo $translations['Kids'] ?></a>
+            <a href="men-category.php?gender=1" class="tab-button <?php echo basename($_SERVER['PHP_SELF']) == 'men-category.php' ? 'active' : ''; ?>" data-target="men"><?php echo $translations['Mens'] ?></a>
+            <a href="../woman-category/woman-category.php?gender=2" class="tab-button <?php echo basename($_SERVER['PHP_SELF']) == '../woman-category/woman-category.php' ? 'active' : ''; ?>" data-target="woman"><?php echo $translations['Ledies'] ?></a>
+            <a href="../kids-category/kids-category.php?gender=3" class="tab-button <?php echo basename($_SERVER['PHP_SELF']) == '../kids-category/kids-category.php' ? 'active' : ''; ?>" data-target="kids"><?php echo $translations['Kids'] ?></a>
         </nav>
 
         <div class="category-list">
@@ -39,8 +39,8 @@ $result->execute();
             </ul>
             <div>
                 <div id="tops">
-                    <h2><a href="../tops.php"><?php echo $translations['Tops'] ?></a></h2>
                     <?php
+                    echo "<h2><a href='../tops.php?gender=" . htmlspecialchars($gender) . "'>" . htmlspecialchars($translations['Tops'] ?? 'Tops') . "</a></h2>";
                     $stmt = $dbh->prepare("SELECT * FROM subcategory WHERE category_id = 1");
                     $stmt->execute();
 
@@ -71,9 +71,10 @@ $result->execute();
                     ?>
                 </div>
                 <div id="jacket">
-                    <h2><a href="../jacket-outerwear.php"><?php echo $translations['Jacket'] ?></a></h2>
-
                     <?php
+
+                    echo "<h2><a href='../jacket-outerwear.php?gender=" . htmlspecialchars($gender) . "'>" . htmlspecialchars($translations['Jacket'] ?? 'Tops') . "</a></h2>";
+
                     $stmt = $dbh->prepare("SELECT * FROM subcategory WHERE category_id = 2");
                     $stmt->execute();
 
@@ -106,9 +107,10 @@ $result->execute();
                     ?>
                 </div>
                 <div id="pants">
-                    <h2><a href="../pants.php"><?php echo $translations['Pants'] ?></a></h2>
-
                     <?php
+
+                    echo "<h2><a href='../pants.php?gender=" . htmlspecialchars($gender) . "'>" . htmlspecialchars($translations['Pants'] ?? 'Tops') . "</a></h2>";
+
                     $stmt = $dbh->prepare("SELECT * FROM subcategory WHERE category_id = 3");
                     $stmt->execute();
 
@@ -138,9 +140,10 @@ $result->execute();
                     ?>
                 </div>
                 <div id="skirt">
-                    <h2><a href="../skirt.php"><?php echo $translations['Skirt'] ?></a></h2>
-
                     <?php
+                    echo "<h2><a href='../skirt.php?gender=" . htmlspecialchars($gender) . "'>" . htmlspecialchars($translations['Skirt'] ?? 'Tops') . "</a></h2>";
+
+
                     $stmt = $dbh->prepare("SELECT * FROM subcategory WHERE category_id = 4");
                     $stmt->execute();
 
@@ -170,9 +173,9 @@ $result->execute();
                     ?>
                 </div>
                 <div id="onepiece">
-                    <h2><a href="../onepiece.php"><?php echo $translations['Onepiece'] ?></a></h2>
-
                     <?php
+                    echo "<h2><a href='../onepiece.php?gender=" . htmlspecialchars($gender) . "'>" . htmlspecialchars($translations['Onepiece'] ?? 'Tops') . "</a></h2>";
+
                     $stmt = $dbh->prepare("SELECT * FROM subcategory WHERE category_id = 5");
                     $stmt->execute();
 

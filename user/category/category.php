@@ -35,11 +35,11 @@ if (file_exists($lang_file)) {
         </header>
 
         <nav class="tabs">
-    <a href="category.php?gender=ALL" class="tab-button <?php echo basename($_SERVER['PHP_SELF']) == 'category.php' ? 'active' : ''; ?>" data-target="all"><?php echo $translations['All'] ?></a>
-    <a href="./men-category/men-category.php?gender=man" class="tab-button <?php echo basename($_SERVER['PHP_SELF']) == 'men-category.php' ? 'active' : ''; ?>" data-target="men"><?php echo $translations['Mens'] ?></a>
-    <a href="./woman-category/woman-category.php?gender=woman" class="tab-button <?php echo strpos($_SERVER['PHP_SELF'], 'woman-category.php') !== false ? 'active' : ''; ?>" data-target="woman"><?php echo $translations['Ledies'] ?></a>
-    <a href="./kids-category/kids-category.php?gender=kids" class="tab-button <?php echo basename($_SERVER['PHP_SELF']) == 'kids-category.php' ? 'active' : ''; ?>" data-target="kids"><?php echo $translations['Kids'] ?></a>
-</nav>
+            <a href="category.php?gender=ALL" class="tab-button <?php echo basename($_SERVER['PHP_SELF']) == 'category.php' ? 'active' : ''; ?>" data-target="all"><?php echo $translations['All'] ?></a>
+            <a href="./men-category/men-category.php?gender=1" class="tab-button <?php echo basename($_SERVER['PHP_SELF']) == 'men-category.php' ? 'active' : ''; ?>" data-target="men"><?php echo $translations['Mens'] ?></a>
+            <a href="./woman-category/woman-category.php?gender=2" class="tab-button <?php echo strpos($_SERVER['PHP_SELF'], 'woman-category.php') !== false ? 'active' : ''; ?>" data-target="woman"><?php echo $translations['Ledies'] ?></a>
+            <a href="./kids-category/kids-category.php?gender=3" class="tab-button <?php echo basename($_SERVER['PHP_SELF']) == 'kids-category.php' ? 'active' : ''; ?>" data-target="kids"><?php echo $translations['Kids'] ?></a>
+        </nav>
 
 
 
@@ -54,8 +54,9 @@ if (file_exists($lang_file)) {
             </ul>
             <div>
                 <div id="tops">
-                    <a href="tops.php"><?php echo $translations['Tops'] ?></a>
+
                     <?php
+                    echo "<h2><a href='tops.php?gender=" . htmlspecialchars($gender) . "'>" . htmlspecialchars($translations['Tops'] ?? 'Tops') . "</a></h2>";
                     $stmt = $dbh->prepare("SELECT * FROM subcategory WHERE category_id = 1");
                     $stmt->execute();
 
@@ -87,9 +88,9 @@ if (file_exists($lang_file)) {
                 </div>
 
                 <div id="jacket">
-                    <a href="jacket-outerwear.php"><?php echo $translations['Jacket'] ?></a>
-
                     <?php
+                    echo "<h2><a href='jacket-outerwear.php?gender=" . htmlspecialchars($gender) . "'>" . htmlspecialchars($translations['Jacket'] ?? 'Jacket') . "</a></h2>";
+
                     $stmt = $dbh->prepare("SELECT * FROM subcategory WHERE category_id = 2");
                     $stmt->execute();
 
@@ -119,9 +120,9 @@ if (file_exists($lang_file)) {
                     ?>
                 </div>
                 <div id="pants">
-                    <a href="pants.php"><?php echo $translations['Pants'] ?></a>
+                <?php    
+                    echo "<h2><a href='pants.php?gender=" . htmlspecialchars($gender) . "'>" . htmlspecialchars($translations['Pants'] ?? 'Pants') . "</a></h2>";
 
-                    <?php
                     $stmt = $dbh->prepare("SELECT * FROM subcategory WHERE category_id = 3");
                     $stmt->execute();
 
@@ -151,9 +152,9 @@ if (file_exists($lang_file)) {
                     ?>
                 </div>
                 <div id="skirt">
-                    <a href="skirt.php"><?php echo $translations['Skirt']; ?></a>
-
                     <?php
+                    echo "<h2><a href='skirt.php?gender=" . htmlspecialchars($gender) . "'>" . htmlspecialchars($translations['Skirt'] ?? 'Skirt') . "</a></h2>";
+
                     $stmt = $dbh->prepare("SELECT * FROM subcategory WHERE category_id = 4");
                     $stmt->execute();
 
@@ -185,9 +186,9 @@ if (file_exists($lang_file)) {
 
 
                 <div id="onepiece">
-                    <a href="onepiece.php"><?php echo $translations['Onepiece'] ?></a>
-
                     <?php
+                    echo "<h2><a href='onepiece.php?gender=" . htmlspecialchars($gender) . "'>" . htmlspecialchars($translations['Onepiece'] ?? 'Onepiece') . "</a></h2>";
+
                     $stmt = $dbh->prepare("SELECT * FROM subcategory WHERE category_id = 5");
                     $stmt->execute();
 

@@ -1,22 +1,38 @@
 <?php
-include "../../../db_open.php"; // PDO接続のファイルをインクルード
+include "../../../db_open.php";
 include "../../head.php";
 include "../../header.php";
+
 echo "<link rel='stylesheet' href='../header.css'>";
 echo "<link rel='stylesheet' href='tops.css'>";
 
+$gender = isset($_GET['gender']) ? $_GET['gender'] : 'ALL';
 $sort = isset($_GET['sort']) ? $_GET['sort'] : 'default';
 $brand = isset($_GET['brand']) && $_GET['brand'] !== '' ? $_GET['brand'] : null;
 
-// SQL文の初期設定
-$sql = "SELECT shop.*, sale.* FROM shop LEFT OUTER JOIN sale ON sale.sale_id = shop.sale_id WHERE shop.category_id = '3'";
+$params = [];
+$sql = "SELECT shop.*, sale.* 
+        FROM shop 
+        LEFT JOIN sale ON sale.sale_id = shop.sale_id 
+        LEFT OUTER JOIN gender ON gender.gender_id = shop.gender
+        WHERE shop.category_id = 3";
 
-// ブランドフィルタがある場合の条件追加
-if ($brand !== null) {
-    $sql .= " AND shop.brand_id = ?";
+// gender が ALL でない場合
+if ($gender == '0') {
+    $sql .= " AND (shop.gender IN (0, 1, 2, 3))";
+} elseif ($gender !== 'ALL') {
+    // gender が ALL でない場合（1, 2, 3）のみフィルタリング
+    $sql .= " AND shop.gender = :gender";
+    $params[':gender'] = $gender;
 }
 
-// ソート条件に応じてクエリを追加
+// ブランドフィルタがある場合
+if ($brand !== null) {
+    $sql .= " AND shop.brand_id = :brand";
+    $params[':brand'] = $brand;
+}
+
+// ソート条件
 switch ($sort) {
     case 'price_asc':
         $sql .= " ORDER BY shop.price ASC";
@@ -31,46 +47,48 @@ switch ($sort) {
         $sql .= " ORDER BY shop.buy DESC";
         break;
     default:
-        // セール商品
         $sql .= " ORDER BY shop.sale_id DESC";
         break;
 }
 
-// ブランドフィルタがある場合、パラメータをバインド
-$params = [];
-if ($brand !== null) {
-    $params[] = $brand;
+// クエリ実行
+try {
+    $stmt = $dbh->prepare($sql);
+    $stmt->execute($params);
+
+    $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    echo 'Error: ' . $e->getMessage();
 }
 
-// SQL実行
-$stmt = $dbh->prepare($sql);
-$stmt->execute($params);
-$products = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-// ブランドリストの取得
+// ブランド一覧の取得
 $sql = "SELECT * FROM brand";
 $stmt = $dbh->prepare($sql);
 $stmt->execute();
 $brands = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$sql = "SELECT * FROM gender";
+$stmt = $dbh->prepare($sql);
+$stmt->execute();
+$genders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
 <html lang="ja">
-
 <body>
     <div class="main-content">
         <aside class="sidebar">
-        <h2 data-i18n="search"><?php echo $translations['Search'] ?></h2>
-        <ul>
-            <li><a href="../brand.php" data-i18n="Search_By_brand"><?php echo $translations['Search By Brand'] ?></a></li>
-            <li><a href="category.php" data-i18n="Search_By_category"><?php echo $translations['Search By Category'] ?></a></li>
-            <li><a href="../ranking.php" data-i18n="Search_By_ranking"><?php echo $translations['Search By Ranking'] ?></a></li>
-            <li><a href="../sale.php" data-i18n="Search_By_sale"><?php echo $translations['Search By Sale'] ?></a></li>
-            <li><a href="../diagnosis.php" data-i18n="Search_By_diagnosis"><?php echo $translations['Search By Diagnosis'] ?></a></li>
-            <li><a href="../advanced_search.php" data-i18n="advanced_search"><?php echo $translations['Advanced Search'] ?></a></li>
-        </ul>
+            <h2 data-i18n="search"><?php echo $translations['Search'] ?></h2>
+            <ul>
+                <li><a href="../brand.php" data-i18n="Search_By_brand"><?php echo $translations['Search By Brand'] ?></a></li>
+                <li><a href="category.php?gender=ALL" data-i18n="Search_By_category"><?php echo $translations['Search By Category'] ?></a></li>
+                <li><a href="../ranking.php" data-i18n="Search_By_ranking"><?php echo $translations['Search By Ranking'] ?></a></li>
+                <li><a href="../sale.php" data-i18n="Search_By_sale"><?php echo $translations['Search By Sale'] ?></a></li>
+                <li><a href="../diagnosis.php" data-i18n="Search_By_diagnosis"><?php echo $translations['Search By Diagnosis'] ?></a></li>
+                <li><a href="../advanced_search.php" data-i18n="advanced_search"><?php echo $translations['Advanced Search'] ?></a></li>
+            </ul>
 
-        <h2 data-i18n="categories_from"><?php echo $translations['Search By Category'] ?></h2>
+            <h2 data-i18n="categories_from"><?php echo $translations['Search By Category'] ?></h2>
 
             <ul class="category-list">
             <li class="category-item">
@@ -88,7 +106,7 @@ $brands = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <li><a href="tops/jersey.php" data-i18n="jersey"><?php echo $translations['Jersey'] ?></a></li>
                     <li><a href="tops/tanktop.php" data-i18n="tanktop"><?php echo $translations['Tanktop'] ?></a></li>
                     <li><a href="tops/camisole.php" data-i18n="camisole"><?php echo $translations['Camisole'] ?></a></li>
-                    <li><a href="tops/tubetops.php" data-i18n="tubetops"><?php echo $translations['Tubetop'] ?></a></li>
+                    <li><a href="tops/tubetop.php" data-i18n="tubetops"><?php echo $translations['Tubetop'] ?></a></li>
                     <li><a href="tops/other-tops.php" data-i18n="other-tops"><?php echo $translations['Other Tops'] ?></a></li>
                 </ul>
             </li>
@@ -165,6 +183,17 @@ $brands = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         // 選択されているブランドを保持
                         $selected = (isset($_GET['brand']) && $_GET['brand'] === $brand_id) ? 'selected' : '';
                         echo "<option value=\"$brand_id\" $selected>$brand_name</option>";
+                    }
+                    ?>
+                </select>
+                <select name="gender" id="gender" onchange="this.form.submit()">
+                    <?php
+                    foreach ($genders as $gender_option) {
+                        $gender_id = htmlspecialchars($gender_option['gender_id']);
+                        $gender_name = htmlspecialchars($gender_option['gender']);
+
+                        $selected = (isset($_GET['gender']) && $_GET['gender'] === $gender_id) ? 'selected' : '';
+                        echo "<option value=\"$gender_id\" $selected>$gender_name</option>";
                     }
                     ?>
                 </select>

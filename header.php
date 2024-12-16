@@ -141,7 +141,7 @@ $unread_count = $notification_count_stmt->fetchColumn();
                 'ジャージ': 'category/tops/jersey.php',
                 'タンクトップ': 'category/tops/tanktop.php',
                 'キャミソール': 'category/tops/camisole.php',
-                'チューブトップス': 'category/tops/tubetops.php',
+                'チューブトップス': 'category/tops/tubetop.php',
                 'その他トップス': 'category/tops/auter-tops.php',
 
                 // ジャケット/アウター
@@ -190,7 +190,7 @@ $unread_count = $notification_count_stmt->fetchColumn();
                 redirectUrl = categoryMapping[query];
             } else {
                 // 一致しない場合は商品検索ページに遷移
-                redirectUrl = 'search.php?query=' + encodeURIComponent(query);
+                redirectUrl = '/sotsuken/sotsuken/user/search.php?query=' + encodeURIComponent(query);
             }
 
             // 遷移先にリダイレクト

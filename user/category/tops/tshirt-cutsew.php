@@ -5,20 +5,34 @@ include "../../../header.php";
 echo "<link rel='stylesheet' href='../../header.css'>";
 echo "<link rel='stylesheet' href='../tops.css'>";
 
+// gender, sort, brandをGETパラメータから取得
+$gender = isset($_GET['gender']) ? $_GET['gender'] : 'ALL';
 $sort = isset($_GET['sort']) ? $_GET['sort'] : 'default';
 $brand = isset($_GET['brand']) && $_GET['brand'] !== '' ? $_GET['brand'] : null;
 
+// 初期化
+$params = [];
 
-// ブランドフィルタがある場合の条件追加
-if ($brand !== null) {
-    $sql .= " AND shop.brand_id = ?";
+// 基本のSQL文
+$sql = "SELECT shop.*, brand.*, sale.*
+        FROM shop
+        LEFT OUTER JOIN subcategory ON shop.subcategory_id = subcategory.subcategory_id
+        LEFT OUTER JOIN brand ON shop.brand_id = brand.brand_id
+        LEFT OUTER JOIN sale ON shop.sale_id = sale.sale_id
+        LEFT OUTER JOIN gender ON gender.gender_id = shop.gender
+        WHERE subcategory.subcategory_name = 'Tシャツ/カットソー'";
+
+// gender が ALL でない場合、shop.gender が指定された値または 0 の両方を表示
+if ($gender !== 'ALL') {
+    $sql .= " AND (shop.gender = :gender OR shop.gender = 0)";
+    $params[':gender'] = $gender;
 }
-$sql = "
-SELECT * FROM shop
-JOIN subcategory ON shop.subcategory_id = subcategory.subcategory_id
-JOIN brand ON shop.brand_id = brand.brand_id
-JOIN sale ON shop.sale_id = sale.sale_id
-WHERE subcategory.subcategory_name = 'Tシャツ/カットソー'";
+
+// ブランドフィルタがある場合
+if ($brand !== null) {
+    $sql .= " AND shop.brand_id = :brand";
+    $params[':brand'] = $brand;
+}
 
 // ソート条件に応じてクエリを追加
 switch ($sort) {
@@ -34,26 +48,31 @@ switch ($sort) {
     case 'favorite':
         $sql .= " ORDER BY shop.buy DESC";
         break;
-       default:
-        // セール商品
+    default:
         $sql .= " ORDER BY shop.sale_id DESC";
         break;
 }
 
-$params = [];
-if ($brand !== null) {
-    $params[] = $brand;
+// クエリ実行
+try {
+    $stmt = $dbh->prepare($sql);
+    $stmt->execute($params);
+
+    // 商品データの取得
+    $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    echo 'Error: ' . $e->getMessage();
 }
 
-$stmt = $dbh->query($sql);
-$stmt->execute($params);
-
-$products = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
+// ブランド一覧の取得
 $sql = "SELECT * FROM brand";
 $stmt = $dbh->prepare($sql);
 $stmt->execute();
-$brands = $stmt->fetchAll(PDO::FETCH_ASSOC);?>
+$brands = $stmt->fetchAll(PDO::FETCH_ASSOC);
+?>
+
+
+
 
 <!DOCTYPE html>
 <html lang="ja">
@@ -68,10 +87,10 @@ $brands = $stmt->fetchAll(PDO::FETCH_ASSOC);?>
     <div class="main-content">
 
         <aside class="sidebar">
-        <h2 data-i18n="search"><?php echo $translations['Search'] ?></h2>
+            <h2 data-i18n="search"><?php echo $translations['Search'] ?></h2>
             <ul>
                 <li><a href="../../brand.php" data-i18n="Search_By_brand"><?php echo $translations['Search By Brand'] ?></a></li>
-                <li><a href="../category.php" data-i18n="Search_By_category"><?php echo $translations['Search By Category'] ?></a></li>
+                <li><a href="../category.php?gender=ALL" data-i18n="Search_By_category"><?php echo $translations['Search By Category'] ?></a></li>
                 <li><a href="../../ranking.php" data-i18n="Search_By_ranking"><?php echo $translations['Search By Ranking'] ?></a></li>
                 <li><a href="../../sale.php" data-i18n="Search_By_sale"><?php echo $translations['Search By Sale'] ?></a></li>
                 <li><a href="../../diagnosis.php" data-i18n="Search_By_diagnosis"><?php echo $translations['Search By Diagnosis'] ?></a></li>
@@ -96,7 +115,7 @@ $brands = $stmt->fetchAll(PDO::FETCH_ASSOC);?>
                         <li><a href="jersey.php" data-i18n="jersey"><?php echo $translations['Jersey'] ?></a></li>
                         <li><a href="tanktop.php" data-i18n="tanktop"><?php echo $translations['Tanktop'] ?></a></li>
                         <li><a href="camisole.php" data-i18n="camisole"><?php echo $translations['Camisole'] ?></a></li>
-                        <li><a href="tubetops.php" data-i18n="tubetops"><?php echo $translations['Tubetop'] ?></a></li>
+                        <li><a href="tubetop.php" data-i18n="tubetops"><?php echo $translations['Tubetop'] ?></a></li>
                         <li><a href="other-tops.php" data-i18n="other-tops"><?php echo $translations['Other Tops'] ?></a></li>
                     </ul>
                 </li>
@@ -187,17 +206,17 @@ $brands = $stmt->fetchAll(PDO::FETCH_ASSOC);?>
                                 <?php
                                 $imgBlob = $product['thumbnail'];
                                 $mimeType = 'image/png,image/jpg,image/svg'; // MIMEタイプはデフォルトを設定（例としてPNG）
-            
+
                                 // MIMEタイプを動的に取得
                                 $finfo = new finfo(FILEINFO_MIME_TYPE);
                                 $mimeType = $finfo->buffer($imgBlob); // BLOBデータからMIMEタイプを取得
-            
+
                                 // Base64にエンコード
                                 $encodedImg = base64_encode($imgBlob);
                                 ?>
                                 <!-- 商品の詳細ページへのリンク -->
                                 <a href="../../goods.php?shop_id=<?php echo htmlspecialchars($product['shop_id'], ENT_QUOTES, 'UTF-8'); ?>">
-                                <img src="data:<?php echo $mimeType; ?>;base64,<?php echo $encodedImg; ?>" alt="goods img" class="product-image">
+                                    <img src="data:<?php echo $mimeType; ?>;base64,<?php echo $encodedImg; ?>" alt="goods img" class="product-image">
 
                                     <div>
                                         <strong><?php echo htmlspecialchars($product['goods'], ENT_QUOTES, 'UTF-8'); ?></strong>
