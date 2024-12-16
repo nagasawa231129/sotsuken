@@ -163,51 +163,77 @@
             xhr.send();
         }
 
-        document.getElementById('add-row').addEventListener('click', function() {
-            var formContainer = document.getElementById('form-container');
-            var newForm = document.querySelector('.goods-form').cloneNode(true);
-            newForm.reset();
-            formContainer.appendChild(newForm);
-        });
+        document.getElementById('add-row').addEventListener('click', function () {
+    const formContainer = document.getElementById('form-container');
+    const forms = document.querySelectorAll('.goods-form');
+    const lastForm = forms[forms.length - 1];
+    const newForm = lastForm.cloneNode(true);
 
-        function submitForms() {
-            var forms = document.querySelectorAll('.goods-form');
-            forms.forEach(function(form, index) {
-                var formData = new FormData(form);
-                var xhr = new XMLHttpRequest();
-                xhr.open('POST', 'add_goods_process.php', true);
-                xhr.onload = function() {
-                    if (xhr.status === 200) {
-                        console.log('フォーム ' + (index + 1) + ' が正常に送信されました。');
-                        alert('正常に追加されました。');
-                    } else {
-                        console.error('フォーム ' + (index + 1) + ' の送信に失敗しました。');
-                    }
-                };
-                xhr.send(formData);
-            });
-        }
+    // フォームの中のフィールドをリセット
+    newForm.reset();
 
-        function submitForms() {
-    const form = document.querySelector('.goods-form');
-    const inputs = form.querySelectorAll('input[required], select[required], textarea[required]');
-    let allFilled = true;
-
-    inputs.forEach(input => {
-        if (!input.value) {
-            allFilled = false;
-            input.style.border = '2px solid red'; // 未入力のフィールドを強調表示
-        } else {
-            input.style.border = ''; // 入力済みのフィールドの強調表示を解除
+    // 各フォームのフィールドに一意の名前を付与
+    const newIndex = forms.length; // 現在のフォーム数を基にインデックスを設定
+    newForm.querySelectorAll('input, select, textarea').forEach((input) => {
+        const name = input.getAttribute('name');
+        if (name) {
+            input.setAttribute('name', name.replace(/\[\d+\]/, `[${newIndex}]`)); // インデックスを更新
         }
     });
 
-    if (allFilled) {
-        form.submit();
+    formContainer.appendChild(newForm);
+});
+
+function submitForms() {
+    const forms = document.querySelectorAll('.goods-form');
+    let allFormsSubmitted = true;
+
+    forms.forEach(function (form, index) {
+        const inputs = form.querySelectorAll('input[required], select[required], textarea[required]');
+        let allFieldsFilled = true;
+
+        // 必須フィールドのチェック
+        inputs.forEach(input => {
+            if (!input.value) {
+                allFieldsFilled = false;
+                input.style.border = '2px solid red'; // 未入力のフィールドを強調表示
+            } else {
+                input.style.border = ''; // 入力済みのフィールドの強調表示を解除
+            }
+        });
+
+        if (allFieldsFilled) {
+            const formData = new FormData(form);
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', 'add_goods_process.php', true);
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    // console.log(`フォーム ${index + 1} が正常に送信されました。`);
+                    // alert('商品を追加しました！');
+                    
+                    // フォームをリセット
+                    form.reset();
+                } else {
+                    console.error(`フォーム ${index + 1} の送信に失敗しました。`);
+                    alert('送信に失敗しました。もう一度試してください。');
+                    allFormsSubmitted = false;
+                }
+            };
+
+            xhr.send(formData);
+        } else {
+            allFormsSubmitted = false;
+        }
+    });
+
+    if (allFormsSubmitted) {
+        alert('すべての商品が正常に追加されました。');
     } else {
-        alert('全ての必須フィールドを入力してください。');
+        alert('必須項目をすべて入力してください。');
     }
 }
+
     </script>
 </body>
 </html>
