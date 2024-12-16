@@ -1,21 +1,26 @@
 <?php
-include "../../db_open.php"; // データベース接続ファイルをインクルード
+// データベース接続
+include './../../db_open.php';
+
 // update_thumbnail.php
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['image']) && isset($_POST['shop_id'])) {
-    // 画像ファイルを取得
-    $image = $_FILES['image']['tmp_name'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $shopId = $_POST['shop_id'];
+    if (isset($_FILES['thumbnail']) && $_FILES['thumbnail']['error'] === UPLOAD_ERR_OK) {
+        $thumbnailData = file_get_contents($_FILES['thumbnail']['tmp_name']);
 
-    // 画像がアップロードされているか確認
-    if (is_uploaded_file($image)) {
-        // 画像を読み込み、Base64エンコード
-        $imageData = file_get_contents($image);
-        $encodedImage = base64_encode($imageData);
+        // サムネイル画像を更新
+        $sql = "UPDATE shop SET thumbnail = :thumbnail WHERE shop_id = :shop_id";
+        $stmt = $dbh->prepare($sql);
+        $stmt->execute([
+            ':thumbnail' => $thumbnailData,
+            ':shop_id' => $shopId
+        ]);
 
-        // 成功した場合、Base64エンコードされた画像データを返す
-        echo "data:image/jpeg;base64," . $encodedImage;
+        echo "サムネイルが正常に更新されました。";
     } else {
-        echo "error"; // 画像の読み込みに失敗した場合
+        echo "サムネイルのアップロードに失敗しました。";
     }
 }
+
+?>
+

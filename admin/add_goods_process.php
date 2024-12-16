@@ -89,7 +89,7 @@ try {
 
     // コミット
     $dbh->commit();
-    echo "商品が正常に追加されました。";
+    // echo "<script><alert>商品が正常に追加されました。</alert></script>";
     header('Location: success_page.php'); // 追加後にリダイレクト
     exit;
 } catch (PDOException $e) {

@@ -1,60 +1,95 @@
-// サムネイル画像を更新する関数
-function updateThumbnail(shop_id) {
-    var fileInput = document.getElementById('thumbnailInput' + shop_id);
-    var file = fileInput.files[0];
-
-    if (file) {
-        var formData = new FormData();
-        formData.append('thumbnail', file);
-        formData.append('shop_id', shop_id); // shop_idをサーバーに送信
-
-        // AJAXでサムネイル画像をサーバーに送信して更新
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', 'update_thumbnail.php', true);
-        xhr.onload = function () {
-            if (xhr.status === 200) {
-                // 画像更新成功後、新しいサムネイルを表示
-                var reader = new FileReader();
-                reader.onload = function (e) {
-                    document.getElementById('shopImage' + shop_id).src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        };
-        xhr.send(formData);
+// ページを離れる前にスクロール位置を保存
+// window.onbeforeunload = function(){
+//     localStorage.setItem("scrollPosition", window.scrollY);
+//   };
+//   // // スクロール位置保存に戻る
+//   window.onload = function(){
+//     if (localStorage.getItem("scrollPosition") !== null) {
+//       window.scrollTo(0, localStorage.getItem("scrollPosition"));
+//     }
+//   };
+function updateThumbnail(shopId) {
+    var input = document.getElementById('thumbnailInput' + shopId);
+    if (!input) {
+        console.error('Input element not found');
+        return;
     }
-}
-// 画像選択ダイアログを開くための関数
-// 画像を削除する関数
-function deleteImage(shop_id, image_id) {
-    if (confirm("本当にこの画像を削除しますか？")) {
-        var formData = new FormData();
-        formData.append('image_id', image_id);
 
-        // AJAXで削除リクエストを送信
+    var file = input.files[0];
+    if (!file) {
+        console.error('No file selected');
+        return;
+    }
+
+    // 画像のプレビュー表示
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        // 即座にプレビュー画像を更新
+        document.getElementById('thumbnailImage' + shopId).src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+
+    // サーバーに送信
+    var formData = new FormData();
+    formData.append('shop_id', shopId);
+    formData.append('thumbnail', file);
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', 'update_thumbnail.php', true);
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            // サムネイルが正常に更新された場合に画像を変更
+            // レスポンスで返されたサムネイルURLを利用して、画像のURLを更新
+            var response = JSON.parse(xhr.responseText);
+            if (response.thumbnail) {
+                document.getElementById('thumbnailImage' + shopId).src = response.thumbnail + '?t=' + new Date().getTime();
+                console.log('サムネイルが正常に更新されました');
+            }
+        } else {
+            alert('サムネイルの更新に失敗しました');
+        }
+    };
+    xhr.send(formData);
+}
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    // 他の初期化コードをここに追加
+});
+
+var imageElement = document.getElementById('subthumbnailImage' + imageId);
+if (imageElement && imageElement.parentElement) {
+    imageElement.parentElement.remove();
+} else {
+    console.error('Element or parentElement not found');
+}
+
+
+
+function deleteImage(shopId, imageId) {
+    if (confirm('本当にこの画像を削除しますか？')) {
         var xhr = new XMLHttpRequest();
         xhr.open('POST', 'delete_image.php', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         xhr.onload = function() {
             if (xhr.status === 200) {
-                // 成功した場合は画像をページから削除
-                var imgElement = document.getElementById('shopImage' + shop_id);
-                imgElement.parentElement.removeChild(imgElement); // 画像を削除
-
-                // 「×」ボタンも削除
-                var deleteButton = document.querySelector('.delete-button');
-                if (deleteButton) {
-                    deleteButton.parentElement.removeChild(deleteButton);
+                // 画像の削除が成功した場合、画像要素を削除
+                var imageContainer = document.getElementById('imageContainer' + imageId);
+                if (imageContainer) {
+                    imageContainer.remove();
+                } else {
+                    console.error('Image container not found for imageId: ' + imageId);
                 }
-                alert("画像が削除されました。");
             } else {
-                alert("画像の削除に失敗しました。");
+                alert('画像の削除に失敗しました。');
             }
         };
-        xhr.send(formData);
+        xhr.send('shop_id=' + shopId + '&image_id=' + imageId);
     }
 }
-
-
 
    
    // categoryが選択された時にsubcategoriesを更新
@@ -73,39 +108,39 @@ function deleteImage(shop_id, image_id) {
     };
     xhr.send();
 }
-const thumbnails = document.querySelectorAll('.thumbnail');
-const modal = document.getElementById('imageModal');
-const modalContent = document.getElementById('modalContent');
-const closeModal = document.getElementById('closeModal');
+// const thumbnails = document.querySelectorAll('.thumbnail');
+// const modal = document.getElementById('imageModal');
+// const modalContent = document.getElementById('modalContent');
+// const closeModal = document.getElementById('closeModal');
 
-thumbnails.forEach(thumbnail => {
-    thumbnail.addEventListener('click', function() {
-        const shopId = this.dataset.shopId; // クリックしたサムネイルのshop_idを取得
-        fetch(`show_images.php?shop_id=${shopId}`) // shop_idを渡して画像を取得
-            .then(response => response.json()) // 画像のBase64エンコードされた配列を取得
-            .then(images => {
-                // モーダル内のコンテンツをクリア
-                modalContent.innerHTML = '';
+// thumbnails.forEach(thumbnail => {
+//     thumbnail.addEventListener('click', function() {
+//         const shopId = this.dataset.shopId; // クリックしたサムネイルのshop_idを取得
+//         fetch(`show_images.php?shop_id=${shopId}`) // shop_idを渡して画像を取得
+//             .then(response => response.json()) // 画像のBase64エンコードされた配列を取得
+//             .then(images => {
+//                 // モーダル内のコンテンツをクリア
+//                 modalContent.innerHTML = '';
 
-                if (images.length > 0) {
-                    // 画像を順にモーダルに追加
-                    images.forEach(encodedImg => {
-                        const imgElement = document.createElement('img');
-                        imgElement.src = encodedImg; // Base64エンコードされた画像をセット
-                        imgElement.alt = '商品画像';
-                        modalContent.appendChild(imgElement); // モーダル内に画像を追加
-                    });
-                    modal.style.display = 'flex'; // モーダルを表示
-                } else {
-                    modalContent.innerHTML = "画像が見つかりません"; // 画像がない場合
-                    modal.style.display = 'flex'; // モーダルを表示
-                }
-            })
-            .catch(error => {
-                console.error("画像の取得に失敗しました:", error);
-            });
-    });
-});
+//                 if (images.length > 0) {
+//                     // 画像を順にモーダルに追加
+//                     images.forEach(encodedImg => {
+//                         const imgElement = document.createElement('img');
+//                         imgElement.src = encodedImg; // Base64エンコードされた画像をセット
+//                         imgElement.alt = '商品画像';
+//                         modalContent.appendChild(imgElement); // モーダル内に画像を追加
+//                     });
+//                     modal.style.display = 'flex'; // モーダルを表示
+//                 } else {
+//                     modalContent.innerHTML = "画像が見つかりません"; // 画像がない場合
+//                     modal.style.display = 'flex'; // モーダルを表示
+//                 }
+//             })
+//             .catch(error => {
+//                 console.error("画像の取得に失敗しました:", error);
+//             });
+//     });
+// });
 
 
 
