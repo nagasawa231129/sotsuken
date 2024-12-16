@@ -5,13 +5,13 @@ if (session_status() == PHP_SESSION_NONE) {
 
 include "../head.php";
 include "../../db_open.php"; // データベース接続
-echo "<link rel='stylesheet' href='regist.css'>";
+echo "<link rel='stylesheet' href='admin_regist.css'>";
 
 $message = ""; // メッセージを格納する変数
 
 // ログイン状態の確認
 if (!isset($_SESSION['mail'])) {
-    header('Location: login.php');
+    header('Location: admin_login.php');
     exit();
 }
 
@@ -23,26 +23,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $kanasei = $_POST['kanasei'];
     $mei = $_POST['mei'];
     $kanamei = $_POST['kanamei'];
-    $display = $_POST['display'];
 
-    if (!empty($pass) && !empty($repass) && !empty($sei) && !empty($kanasei) && !empty($mei) && !empty($kanamei) && !empty($display)) {
+    if (!empty($pass) && !empty($repass) && !empty($sei) && !empty($kanasei) && !empty($mei) && !empty($kanamei)) {
         if ($pass === $repass) {
             // パスワードをハッシュ化
             $hashed_pass = password_hash($pass, PASSWORD_DEFAULT); // bcrypt使用
 
             try {
                 // データベースにユーザー情報を更新するSQL文
-                $sql = "UPDATE user SET pass = :pass, display_name = :display ,sei = :sei, kanasei = :kanasei, mei = :mei, kanamei = :kanamei WHERE mail = :mail";
+                $sql = "UPDATE user SET pass = :pass, sei = :sei, kanasei = :kanasei, mei = :mei, kanamei = :kanamei WHERE mail = :mail";
                 $stmt = $dbh->prepare($sql);
 
                 $stmt->execute([
                     ':pass' => $hashed_pass,
-                    ':display' => $display,
                     ':sei' => $sei,
                     ':kanasei' => $kanasei,
                     ':mei' => $mei,
                     ':kanamei' => $kanamei,
-                    ':mail' => $_SESSION['mail'],
+                    ':mail' => $_SESSION['mail']
                 ]);
 
                 $message = "<div class='success'>新規登録が完了しました。</div>";
@@ -68,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <div class="container">
         <h1>新規登録</h1>
         <?php echo $message; ?> <!-- メッセージの表示 -->
-        <form action="next_regist.php" method="POST" onsubmit="validateForm(event)">
+        <form action="admin_next_regist.php" method="POST" onsubmit="validateForm(event)">
 
             <label for="pass">パスワード:</label>
             <input type="password" id="pass" name="pass" maxlength="16" minlength="8"
@@ -79,12 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <input type="password" id="repass" name="repass" maxlength="16" minlength="8"
                 required pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,16}$"
                 placeholder="パスワードの再確認">
-           
-                     <!-- 姓 -->
-            <label for="display">ニックネーム:</label>
-            <input type="text" id="display" name="display" required>
-
-
+            
                 <!-- 姓 -->
             <label for="sei">姓:</label>
             <input type="text" id="sei" name="sei" required>
