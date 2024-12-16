@@ -8,31 +8,51 @@
 //       window.scrollTo(0, localStorage.getItem("scrollPosition"));
 //     }
 //   };
-
-
-function updateThumbnail(shop_id) {
-    var fileInput = document.getElementById('thumbnailInput' + shop_id);
-    var file = fileInput.files[0];
-
-    if (file) {
-        var formData = new FormData();
-        formData.append('thumbnail', file);
-        formData.append('shop_id', shop_id);
-
-        // AJAXでサムネイル画像をサーバーに送信して更新
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', 'update_thumbnail.php', true);
-        xhr.onload = function () {
-            if (xhr.status === 200) {
-                // 成功時に新しいサムネイル画像を表示
-                document.getElementById('thumbnailImage' + shop_id).src = xhr.responseText;
-            } else {
-                alert('サムネイルの更新に失敗しました。');
-            }
-        };
-        xhr.send(formData);
+function updateThumbnail(shopId) {
+    var input = document.getElementById('thumbnailInput' + shopId);
+    if (!input) {
+        console.error('Input element not found');
+        return;
     }
+
+    var file = input.files[0];
+    if (!file) {
+        console.error('No file selected');
+        return;
+    }
+
+    // 画像のプレビュー表示
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        // 即座にプレビュー画像を更新
+        document.getElementById('thumbnailImage' + shopId).src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+
+    // サーバーに送信
+    var formData = new FormData();
+    formData.append('shop_id', shopId);
+    formData.append('thumbnail', file);
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', 'update_thumbnail.php', true);
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            // サムネイルが正常に更新された場合に画像を変更
+            // レスポンスで返されたサムネイルURLを利用して、画像のURLを更新
+            var response = JSON.parse(xhr.responseText);
+            if (response.thumbnail) {
+                document.getElementById('thumbnailImage' + shopId).src = response.thumbnail + '?t=' + new Date().getTime();
+                console.log('サムネイルが正常に更新されました');
+            }
+        } else {
+            alert('サムネイルの更新に失敗しました');
+        }
+    };
+    xhr.send(formData);
 }
+
+
 
 
 
@@ -88,39 +108,39 @@ function deleteImage(shopId, imageId) {
     };
     xhr.send();
 }
-const thumbnails = document.querySelectorAll('.thumbnail');
-const modal = document.getElementById('imageModal');
-const modalContent = document.getElementById('modalContent');
-const closeModal = document.getElementById('closeModal');
+// const thumbnails = document.querySelectorAll('.thumbnail');
+// const modal = document.getElementById('imageModal');
+// const modalContent = document.getElementById('modalContent');
+// const closeModal = document.getElementById('closeModal');
 
-thumbnails.forEach(thumbnail => {
-    thumbnail.addEventListener('click', function() {
-        const shopId = this.dataset.shopId; // クリックしたサムネイルのshop_idを取得
-        fetch(`show_images.php?shop_id=${shopId}`) // shop_idを渡して画像を取得
-            .then(response => response.json()) // 画像のBase64エンコードされた配列を取得
-            .then(images => {
-                // モーダル内のコンテンツをクリア
-                modalContent.innerHTML = '';
+// thumbnails.forEach(thumbnail => {
+//     thumbnail.addEventListener('click', function() {
+//         const shopId = this.dataset.shopId; // クリックしたサムネイルのshop_idを取得
+//         fetch(`show_images.php?shop_id=${shopId}`) // shop_idを渡して画像を取得
+//             .then(response => response.json()) // 画像のBase64エンコードされた配列を取得
+//             .then(images => {
+//                 // モーダル内のコンテンツをクリア
+//                 modalContent.innerHTML = '';
 
-                if (images.length > 0) {
-                    // 画像を順にモーダルに追加
-                    images.forEach(encodedImg => {
-                        const imgElement = document.createElement('img');
-                        imgElement.src = encodedImg; // Base64エンコードされた画像をセット
-                        imgElement.alt = '商品画像';
-                        modalContent.appendChild(imgElement); // モーダル内に画像を追加
-                    });
-                    modal.style.display = 'flex'; // モーダルを表示
-                } else {
-                    modalContent.innerHTML = "画像が見つかりません"; // 画像がない場合
-                    modal.style.display = 'flex'; // モーダルを表示
-                }
-            })
-            .catch(error => {
-                console.error("画像の取得に失敗しました:", error);
-            });
-    });
-});
+//                 if (images.length > 0) {
+//                     // 画像を順にモーダルに追加
+//                     images.forEach(encodedImg => {
+//                         const imgElement = document.createElement('img');
+//                         imgElement.src = encodedImg; // Base64エンコードされた画像をセット
+//                         imgElement.alt = '商品画像';
+//                         modalContent.appendChild(imgElement); // モーダル内に画像を追加
+//                     });
+//                     modal.style.display = 'flex'; // モーダルを表示
+//                 } else {
+//                     modalContent.innerHTML = "画像が見つかりません"; // 画像がない場合
+//                     modal.style.display = 'flex'; // モーダルを表示
+//                 }
+//             })
+//             .catch(error => {
+//                 console.error("画像の取得に失敗しました:", error);
+//             });
+//     });
+// });
 
 
 

@@ -118,17 +118,24 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td>
-                                    <?php
-                                    $thumbimgBlob = $product['thumbnail'];
-                                    $shopId = $product['shop_id'];
-                                    if ($thumbimgBlob) {
-                                        $thumbencodedImg = base64_encode($thumbimgBlob);
-                                        echo "<img src='data:image/jpeg;base64,$thumbencodedImg' alt='サムネイル' width='100' class='thumbnail' data-shop-id='$shopId' onclick='document.getElementById(\"thumbnailInput$shopId\").click();' id='thumbnailImage$shopId' />";
-                                        echo "<input type='file' id='thumbnailInput$shopId' style='display:none;' accept='image/jpeg, image/jpg, image/png' onchange='updateThumbnail($shopId)' />";
-                                    }
-                                    ?>
-                                </td>
+                            <td>
+    <?php
+    $thumbimgBlob = $product['thumbnail'];
+    $shopId = $product['shop_id'];
+    if ($thumbimgBlob) {
+        $thumbencodedImg = base64_encode($thumbimgBlob);
+        echo "<img src='data:image/jpeg;base64,$thumbencodedImg' alt='サムネイル' width='100' class='thumbnail' data-shop-id='$shopId' onclick='document.getElementById(\"thumbnailInput$shopId\").click();' id='thumbnailImage$shopId' />";
+        echo "<input type='file' id='thumbnailInput$shopId' style='display:none;' accept='image/jpeg, image/jpg, image/png' onchange='updateThumbnail($shopId)' />";
+    }
+    ?>
+</td>
+
+
+
+
+
+
+
 
                                 <td>
                                     <div class="input-group" style="position: relative;">
