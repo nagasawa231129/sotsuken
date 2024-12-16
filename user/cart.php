@@ -8,6 +8,15 @@
         
     </head>
     <body>
+    <header>
+<!-- ヘッダー部分を追加 -->
+<div class="search-container">
+    <!-- 「卒研TOWN」を左側に移動 -->
+    <div class="search-bar">
+        <a class="site-name" href="/sotsuken/sotsuken/user/toppage.php">卒研TOWN</a>
+    </div>
+</div>
+</header>
     <div class="container">
         <h1>カートの中身</h1>
 
@@ -63,13 +72,18 @@
                             $price = $goodsRow['price'];
                             $size = $goodsRow['size'];
                             $color = $goodsRow['color'];
+                            $thumbnail = $goodsRow['thumbnail']; // 画像データ (BLOB)
                             $quantity = $goodsRow['material'];
 
                             $totalPrice = $price * $item['quantity'];
                             $sumPrice += $totalPrice;
 
+                            $encodedImg = base64_encode($thumbnail);
+                            $mimeType = 'image/png'; // 必要に応じて正確な MIME タイプを設定
+
                             // 商品情報を表示
                             echo "<div class='cart-item'>";
+                            echo "<img src='data:$mimeType;base64,$encodedImg' alt='商品画像' style='width:100px; height:auto;'><br>";
                             echo "<p>商品名: <span class='info-text'>" . htmlspecialchars($goods, ENT_QUOTES, 'UTF-8') . "</span><br>";
                             echo "価格: <span class='info-text'>" . htmlspecialchars($price, ENT_QUOTES, 'UTF-8') . "円</span><br>";
                             echo "サイズ: <span class='info-text'>" . htmlspecialchars($size, ENT_QUOTES, 'UTF-8') . "</span><br>";
