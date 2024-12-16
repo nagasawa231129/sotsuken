@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             try {
                 // データベースにユーザー情報を更新するSQL文
-                $sql = "UPDATE user SET pass = :pass, sei = :sei, kanasei = :kanasei, mei = :mei, kanamei = :kanamei WHERE mail = :mail";
+                $sql = "UPDATE admin SET pass = :pass, sei = :sei, kanasei = :kanasei, mei = :mei, kanamei = :kanamei WHERE mail = :mail";
                 $stmt = $dbh->prepare($sql);
 
                 $stmt->execute([
@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 ]);
 
                 $message = "<div class='success'>新規登録が完了しました。</div>";
-                header('Location: toppage.php');
+                header('Location: admin_toppage.php');
                 exit();
             } catch (PDOException $e) {
                 $message = "<div class='error'>エラーが発生しました。再度お試しください。</div>";
