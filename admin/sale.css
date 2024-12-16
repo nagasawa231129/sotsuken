@@ -1,0 +1,194 @@
+
+/* 全体のフォントと背景 */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f7f7f7;  /* 背景色を柔らかいグレーに変更 */
+    color: #333;
+    margin: 0;
+    padding: 20px;
+    line-height: 1.6;  /* 行間を少し広げて読みやすく */
+}
+
+/* テーブルのスタイル */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);  /* ボックスシャドウを強調 */
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* テーブルヘッダー */
+th {
+    background-color: #4CAF50;  /* ヘッダーの背景色をグリーン */
+    color: white;
+    text-align: left;
+    padding: 12px;
+    font-size: 16px;  /* フォントサイズを少し大きく */
+    border-bottom: 2px solid #ddd;
+}
+
+/* テーブルのセル */
+td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    font-size: 14px;
+    height: 50px;
+    vertical-align: middle;
+    background-color: #f9f9f9;  /* セルの背景色を柔らかく */
+}
+
+tr:hover {
+    background-color: #f1f1f1;  /* 行をホバーしたときの色 */
+}
+
+/* フォーム要素のスタイル */
+input[type="text"], input[type="number"], select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    height: 40px;
+    line-height: 20px;
+    box-sizing: border-box;  /* パディングを含むサイズ */
+}
+
+/* 更新ボタン */
+.update-btn {
+    padding: 10px 20px;
+    background-color: #007BFF;  /* ブルー系の色 */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.update-btn:hover {
+    background-color: #0056b3;  /* ホバー時の色を少し暗く */
+}
+
+/* メッセージ表示 */
+.message {
+    color: #28a745;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.error {
+    color: #dc3545;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+/* 価格入力のスタイル */
+.price-input {
+    width: 100px;
+    box-sizing: border-box;
+    height: 40px;
+}
+
+/* テーブル内のセル内の要素の中央揃え */
+td {
+    vertical-align: middle;
+}
+
+/* 新規追加ボタンのスタイル */
+#add-button {
+    padding: 12px 24px;  /* ボタンの内側の余白を調整 */
+    background-color: #28a745;  /* 緑色 */
+    color: white;
+    border: none;
+    border-radius: 8px;  /* ボタンを丸く */
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);  /* ボタンに影を追加 */
+}
+
+#add-button:hover {
+    background-color: #218838;  /* ホバー時に色を変更 */
+    transform: scale(1.05);  /* ボタンを少し拡大 */
+}
+
+#add-button:active {
+    background-color: #1e7e34;  /* 押下時の色 */
+    transform: scale(0.98);  /* 押下時に少し縮小 */
+}
+
+/* エラーメッセージのスタイル */
+.error-message {
+    color: #dc3545;
+    background-color: #f8d7da;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+/* 成功メッセージのスタイル */
+.success-message {
+    color: #155724;
+    background-color: #d4edda;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+/* <select> 要素の幅を広げる */
+select {
+    width: 100%;  /* 親要素に合わせて幅を広げる */
+    box-sizing: border-box;  /* 幅の計算にパディングを含める */
+    padding: 8px;  /* 内側のスペースを調整 */
+}
+
+/* <option> 要素のフォントサイズやパディングを調整 */
+select option {
+    padding: 8px;  /* アイテム間のスペースを確保 */
+    font-size: 14px;  /* フォントサイズの調整 */
+    white-space: nowrap;  /* テキストの折り返しを防ぐ */
+}
+
+/* 必要に応じて、特定の <select> に対して幅を制限 */
+.custom-select {
+    width: 250px;  /* 適切な幅を指定 */
+}
+.select {
+    display: flex; /* フレックスボックスを使用 */
+    justify-content: flex-end; /* 子要素を右端に配置 */
+    align-items: center; /* 垂直方向に中央揃え */
+    gap: 20px; /* ボタン間の間隔を調整 */
+    height: 100px; /* 高さを固定 */
+}
+
+#add-button, #sale-button {
+    padding: 10px 20px; /* ボタンの余白 */
+    font-size: 16px; /* ボタンの文字サイズ */
+    background-color: #007BFF; /* 背景色 */
+    color: #fff; /* 文字色 */
+    border: none; /* 枠線を削除 */
+    border-radius: 5px; /* 角丸を適用 */
+    cursor: pointer; /* マウスオーバー時にポインタを表示 */
+}
+
+#add-button:hover, #sale-button:hover {
+    background-color: #0056b3; /* ホバー時の背景色 */
+}
+/* disabled または readonly のスタイルを明示的に設定 */
+
+select[disabled], input[readonly] {
+    background-color: #f9f9f9 !important; /* 背景色を少し灰色に */
+    color: #000 !important;               /* 文字色を黒に設定 */
+    border: 1px solid #ccc !important;    /* 枠線を調整 */
+    cursor: not-allowed !important;       /* ポインタを変更不可のスタイルに */
+    opacity: 1 !important;                /* 不透明度を100%に */
+    -webkit-text-fill-color: #000 !important; /* Webkitブラウザ用の文字色 */
+}

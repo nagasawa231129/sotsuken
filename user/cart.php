@@ -1,3 +1,10 @@
+<?php
+if (isset($_SESSION['id'])) {
+    $userId = $_SESSION['id'];
+} else {
+    $userId = null;
+}
+?>
 <!DOCTYPE html>
 <html lang="ja">
     <head>
@@ -200,21 +207,30 @@ include '../../db_open.php';
 
 $sumPrice = 0;
 
-if($conn){
-    $sql = "SELECT DISTINCT shop_id,quantity FROM cart";
-    $result = $conn->query($sql);
+if($dbh){
+    $sql = "SELECT DISTINCT shop_id,quantity FROM cart WHERE user_id = :user_id";
+    $result = $dbh->prepare($sql);
+    $result->bindParam(':user_id', $userId, PDO::PARAM_INT);
 
+   
+    $result->execute();
+    $re = $result->fetch(PDO::FETCH_ASSOC);
+
+    echo $re['shop_id'];
+    
     if($result === false){
-        $errorInfo = $conn->errorInfo();
+        $errorInfo = $dbh->errorInfo();
         echo 'クエリ失敗: ' . $errorInfo[2];
     }else{
+      
         while($row = $result->fetch(PDO::FETCH_ASSOC)){
             $shopId = $row['shop_id'];
             $quantity = $row['quantity'];
             // shopテーブルから商品情報を取得
-            $sqlGoods = "SELECT goods, price FROM shop WHERE shop_id = :shop_id";
-            $stmt = $conn->prepare($sqlGoods);
+            $sqlGoods = "SELECT goods, price FROM shop WHERE user_id = :user_id";
+            $stmt = $dbh->prepare($sqlGoods);
             $stmt->bindParam(':shop_id', $shopId, PDO::PARAM_INT);
+
             $stmt->execute();
 
             if($stmt->rowCount() > 0){
@@ -242,7 +258,7 @@ if($conn){
     echo '接続失敗';  // 接続が失敗した場合
 }
 
-$conn = null;
+$dbh = null;
 ?>
         <p>合計金額: <span id="totalSum" class="info-text"><?php echo htmlspecialchars($sumPrice, ENT_QUOTES, 'UTF-8'); ?>円</span></p>
         <form action="register.php" method="post">
