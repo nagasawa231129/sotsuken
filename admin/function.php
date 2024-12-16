@@ -7,6 +7,7 @@ function update() {
     $original_price = $_POST['price'];
     $goods_info = $_POST['goods_info'];
 
+    //f
     // その他のフォームデータを取得
     $size = $_POST['size'];
     $color = $_POST['color'];
