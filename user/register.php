@@ -1,3 +1,9 @@
+<div class="search-container">
+    <!-- 「卒研TOWN」を左側に移動 -->
+    <div class="search-bar">
+        <a class="site-name" href="/sotsuken/sotsuken/user/toppage.php">卒研TOWN</a>
+    </div>
+</div>
 <?php
 include '../../db_open.php';  // db_open.phpをインクルードして、$
 
@@ -38,7 +44,7 @@ if ($dbh) {
             $order_date = $row['order_date'];
 
             // shopテーブルから商品情報を取得
-            $sqlGoods = "SELECT goods, price FROM shop WHERE shop_id = :shop_id";
+            $sqlGoods = "SELECT goods, price,thumbnail FROM shop WHERE shop_id = :shop_id";
             $stmt = $dbh->prepare($sqlGoods);
             $stmt->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
             $stmt->execute();
@@ -46,16 +52,22 @@ if ($dbh) {
             // 商品情報が正しく取得できたか確認
             $goodsRow = $stmt->fetch(PDO::FETCH_ASSOC);
 
+
             if ($goodsRow) {
                 // 商品情報が取得できた場合
                 $goods = $goodsRow['goods'];
                 $price = $goodsRow['price'];
+                $thumbnail = $goodsRow['thumbnail'];
+
+                $encodedImg = base64_encode($thumbnail);
+                $mimeType = 'image/png'; // 必要に応じて正確な MIME タイプを設定
 
                 // 合計金額の計算
                 $sumPrice += ($price * $quantity);
 
                 // 商品情報を表示
                 echo "<div class='cart-item'>";
+                echo "<img src='data:$mimeType;base64,$encodedImg' alt='商品画像' style='width:100px; height:auto;'><br>";
                 echo "<p>商品名: <span class='info-text'>" . htmlspecialchars($goods, ENT_QUOTES, 'UTF-8') . "</span><br>"; 
                 echo "価格: <span class='info-text'>" . htmlspecialchars($price, ENT_QUOTES, 'UTF-8') . "円</span><br>";
                 echo "数量: <span id='quantity_$shop_id'>" . $quantity . "</span> 個<br>";
@@ -95,10 +107,12 @@ if ($dbh) {
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="register_style.css">
+    <link rel="stylesheet" href="header.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>決済完了</title>
 </head>
 <body>
+
     <p>合計金額: <span id="totalSum" class="info-text"><?php echo htmlspecialchars($sumPrice, ENT_QUOTES, 'UTF-8'); ?>円</span></p>
 
     <h3>お届け先住所を指定</h3>

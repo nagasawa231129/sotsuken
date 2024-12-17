@@ -23,7 +23,7 @@ if ($shopId > 0 && $newQuantity > 0) {
         // SQLを実行
         if ($stmt->execute()) {
             // 更新成功
-            echo 'success';
+            echo "success: $quantity";
         } else {
             // 更新失敗
             echo 'failure: 更新に失敗しまし。';

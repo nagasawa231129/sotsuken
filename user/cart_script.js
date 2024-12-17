@@ -39,6 +39,8 @@ function updateQuantityHandler(button) {
     const currentQuantity = parseInt(button.getAttribute('data-quantity'));
     const price = parseInt(button.getAttribute('data-price'));
 
+    console.log(`Shop ID: ${shopId}, Current Quantity: ${currentQuantity}, Price: ${price}`); // デバッグ用
+
     let newQuantity;
     if (button.classList.contains('increase-btn')) {
         newQuantity = currentQuantity + 1; // 数量を1増加
@@ -48,7 +50,7 @@ function updateQuantityHandler(button) {
         } else {
             newQuantity = 0;
             deleteItemFromCart(shopId);
-            return;
+            
         }
     }
 
@@ -68,7 +70,7 @@ function updateQuantityHandler(button) {
 
             // location.reload();
         } else {
-            alert('更新に失敗しました。再度お試しください。');
+            alert('更新に失敗しました。再度お試しください。update');
             console.log(`shop_id=${shopId}&quantity=${newQuantity}`); // リクエスト内容を確認
 
             // const quantityStr = button.getAttribute('data-quantity');
@@ -84,32 +86,40 @@ function updateQuantityHandler(button) {
 }
 
 function deleteItemFromCart(shopId) {
-     const xhr = new XMLHttpRequest(); xhr.open('POST', 'delete_cart.php', true); 
-     xhr.setRequestHeader('Content-Type', 'application/json'); 
-     xhr.onreadystatechange = function() { 
-        if (xhr.readyState == 4) {
-             if (xhr.status == 200) {
-                 if (xhr.responseText.trim() === 'success') {
-                     // カートから商品を削除 
-                     document.getElementById('item_' + shopId).remove(); 
-                     // 全体金額の更新を行う 
-                     updateTotalAmount(shopId, 0, 0);
-                     
-                     const quentityElement = document.getElementById('quentity_' + shopId);
-                     if(quentityElement){
-                        quantityElement.innerText = '0';
-                     }
-                 } else { 
-                    alert('削除に失敗しました。再度お試しください。'); 
-                } 
-            } else {
-                 console.error('HTTPエラー:', xhr.status);
-                 alert('削除に失敗しました。再度お試しください。');
-                 } 
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', 'delete_cart.php', true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                if (xhr.responseText.trim() === 'success') {
+                    const itemElement = document.getElementById('item_' + shopId);
+                    if (itemElement) {
+                        itemElement.remove(); // 商品要素を削除
+                    }
+
+                    // 合計金額を更新
+                    updateTotalAmount(shopId, 0, 0);
+
+                    // カートが空の場合、支払いボタンを非表示
+                    const cartItems = document.querySelectorAll('[id^="item_"]');
+                    if (cartItems.length === 0) {
+                        const paymentButton = document.getElementById('submit');
+                        if (paymentButton) {
+                            paymentButton.style.display = 'none';
+                        }
+                    }
+                } else {
+                    alert('削除に失敗しました。再度お試しください。');
                 }
-             }; 
-    xhr.send(JSON.stringify({ shop_id: shopId })); 
+            } else {
+                alert('HTTPエラーが発生しました。再度お試しください。');
+            }
+        }
+    };
+    xhr.send(JSON.stringify({ shop_id: shopId }));
 }
+
 
 
 function updateQuantity(shopId, newQuantity, callback) {
@@ -180,12 +190,12 @@ function updateTotalAmount(shopId, price, quantity) {
 
 // 減少ボタンをクリックした時の処理
 function decreaseQuantity(shopId, currentQuantity, price) {
-    if (currentQuantity > 1) { // 個数が1以下にはならないように制限
-        var newQuantity = currentQuantity - 1;
+    if (currentQuantity > 1) {
+        const newQuantity = currentQuantity - 1;
 
         // ボタンを無効化
-        var increaseButton = document.getElementById('increaseBtn_' + shopId);
-        var decreaseButton = document.getElementById('decreaseBtn_' + shopId);
+        const increaseButton = document.getElementById('increaseBtn_' + shopId);
+        const decreaseButton = document.getElementById('decreaseBtn_' + shopId);
         increaseButton.disabled = true;
         decreaseButton.disabled = true;
 
@@ -194,21 +204,20 @@ function decreaseQuantity(shopId, currentQuantity, price) {
         document.getElementById('increaseBtn_' + shopId).setAttribute('data-quantity', newQuantity);
         document.getElementById('decreaseBtn_' + shopId).setAttribute('data-quantity', newQuantity);
 
-        // 商品ごとの合計金額を即座に更新
+        // 商品ごとの合計金額を更新
         updateTotalAmount(shopId, price, newQuantity);
 
         // サーバーに数量更新リクエストを送信
         updateQuantity(shopId, newQuantity, function(success) {
             if (success) {
-                // サーバーからの成功応答後にボタンを再度有効化
                 increaseButton.disabled = false;
                 decreaseButton.disabled = false;
-
-                // location.reload();
             } else {
                 alert('更新に失敗しました。再度お試しください。');
             }
         });
+    } else if (currentQuantity === 1) {
+        deleteItemFromCart(shopId); // 数量1の場合、削除処理
     }
 }
 
