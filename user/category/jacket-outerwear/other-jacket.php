@@ -21,8 +21,11 @@ $sql = "SELECT shop.*, brand.*, sale.*
         WHERE subcategory.subcategory_name =  'その他ジャケット'";
 
 // gender が ALL でない場合、shop.gender が指定された値または 0 の両方を表示
-if ($gender !== 'ALL') {
-    $sql .= " AND (shop.gender = :gender OR shop.gender = 0)";
+if ($gender == '0') {
+    $sql .= " AND (shop.gender IN (0, 1, 2, 3))";
+} elseif ($gender !== 'ALL') {
+    // gender が ALL でない場合（1, 2, 3）のみフィルタリング
+    $sql .= " AND shop.gender = :gender";
     $params[':gender'] = $gender;
 }
 
@@ -67,6 +70,11 @@ $sql = "SELECT * FROM brand";
 $stmt = $dbh->prepare($sql);
 $stmt->execute();
 $brands = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$sql = "SELECT * FROM gender";
+$stmt = $dbh->prepare($sql);
+$stmt->execute();
+$genders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -186,6 +194,17 @@ $brands = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         // 選択されているブランドを保持
                         $selected = (isset($_GET['brand']) && $_GET['brand'] === $brand_id) ? 'selected' : '';
                         echo "<option value=\"$brand_id\" $selected>$brand_name</option>";
+                    }
+                    ?>
+                </select>
+                <select name="gender" id="gender" onchange="this.form.submit()">
+                    <?php
+                    foreach ($genders as $gender_option) {
+                        $gender_id = htmlspecialchars($gender_option['gender_id']);
+                        $gender_name = htmlspecialchars($gender_option['gender']);
+
+                        $selected = (isset($_GET['gender']) && $_GET['gender'] === $gender_id) ? 'selected' : '';
+                        echo "<option value=\"$gender_id\" $selected>$gender_name</option>";
                     }
                     ?>
                 </select>
