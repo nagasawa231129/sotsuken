@@ -2,7 +2,7 @@
 $translations = [
     'Old Items' => '古い順',
     'Sale Items' => 'セール商品',
-    'New Items' => '新しい順',
+    'New Items' => '新作順',
     'Recommendation' => 'おすすめ順',
     'Popular' => '人気順',
     'Cheap' => '価格が安い順',
@@ -258,5 +258,6 @@ $translations = [
     'Unsubscribe' => '退会',
     'Unsubscription Process' => '退会手続き',
     'Update Information' => '情報を更新',
+    'Your Favorite Brand' => 'あなたのお気に入りブランド商品',
     '' => '',
 ];

@@ -67,35 +67,63 @@ if ($shop_id) {
 
 ?>
         <div class="button-container">
-            <form action="add_to_cart.php" method="POST">
-                <input type="hidden" name="shop_id" value="<?php echo $goodsResult['shop_id']; ?>">
-                <input type="hidden" name="user_id" value="<?php echo $userId; ?>">
-                <button type="submit"><?php echo $translations['Add to Cart'] ?></button>
-            </form>
+    <form action="add_to_cart.php" method="POST">
+        <input type="hidden" name="shop_id" value="<?php echo $goodsResult['shop_id']; ?>">
+        <input type="hidden" name="user_id" value="<?php echo $userId; ?>">
 
-            <?php
-            // お気に入りボタンを表示する前に、ユーザーがその商品をお気に入りに登録しているかをチェック
-            if ($userId) {
-                // 商品がすでにお気に入りに追加されているかを確認
-                $sql_favorite_check = "SELECT * FROM favorite WHERE user_id = :user_id AND shop_id = :shop_id";
-                $stmt_favorite_check = $dbh->prepare($sql_favorite_check);
-                $stmt_favorite_check->bindParam(':user_id', $userId);
-                $stmt_favorite_check->bindParam(':shop_id', $goodsResult['shop_id']);
-                $stmt_favorite_check->execute();
-                $is_favorite = $stmt_favorite_check->rowCount() > 0; // 既にお気に入りに追加されているかどうか
+        <?php
+        // 商品のサイズ・カラー情報を取得
+        $sql_variations = "
+        SELECT * FROM product_variations 
+        WHERE shop_id = :shop_id
+        ";
+        $stmt_variations = $dbh->prepare($sql_variations);
+        $stmt_variations->bindParam(':shop_id', $goodsResult['shop_id']);
+        $stmt_variations->execute();
+        $variations = $stmt_variations->fetchAll(PDO::FETCH_ASSOC);
 
-                // お気に入りボタンの表示
-                if ($is_favorite) {
-                    echo "<button class='favorite-button filled' data-shop-id='{$goodsResult['shop_id']}' data-user-id='{$userId}' title='お気に入り済み'>❤️</button>";
-                } else {
-                    echo "<button class='favorite-button' data-shop-id='{$goodsResult['shop_id']}' data-user-id='{$userId}' title='お気に入りに追加'>♡</button>";
+        $sizes = []; // サイズごとのグループ化
+        $colors = []; // 色ごとのグループ化
+
+        foreach ($variations as $variation) {
+            $sizes[$variation['size']][] = $variation; // サイズごとにグループ化
+            $colors[$variation['color']][] = $variation; // 色ごとにグループ化
+        }
+
+        // 色とサイズごとに表示する
+        foreach ($colors as $color => $color_variations) {
+            echo "<p>$color</p>"; // 色を表示
+            foreach ($sizes as $size => $size_variations) {
+                echo "<p>$size</p>"; // サイズを表示
+                foreach ($size_variations as $variation) {
+                    echo "<button type='submit' name='variation_id' value='{$variation['variation_id']}'>カートに入れる</button>";
                 }
-            } else {
-                echo "<button class='favorite-button' disabled>♡</button>"; // ログインしていない場合の表示
             }
+        }
+        ?>
+    </form>
 
-            ?>
-        </div>
+    <?php
+    // お気に入りボタンの処理（既存のコード）
+    if ($userId) {
+        $sql_favorite_check = "SELECT * FROM favorite WHERE user_id = :user_id AND shop_id = :shop_id";
+        $stmt_favorite_check = $dbh->prepare($sql_favorite_check);
+        $stmt_favorite_check->bindParam(':user_id', $userId);
+        $stmt_favorite_check->bindParam(':shop_id', $goodsResult['shop_id']);
+        $stmt_favorite_check->execute();
+        $is_favorite = $stmt_favorite_check->rowCount() > 0;
+
+        if ($is_favorite) {
+            echo "<button class='favorite-button filled' data-shop-id='{$goodsResult['shop_id']}' data-user-id='{$userId}' title='お気に入り済み'>❤️</button>";
+        } else {
+            echo "<button class='favorite-button' data-shop-id='{$goodsResult['shop_id']}' data-user-id='{$userId}' title='お気に入りに追加'>♡</button>";
+        }
+    } else {
+        echo "<button class='favorite-button' disabled>♡</button>";
+    }
+    ?>
+</div>
+
 
         <script>
             // お気に入りボタンのクリックイベントを設定

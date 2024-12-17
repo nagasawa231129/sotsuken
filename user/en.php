@@ -259,6 +259,6 @@ $translations = [
     "Unsubscribe" => "Unsubscribe",
     "Unsubscription Process" => "Unsubscription Process",
     "Update Information" => "Update Information",
-    "" => "",
+    "Your Favorite Brand" => "Your Favorite Brand",
     "" => "",
 ];

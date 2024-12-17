@@ -207,6 +207,18 @@ h3, h2 {
     text-align: center; /* 見出しを中央揃え */
 }
 
+.ranking-label {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: #e74c3c; /* 赤色背景 */
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 5px 8px;
+    border-radius: 5px;
+    z-index: 10; /* 順位ラベルを前面に表示 */
+}
 
 
 /* メディアクエリ: 小さい画面向け（モバイル対応） */
