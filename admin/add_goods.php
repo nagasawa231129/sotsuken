@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,16 +12,19 @@
             flex-direction: column;
             gap: 10px;
         }
+
         .checkbox-container label {
             display: flex;
             align-items: center;
             gap: 8px;
         }
+
         .checkbox-container input {
             margin: 0;
         }
     </style>
 </head>
+
 <body>
     <a href="admin_toppage.php">トップページ</a>
     <h1>商品追加フォーム</h1>
@@ -33,6 +37,7 @@
                             <th class="thumbnail">サムネ</th>
                             <th class="thumbnail">サブimg</th>
                             <th class="goods_info">商品の説明</th>
+                            <th class="group_sele">グループ指定</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -52,6 +57,18 @@
                                     <textarea name="goods_info[]" rows="4" cols="50" required></textarea>
                                 </div>
                             </td>
+                            <td>
+                                <select name="group[]" class="group-select" >
+                                    <option value="">指定なし</option>
+                                    <?php
+                                    for ($i = 1; $i <= 50; $i++) {
+                                        echo "<option value='{$i}'>{$i}</option>";
+                                    }
+                                    ?>
+                                </select>
+
+                            </td>
+
                         </tr>
                     </tbody>
                 </table>
@@ -147,7 +164,6 @@
     </div>
 
     <script>
-
         // ページのスクロール位置を保存
         window.addEventListener("beforeunload", () => {
             localStorage.setItem("scrollPosition", window.scrollY);
@@ -177,77 +193,75 @@
             xhr.send();
         }
 
-        document.getElementById('add-row').addEventListener('click', function () {
-    const formContainer = document.getElementById('form-container');
-    const forms = document.querySelectorAll('.goods-form');
-    const lastForm = forms[forms.length - 1];
-    const newForm = lastForm.cloneNode(true);
+        document.getElementById('add-row').addEventListener('click', function() {
+            const formContainer = document.getElementById('form-container');
+            const forms = document.querySelectorAll('.goods-form');
+            const lastForm = forms[forms.length - 1];
+            const newForm = lastForm.cloneNode(true);
 
-    // フォームの中のフィールドをリセット
-    newForm.reset();
+            // フォームの中のフィールドをリセット
+            newForm.reset();
 
-    // 各フォームのフィールドに一意の名前を付与
-    const newIndex = forms.length; // 現在のフォーム数を基にインデックスを設定
-    newForm.querySelectorAll('input, select, textarea').forEach((input) => {
-        const name = input.getAttribute('name');
-        if (name) {
-            input.setAttribute('name', name.replace(/\[\d+\]/, `[${newIndex}]`)); // インデックスを更新
-        }
-    });
+            // 各フォームのフィールドに一意の名前を付与
+            const newIndex = forms.length; // 現在のフォーム数を基にインデックスを設定
+            newForm.querySelectorAll('input, select, textarea').forEach((input) => {
+                const name = input.getAttribute('name');
+                if (name) {
+                    input.setAttribute('name', name.replace(/\[\d+\]/, `[${newIndex}]`)); // インデックスを更新
+                }
+            });
 
-    formContainer.appendChild(newForm);
-});
-
-function submitForms() {
-    const forms = document.querySelectorAll('.goods-form');
-    let allFormsSubmitted = true;
-
-    forms.forEach(function (form, index) {
-        const inputs = form.querySelectorAll('input[required], select[required], textarea[required]');
-        let allFieldsFilled = true;
-
-        // 必須フィールドのチェック
-        inputs.forEach(input => {
-            if (!input.value) {
-                allFieldsFilled = false;
-                input.style.border = '2px solid red'; // 未入力のフィールドを強調表示
-            } else {
-                input.style.border = ''; // 入力済みのフィールドの強調表示を解除
-            }
+            formContainer.appendChild(newForm);
         });
 
-        if (allFieldsFilled) {
-            const formData = new FormData(form);
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', 'add_goods_process.php', true);
+        // 商品の送信
+        function submitForms() {
+            const forms = document.querySelectorAll('.goods-form');
+            let allFormsSubmitted = true;
 
-            xhr.onload = function () {
-                if (xhr.status === 200) {
-                    // console.log(`フォーム ${index + 1} が正常に送信されました。`);
-                    // alert('商品を追加しました！');
-                    
-                    // フォームをリセット
-                    form.reset();
+            forms.forEach(function(form, index) {
+                const inputs = form.querySelectorAll('input[required], select[required], textarea[required]');
+                let allFieldsFilled = true;
+
+                // 必須フィールドのチェック
+                inputs.forEach(input => {
+                    if (!input.value) {
+                        allFieldsFilled = false;
+                        input.style.border = '2px solid red'; // 未入力のフィールドを強調表示
+                    } else {
+                        input.style.border = ''; // 入力済みのフィールドの強調表示を解除
+                    }
+                });
+
+                if (allFieldsFilled) {
+                    const formData = new FormData(form);
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('POST', 'add_goods_process.php', true);
+
+                    xhr.onload = function() {
+                        if (xhr.status === 200) {
+                            // フォームをリセット
+                            form.reset();
+                        } else {
+                            console.error(`フォーム ${index + 1} の送信に失敗しました。`);
+                            alert('送信に失敗しました。もう一度試してください。');
+                            allFormsSubmitted = false;
+                        }
+                    };
+
+                    xhr.send(formData);
                 } else {
-                    console.error(`フォーム ${index + 1} の送信に失敗しました。`);
-                    alert('送信に失敗しました。もう一度試してください。');
                     allFormsSubmitted = false;
                 }
-            };
+            });
 
-            xhr.send(formData);
-        } else {
-            allFormsSubmitted = false;
+            if (allFormsSubmitted) {
+                alert('すべての商品が正常に追加されました。');
+            } else {
+                alert('必須項目をすべて入力してください。');
+            }
         }
-    });
-
-    if (allFormsSubmitted) {
-        alert('すべての商品が正常に追加されました。');
-    } else {
-        alert('必須項目をすべて入力してください。');
-    }
-}
-
     </script>
 </body>
+
 </html>
