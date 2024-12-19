@@ -127,14 +127,13 @@ html, body {
 .products-container, .sale-products-container {
     margin-right: 50px;
     margin-bottom: 20px;
-    width: 80%; /* ボックス全体の幅を指定 (親要素に依存) */
+    /* width: 80%; */
     height: 410px;
-    max-width: 1200px; /* 最大幅を設定 */
-    margin: 0 auto; /* 中央揃え */
-    /* border: 1px solid #ccc; ボックス全体の枠線 */
-    border-radius: 8px; /* 角を丸める */
-    background: #f9f9f9; /* 背景色 */
-    overflow: hidden; /* 内容がはみ出ないようにする */
+    max-width: 1200px;
+    /* margin: 0 auto; */
+    border-radius: 8px;
+    background: #f9f9f9;
+    overflow: hidden;
 }
 
 .product-scroll, .sale-product-scroll {
