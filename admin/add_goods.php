@@ -1,11 +1,25 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="add_goods.css">
     <title>商品追加フォーム</title>
+    <style>
+        .checkbox-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .checkbox-container label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .checkbox-container input {
+            margin: 0;
+        }
+    </style>
 </head>
 <body>
     <a href="admin_toppage.php">トップページ</a>
@@ -41,7 +55,6 @@
                         </tr>
                     </tbody>
                 </table>
-
                 <table>
                     <thead>
                         <tr>
@@ -71,16 +84,18 @@
                             <td><input type="text" name="goods[]" required></td>
                             <td><input type="number" name="price[]" required></td>
                             <td>
-                                <select name="size[]" class="wide-select" required>
+                                <!-- サイズの選択肢をチェックボックスで複数選択 -->
+                                <div class="checkbox-container">
                                     <?php
                                     $size_sql = "SELECT size_id, size FROM size";
                                     foreach ($dbh->query($size_sql) as $size) {
-                                        echo "<option value='{$size['size_id']}'>{$size['size']}</option>";
+                                        echo "<label><input type='checkbox' name='size[]' value='{$size['size_id']}'> {$size['size']}</label>";
                                     }
                                     ?>
-                                </select>
+                                </div>
                             </td>
                             <td>
+                                <!-- 色の選択肢は単一選択 -->
                                 <select name="color[]" class="wide-select" required>
                                     <?php
                                     $color_sql = "SELECT color_id, ja_color FROM color";
@@ -126,7 +141,6 @@
             </div>
         </form>
     </div>
-
     <div class="button-container">
         <button type="button" id="add-row">＋ 1行追加</button>
         <button type="button" onclick="submitForms()">追加</button>
