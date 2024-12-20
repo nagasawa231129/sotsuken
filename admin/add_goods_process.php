@@ -19,7 +19,7 @@ if (empty($_FILES['subthumbnail']['tmp_name'][0])) {
 }
 
 // POSTデータのバリデーション
-$requiredFields = ['brand', 'goods', 'price', 'size', 'color', 'category', 'subcategory', 'gender', 'goods_info'];
+$requiredFields = ['brand', 'goods', 'price', 'color', 'category', 'subcategory', 'gender', 'goods_info'];
 foreach ($requiredFields as $field) {
     if (empty($_POST[$field])) {
         $hasError = true;
@@ -58,10 +58,15 @@ $thumbnailData = file_get_contents($_FILES['thumbnail']['tmp_name'][0]);
 $dbh->beginTransaction();
 try {
     foreach ($brands as $index => $brand_id) {
-        // 各サイズについて商品を挿入
+        // サイズごとに同じグループを使用するための準備
+        $newShopGroup = null;
+
         foreach ($sizes as $size) {
-            // 次のshop_group番号を取得
-            $newShopGroup = getNewShopGroup($dbh);
+            // shop_groupを初期化または再利用
+            if ($newShopGroup === null) {
+                // 新しいshop_groupを取得
+                $newShopGroup = getNewShopGroup($dbh);
+            }
 
             // shopテーブルにデータ挿入
             $sql = "INSERT INTO shop (thumbnail, brand_id, goods, price, size, color, category_id, subcategory_id, gender, exp, original_price)
@@ -84,7 +89,7 @@ try {
             // 挿入したshopのIDを取得
             $shop_id = $dbh->lastInsertId();
 
-            // groupテーブルに新しいshop_groupを追加
+            // groupテーブルにデータ挿入
             $groupStmt = $dbh->prepare("INSERT INTO `group` (shop_group, shop_id) VALUES (:shop_group, :shop_id)");
             $groupStmt->execute([
                 ':shop_group' => $newShopGroup,

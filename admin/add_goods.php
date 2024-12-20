@@ -22,6 +22,23 @@
         .checkbox-container input {
             margin: 0;
         }
+
+        .delete-form-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
     </style>
 </head>
 
@@ -30,7 +47,9 @@
     <h1>商品追加フォーム</h1>
     <div class="form-container" id="form-container">
         <form method="post" action="add_goods_process.php" enctype="multipart/form-data" class="goods-form">
+            
             <div class="single-form">
+
                 <table id="goods-table">
                     <thead>
                         <tr>
@@ -58,7 +77,7 @@
                                 </div>
                             </td>
                             <td>
-                                <select name="group[]" class="group-select" >
+                                <select name="group[]" class="group-select">
                                     <option value="">指定なし</option>
                                     <?php
                                     for ($i = 1; $i <= 50; $i++) {
@@ -155,6 +174,7 @@
                         </tr>
                     </tbody>
                 </table>
+                
             </div>
         </form>
     </div>
@@ -176,6 +196,14 @@
                 window.scrollTo(0, parseInt(scrollPosition));
             }
         });
+
+        function deleteForm(button) {
+            const form = button.closest('.single-form');
+            if (form) {
+                form.remove();
+            }
+        }
+
 
         function updateSubcategory(categoryElement) {
             var categoryId = categoryElement.value;
