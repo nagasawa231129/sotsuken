@@ -11,8 +11,8 @@ function update() {
     // その他のフォームデータを取得
     $size = $_POST['size'];
     $color = $_POST['color'];
-    $category = $_POST['category'];
-    $subcategory = $_POST['subcategory'];
+    $category = $_POST['category_id'];
+    $subcategory = $_POST['subcategory_id'];
     $gender = $_POST['gender'];
     $brand = $_POST['brand'];
 

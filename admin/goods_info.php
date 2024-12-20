@@ -16,26 +16,27 @@
                 window.scrollTo(0, parseInt(scrollPosition));
             }
         });
+            // ページが読み込まれたときにスクロール位置をトップに設定
+    window.onload = function() {
+        window.scrollTo(0, 0);
+    }
     </script>
 </head>
 
 <body>
     <?php
-    $scroll_position_flag = false;
     // データベース接続
     include './../../db_open.php';
     include './function.php';
+
     // 商品情報を更新する処理
     if (isset($_POST['update'])) {
         update();
-        $scroll_position_flag = true; // 更新後のフラグ
     }
-
 
     // 商品情報を削除する処理
     if (isset($_POST['delete'])) {
         delete();
-        $scroll_position_flag = true; // 削除後のフラグ
     }
 
     // 検索条件が送信された場合
@@ -43,6 +44,11 @@
     if (isset($_POST['search'])) {
         $search_query = $_POST['search_query'];  // フォームから送信された検索キーワードを受け取る
     }
+
+    // ページネーション用の変数
+    $limit = 20; // 1ページあたりの表示件数
+    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1; // 現在のページ
+    $offset = ($page - 1) * $limit; // データの開始位置
 
     // 商品情報を取得するSQLクエリ
     $sql = "SELECT 
@@ -70,12 +76,24 @@
         LEFT JOIN gender ON shop.gender = gender.gender_id
         LEFT JOIN subcategory ON shop.subcategory_id = subcategory.subcategory_id
         LEFT JOIN size ON shop.size = size.size_id
-        WHERE shop.goods LIKE :search_query";  // 商品名による検索条件を追加
+        WHERE shop.goods LIKE :search_query
+        LIMIT :limit OFFSET :offset";  // ページネーションのためにLIMITとOFFSETを追加
 
     // プレースホルダに検索条件をバインド
     $stmt = $dbh->prepare($sql);
     $stmt->bindValue(':search_query', '%' . $search_query . '%', PDO::PARAM_STR);
+    $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
     $stmt->execute();
+
+    // 商品情報の総数を取得（ページネーションのため）
+    $count_sql = "SELECT COUNT(*) FROM shop WHERE goods LIKE :search_query";
+    $count_stmt = $dbh->prepare($count_sql);
+    $count_stmt->bindValue(':search_query', '%' . $search_query . '%', PDO::PARAM_STR);
+    $count_stmt->execute();
+    $total_items = $count_stmt->fetchColumn();
+    $total_pages = ceil($total_items / $limit); // 総ページ数
+
     ?>
     <div class="select">
         <button id="add-button" onclick="location.href='add_goods.php'">追加</button>
@@ -101,13 +119,10 @@
 
     <?php if ($stmt->rowCount() > 0): ?>
         <?php while ($product = $stmt->fetch(PDO::FETCH_ASSOC)): ?>
-
-            <form method="post" action="" enctype="multipart/form-data"> <!-- enctypeを追加 -->
-
+            <form method="post" action="" enctype="multipart/form-data">
                 <input type="hidden" name="shop_id" value="<?= htmlspecialchars($product['shop_id']) ?>">
 
                 <div class="form-container">
-
                     <table id="goods-table">
                         <thead>
                             <tr>
@@ -118,25 +133,17 @@
                         </thead>
                         <tbody>
                             <tr>
-                            <td>
-    <?php
-    $thumbimgBlob = $product['thumbnail'];
-    $shopId = $product['shop_id'];
-    if ($thumbimgBlob) {
-        $thumbencodedImg = base64_encode($thumbimgBlob);
-        echo "<img src='data:image/jpeg;base64,$thumbencodedImg' alt='サムネイル' width='100' class='thumbnail' data-shop-id='$shopId' onclick='document.getElementById(\"thumbnailInput$shopId\").click();' id='thumbnailImage$shopId' />";
-        echo "<input type='file' id='thumbnailInput$shopId' style='display:none;' accept='image/jpeg, image/jpg, image/png' onchange='updateThumbnail($shopId)' />";
-    }
-    ?>
-</td>
-
-
-
-
-
-
-
-
+                                <td>
+                                    <?php
+                                    $thumbimgBlob = $product['thumbnail'];
+                                    $shopId = $product['shop_id'];
+                                    if ($thumbimgBlob) {
+                                        $thumbencodedImg = base64_encode($thumbimgBlob);
+                                        echo "<img src='data:image/jpeg;base64,$thumbencodedImg' alt='サムネイル' width='100' class='thumbnail' data-shop-id='$shopId' onclick='document.getElementById(\"thumbnailInput$shopId\").click();' id='thumbnailImage$shopId' />";
+                                        echo "<input type='file' id='thumbnailInput$shopId' style='display:none;' accept='image/jpeg, image/jpg, image/png' onchange='updateThumbnail($shopId)' />";
+                                    }
+                                    ?>
+                                </td>
                                 <td>
                                     <div class="input-group" style="position: relative;">
                                         <?php
@@ -156,7 +163,6 @@
                                                 echo "</div>";
                                             }
                                         }
-
                                         ?>
 
                                         <div class="input-group">
@@ -169,11 +175,11 @@
                                         <textarea name="goods_info" rows="4" cols="50" required><?= htmlspecialchars($product['exp']) ?></textarea>
                                     </div>
                                 </td>
-
                             </tr>
                         </tbody>
                     </table>
 
+                    <!-- 商品詳細 -->
                     <table>
                         <thead>
                             <tr>
@@ -203,56 +209,56 @@
                                 <td><input type="text" name="goods" value="<?= htmlspecialchars($product['goods']) ?>" required></td>
                                 <td class="price-select"><input type="number" name="price" value="<?= htmlspecialchars($product['original_price']) ?>" required></td>
                                 <td>
-                                    <select name="size" class="wide-select" required>
+                                    <select name="size" class="wide-select">
                                         <?php
                                         $size_sql = "SELECT size_id, size FROM size";
-                                        foreach ($dbh->query($size_sql) as $size) {
-                                            $selected = ($product['size_id'] == $size['size_id']) ? 'selected' : ''; // 選択されたサイズを設定
-                                            echo "<option value='{$size['size_id']}' {$selected}>{$size['size']}</option>";
+                                        foreach ($dbh->query($size_sql) as $size_option) {
+                                            $selected = ($product['size_id'] == $size_option['size_id']) ? 'selected' : '';
+                                            echo "<option value='{$size_option['size_id']}' {$selected}>{$size_option['size']}</option>";
                                         }
                                         ?>
                                     </select>
                                 </td>
-                                <td class="color">
-                                    <select name="color" class="wide-select" required>
+                                <td>
+                                    <select name="color" class="wide-select">
                                         <?php
                                         $color_sql = "SELECT color_id, ja_color FROM color";
-                                        foreach ($dbh->query($color_sql) as $color) {
-                                            $selected = ($product['color_id'] == $color['color_id']) ? 'selected' : ''; // 選択された色を設定
-                                            echo "<option value='{$color['color_id']}' {$selected}>{$color['ja_color']}</option>";
+                                        foreach ($dbh->query($color_sql) as $color_option) {
+                                            $selected = ($product['color_id'] == $color_option['color_id']) ? 'selected' : '';
+                                            echo "<option value='{$color_option['color_id']}' {$selected}>{$color_option['ja_color']}</option>";
                                         }
                                         ?>
                                     </select>
                                 </td>
                                 <td>
-                                    <select name="category" class="category" required onchange="updateSubcategory(this)">
+                                    <select name="category_id">
                                         <?php
                                         $category_sql = "SELECT category_id, category_name FROM category";
-                                        foreach ($dbh->query($category_sql) as $category) {
-                                            $selected = ($product['category_id'] == $category['category_id']) ? 'selected' : ''; // 選択されたカテゴリを設定
-                                            echo "<option value='{$category['category_id']}' {$selected}>{$category['category_name']}</option>";
+                                        foreach ($dbh->query($category_sql) as $category_option) {
+                                            $selected = ($product['category_id'] == $category_option['category_id']) ? 'selected' : '';
+                                            echo "<option value='{$category_option['category_id']}' {$selected}>{$category_option['category_name']}</option>";
                                         }
                                         ?>
                                     </select>
                                 </td>
                                 <td>
-                                    <select name="subcategory" class="subcategory" required>
+                                    <select name="subcategory_id">
                                         <?php
                                         $subcategory_sql = "SELECT subcategory_id, subcategory_name FROM subcategory";
-                                        foreach ($dbh->query($subcategory_sql) as $subcategory) {
-                                            $subselected = ($product['subcategory_id'] == $subcategory['subcategory_id']) ? 'selected' : ''; // 選択されたカテゴリを設定
-                                            echo "<option value='{$subcategory['subcategory_id']}'{$subselected}>{$subcategory['subcategory_name']}</option>";
+                                        foreach ($dbh->query($subcategory_sql) as $subcategory_option) {
+                                            $selected = ($product['subcategory_id'] == $subcategory_option['subcategory_id']) ? 'selected' : '';
+                                            echo "<option value='{$subcategory_option['subcategory_id']}' {$selected}>{$subcategory_option['subcategory_name']}</option>";
                                         }
                                         ?>
                                     </select>
                                 </td>
                                 <td>
-                                    <select name="gender" required>
+                                    <select name="gender">
                                         <?php
                                         $gender_sql = "SELECT gender_id, gender FROM gender";
-                                        foreach ($dbh->query($gender_sql) as $gender) {
-                                            $gselected = ($product['gender_id'] == $gender['gender_id']) ? 'selected' : ''; // 選択された色を設定
-                                            echo "<option value='{$gender['gender_id']}'{$gselected}>{$gender['gender']}</option>";
+                                        foreach ($dbh->query($gender_sql) as $gender_option) {
+                                            $selected = ($product['gender_id'] == $gender_option['gender_id']) ? 'selected' : '';
+                                            echo "<option value='{$gender_option['gender_id']}' {$selected}>{$gender_option['gender']}</option>";
                                         }
                                         ?>
                                     </select>
@@ -260,44 +266,23 @@
                             </tr>
                         </tbody>
                     </table>
-                </div>
-                </div>
-                <div class="form-container">
-                    <!-- 商品情報の入力フォーム (省略) -->
-                    <div class="button-container">
-                        <button type="submit" name="update">更新</button>
-                    </div> <!-- 商品情報の入力フォーム (省略) -->
-                    <div class="button-container">
-                        <button type="submit" name="delete">削除</button>
+
+                    <div class="form-container">
+                        <button type="submit" name="update">修正</button>
+                        <button type="submit" name="delete" onclick="return confirm('削除してもよろしいですか？');">削除</button>
                     </div>
                 </div>
-
             </form>
-
-
-            </tr>
         <?php endwhile; ?>
-    <?php else: ?>
-        <tr>
-            <td colspan="8">商品情報が見つかりません。</td>
-        </tr>
     <?php endif; ?>
-    </tbody>
-    </table>
-    </div>
 
-    <script src="goods_info.js">
-        // ページを離れる前にスクロール位置を保存
-        window.onbeforeunload = function() {
-            localStorage.setItem("scrollPosition", window.scrollY); // 現在のスクロール位置を保存
-        };
+    <div class="pagination">
+    <?php if ($page > 1): ?>
+        <a href="?page=<?= $page - 1 ?>&search_query=<?= urlencode($search_query) ?>#"><?= '前のページ' ?></a>
+    <?php endif; ?>
+    <?php if ($page < $total_pages): ?>
+        <a href="?page=<?= $page + 1 ?>&search_query=<?= urlencode($search_query) ?>#"><?= '次のページ' ?></a>
+    <?php endif; ?>
+</div>
 
-        // ページ読み込み時に保存したスクロール位置に戻る
-        window.onload = function() {
-            const savedPosition = localStorage.getItem("scrollPosition");
-            if (savedPosition !== null) {
-                window.scrollTo(0, parseInt(savedPosition, 10)); // 保存した位置にスクロール
-            }
-        };
-    </script>
 </body>
