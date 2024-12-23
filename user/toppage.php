@@ -26,30 +26,6 @@ if (file_exists($lang_file)) {
 <link rel="stylesheet" href="toppage.css">
 <link rel="stylesheet" href="header.css">
 
-<?php
-$itemsPerPage = 85;
-
-// 現在のページ番号を取得（デフォルトは1）
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-
-// ページ番号が1より小さい場合は1に設定
-if ($page < 1) {
-    $page = 1;
-}
-
-// OFFSETを計算
-$offset = ($page - 1) * $itemsPerPage;
-
-// 総企業数を取得
-$totalQuery = "SELECT COUNT(*) FROM shop";
-$totalResult = $dbh->query($totalQuery);
-$totalItems = $totalResult->fetchColumn();
-
-// 総ページ数を計算
-$totalPages = ceil($totalItems / $itemsPerPage);
-?>
-
-
 <div class="main-content">
     <aside class="sidebar">
         <h2 data-i18n="search"><?php echo $translations['Search'] ?></h2>
@@ -140,21 +116,25 @@ $totalPages = ceil($totalItems / $itemsPerPage);
         <!-- 新しい順 -->
 
         <h2><?php echo $translations['New Items'] ?></h2>
+        <a href='all_newitem.php' class="all_item"><?php echo $translations['View All']; ?></a>
         <div class="sale-products-container">
             <div class="sale-product-scroll">
                 <?php
+                $limit = 20; // 最大表示数
                 $sql = "SELECT  shop.*, 
+                `group`.shop_group,
                 brand.brand_name, 
                 sale.sale_id
-        FROM shop
-        LEFT OUTER JOIN brand ON brand.brand_id = shop.brand_id
-        LEFT OUTER JOIN sale ON sale.sale_id = shop.sale_id
-        ORDER BY shop.arrival DESC  -- arrivalが新しい順に並べ替え
-        LIMIT :limit OFFSET :offset";
+                FROM shop
+                LEFT OUTER JOIN `group` ON `group`.shop_id = shop.shop_id
+                LEFT OUTER JOIN brand ON brand.brand_id = shop.brand_id
+                LEFT OUTER JOIN sale ON sale.sale_id = shop.sale_id
+                ORDER BY shop.shop_id DESC  -- arrivalが新しい順に並べ替え
+                LIMIT :limit";
 
                 $stmt = $dbh->prepare($sql);
-                $stmt->bindValue(':limit', $itemsPerPage, PDO::PARAM_INT);
-                $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+                $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+                // $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
                 $stmt->execute();
 
                 if ($stmt->rowCount() > 0) {
@@ -171,7 +151,7 @@ $totalPages = ceil($totalItems / $itemsPerPage);
                         $encodedImg = base64_encode($imgBlob);
 
                         // 商品詳細ページへのリンク生成
-                        $productLink = "goods.php?shop_id={$rec['shop_id']}&group_id={$rec['group_id']}";
+                        $productLink = "goods.php?shop_id={$rec['shop_id']}&shop_group={$rec['shop_group']}";
 
                         // 商品情報を全体リンクで表示
                         echo "<a href='{$productLink}' style='text-decoration: none; color: inherit;'>";
@@ -220,22 +200,24 @@ $totalPages = ceil($totalItems / $itemsPerPage);
         <!-- <div class="product-sale"> -->
         <!-- セール商品のみ -->
         <h2><?php echo $translations['Sale Items'] ?></h2>
+        <a href='all_saleitem.php' class="all_item"><?php echo $translations['View All']; ?></a>
         <div class="sale-products-container">
             <div class="sale-product-scroll">
                 <?php
                 $sql = "SELECT shop.*, 
-               brand.brand_name, 
-               sale.sale_id
-       FROM shop
-       LEFT OUTER JOIN brand ON brand.brand_id = shop.brand_id
-       LEFT OUTER JOIN sale ON sale.sale_id = shop.sale_id
-       WHERE shop.sale_id != 0  -- saleカラムが0以外の商品を表示
-       GROUP BY shop.shop_id
-       LIMIT :limit OFFSET :offset";
+                brand.brand_name, 
+                sale.sale_id,
+                `group`.shop_group
+                FROM shop
+                LEFT OUTER JOIN `group` ON `group`.shop_id = shop.shop_id
+                LEFT OUTER JOIN brand ON brand.brand_id = shop.brand_id
+                LEFT OUTER JOIN sale ON sale.sale_id = shop.sale_id
+                WHERE shop.sale_id != 0  -- saleカラムが0以外の商品を表示
+                GROUP BY shop.shop_id
+                LIMIT :limit";
 
                 $stmt = $dbh->prepare($sql);
-                $stmt->bindValue(':limit', $itemsPerPage, PDO::PARAM_INT);
-                $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+                $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
                 $stmt->execute();
 
                 if ($stmt->rowCount() > 0) {
@@ -252,7 +234,7 @@ $totalPages = ceil($totalItems / $itemsPerPage);
                         $encodedImg = base64_encode($imgBlob);
 
                         // 商品詳細ページへのリンク生成
-                        $productLink = "goods.php?shop_id={$rec['shop_id']}&group_id={$rec['group_id']}";
+                        $productLink = "goods.php?shop_id={$rec['shop_id']}&shop_group={$rec['shop_group']}";
 
                         // 商品情報を全体リンクで表示
                         echo "<a href='{$productLink}' style='text-decoration: none; color: inherit;'>";
@@ -302,22 +284,24 @@ $totalPages = ceil($totalItems / $itemsPerPage);
         <!-- ランキング順 -->
 
         <h2><?php echo $translations['Popular Ranking'] ?></h2>
+        <a href='all_popularitem.php' class="all_item"><?php echo $translations['View All']; ?></a>
         <div class="sale-products-container">
             <div class="sale-product-scroll">
                 <?php
                 $sql = "SELECT shop.*, 
                 brand.brand_name, 
                 sale.sale_id, 
-                shop.thumbnail
-        FROM shop
-        LEFT OUTER JOIN brand ON brand.brand_id = shop.brand_id
-        LEFT OUTER JOIN sale ON sale.sale_id = shop.sale_id
-        ORDER BY shop.buy DESC  -- buyが多い順に並べ替え
-        LIMIT :limit OFFSET :offset";
+                shop.thumbnail,
+                `group`.shop_group
+                FROM shop
+                LEFT OUTER JOIN brand ON brand.brand_id = shop.brand_id
+                LEFT OUTER JOIN sale ON sale.sale_id = shop.sale_id
+                LEFT OUTER JOIN `group` ON `group`.shop_id = shop.shop_id
+                ORDER BY shop.buy DESC  -- buyが多い順に並べ替え
+                LIMIT :limit";
 
                 $stmt = $dbh->prepare($sql);
-                $stmt->bindValue(':limit', $itemsPerPage, PDO::PARAM_INT);
-                $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+                $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
                 $stmt->execute();
 
                 if ($stmt->rowCount() > 0) {
@@ -334,7 +318,7 @@ $totalPages = ceil($totalItems / $itemsPerPage);
                         $encodedImg = base64_encode($imgBlob);
 
                         // 商品詳細ページへのリンク生成
-                        $productLink = "goods.php?shop_id={$rec['shop_id']}&group_id={$rec['group_id']}";
+                        $productLink = "goods.php?shop_id={$rec['shop_id']}&shop_group={$rec['shop_group']}";
 
                         // 商品情報を全体リンクで表示
                         echo "<a href='{$productLink}' style='text-decoration: none; color: inherit;'>";
@@ -381,142 +365,99 @@ $totalPages = ceil($totalItems / $itemsPerPage);
             </div>
         </div>
 
-<!-- 自分の好きなブランドのみ -->
-<h2><?php echo $translations['Your Favorite Brand']; ?></h2>
+        <!-- 自分の好きなブランドのみ -->
+        <h2><?php echo $translations['Your Favorite Brand']; ?></h2>
 
-<?php
-// ブランド名を格納する変数
-$favoriteBrandName = '';
-
-if ($userId) {
-    // 1. ユーザーが最も購入したブランドIDを取得するクエリ
-    $sql = "
-    SELECT brand.brand_id, brand.brand_name, SUM(cd.quantity) AS total_quantity
-    FROM cart_detail AS cd
-    INNER JOIN shop ON cd.shop_id = shop.shop_id
-    INNER JOIN brand ON shop.brand_id = brand.brand_id
-    WHERE cd.user_id = :user_id
-    GROUP BY brand.brand_id
-    ORDER BY total_quantity DESC
-    LIMIT 1
-    ";
-
-    $stmt = $dbh->prepare($sql);
-    $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
-    $stmt->execute();
-    $topBrand = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if ($topBrand) {
-        $topBrandId = $topBrand['brand_id'];
-        $favoriteBrandName = htmlspecialchars($topBrand['brand_name']);
-
-        // 2. 取得したブランドIDの商品を取得するクエリ
-        $sql_products = "SELECT shop.*, brand.brand_name, sale.sale_id
-                         FROM shop
-                         LEFT JOIN brand ON brand.brand_id = shop.brand_id
-                         LEFT JOIN sale ON sale.sale_id = shop.sale_id
-                         WHERE shop.brand_id = :brand_id
-                         LIMIT :limit";
-
-        $stmt_products = $dbh->prepare($sql_products);
-        $limit = 10; // 表示する商品の上限
-        $stmt_products->bindValue(':brand_id', $topBrandId, PDO::PARAM_INT);
-        $stmt_products->bindValue(':limit', $limit, PDO::PARAM_INT);
-        $stmt_products->execute();
-        $products = $stmt_products->fetchAll(PDO::FETCH_ASSOC);
-    } else {
-        $favoriteBrandName = "お気に入りのブランドはまだありません。";
-    }
-} else {
-    $favoriteBrandName = "ログインしてください。";
-}
-?>
-
-<!-- ブランド名の表示 -->
-<p>あなたのお気に入りブランド：<?php echo $favoriteBrandName; ?></p>
-
-<div class="sale-products-container">
-    <div class="sale-product-scroll">
         <?php
-        if (count($products) > 0) {
-            foreach ($products as $rec) {
-                // 商品表示のコード（画像や商品名など）
-                $imgBlob = $rec['thumbnail'];
-                $mimeType = 'image/png'; // MIMEタイプはデフォルトを設定（例としてPNG）
-                $finfo = new finfo(FILEINFO_MIME_TYPE);
-                $mimeType = $finfo->buffer($imgBlob); // BLOBデータからMIMEタイプを取得
-                $encodedImg = base64_encode($imgBlob);
-                $productLink = "goods.php?shop_id={$rec['shop_id']}&group_id={$rec['group_id']}";
+        // ブランド名を格納する変数
+        $favoriteBrandName = '';
+        $products = []; // 初期化
 
-                echo "<a href='{$productLink}' style='text-decoration: none; color: inherit;'>";
-                echo "<div class='sale-product-item'>";
-                echo "<div class='product-image-block'>";
-                echo "<img src='data:{$mimeType};base64,{$encodedImg}' alt='goods img' class='sale-product-image'>";
-                echo "</div>";
-                echo "<div class='product-info'>";
-                echo "<p class='sale-product-brand' data-i18n='brand'>" . $translations['Brand'] . "： {$rec['brand_name']}</p>";
-                echo "<p class='sale-product-name' data-i18n='goods_name'>" . $translations['Product Name'] . " ：{$rec['goods']}</p>";
-                echo "<p class='sale-product-price' data-i18n='price'>" . $translations['Price'] . "：{$rec['original_price']}円</p>";
+        if ($userId) {
+            // 1. ユーザーが最も購入したブランドIDを取得するクエリ
+            $sql = "
+            SELECT brand.brand_id, brand.brand_name, SUM(cd.quantity) AS total_quantity
+            FROM cart_detail AS cd
+            INNER JOIN shop ON cd.shop_id = shop.shop_id
+            INNER JOIN brand ON shop.brand_id = brand.brand_id
+            WHERE cd.user_id = :user_id
+            GROUP BY brand.brand_id
+            ORDER BY total_quantity DESC
+            LIMIT 1
+            ";
 
-                // 割引計算と表示
-                if ($rec['sale_id']) {
-                    $sale_id = $rec['sale_id'];
-                    $sql_sale = "SELECT sale, sale_id FROM sale WHERE sale_id = :sale_id";
-                    $stmt_sale = $dbh->prepare($sql_sale);
-                    $stmt_sale->bindParam(':sale_id', $sale_id);
-                    $stmt_sale->execute();
-                    $sale = $stmt_sale->fetch(PDO::FETCH_ASSOC);
+            $stmt = $dbh->prepare($sql);
+            $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+            $stmt->execute();
+            $topBrand = $stmt->fetch(PDO::FETCH_ASSOC);
 
-                    if ($sale && isset($rec['original_price']) && $sale['sale_id'] != 10) {
-                        $discounted_price = ceil($rec['original_price'] * (1 - $sale['sale'] / 100));
-                        echo "<p class='product-discount' data-i18n='discounted_price'>" . $translations['Discounted Price'] . "：{$discounted_price}円</p>";
-                    }
-                }
-                echo "</div>";
-                echo "</div>";
-                echo "</a>";
+            if ($topBrand) {
+                $topBrandId = $topBrand['brand_id'];
+                $favoriteBrandName = htmlspecialchars($topBrand['brand_name']);
+
+                // 2. ブランドIDの商品を取得するクエリ
+                $sql_products = "
+                SELECT shop.*, brand.brand_name, sale.sale_id, sale.sale, `group`.shop_group
+                FROM shop
+                LEFT OUTER JOIN `group` ON `group`.shop_id = shop.shop_id
+                LEFT JOIN brand ON brand.brand_id = shop.brand_id
+                LEFT JOIN sale ON sale.sale_id = shop.sale_id
+                WHERE shop.brand_id = :brand_id
+                LIMIT 10";
+
+                $stmt_products = $dbh->prepare($sql_products);
+                $stmt_products->bindValue(':brand_id', $topBrandId, PDO::PARAM_INT);
+                $stmt_products->execute();
+                $products = $stmt_products->fetchAll(PDO::FETCH_ASSOC);
+            } else {
+                $favoriteBrandName = "お気に入りのブランドはまだありません。";
             }
         } else {
-            echo "<p>このブランドの商品の情報は見つかりませんでした。</p>";
+            $favoriteBrandName = "ログインしてください。";
         }
         ?>
-    </div>
-</div>
 
-                <!-- </div> -->
-            </div>
-            <div class="pagination">
-                <?php if ($totalPages > 1): // ページ数が1ページより多い場合のみ表示 
+        <!-- ブランド名の表示 -->
+        <p>あなたのお気に入りブランド：<?php echo $favoriteBrandName; ?></p>
+        <a href='all_myfavorite.php' class="all_item"><?php echo $translations['View All']; ?></a>
+
+        <div class="sale-products-container">
+            <div class="sale-product-scroll">
+                <?php
+                // var_dump($products);
+                if (!empty($products)) {
+                    foreach ($products as $rec) {
+                        // 商品表示のコード
+                        $imgBlob = $rec['thumbnail'];
+                        $mimeType = $rec['thumbnail_mime'] ?? 'image/png'; // MIMEタイプのデフォルト値
+                        $encodedImg = base64_encode($imgBlob);
+                        $productLink = "goods.php?shop_id={$rec['shop_id']}&shop_group={$rec['shop_group']}";
+
+                        echo "<a href='{$productLink}' style='text-decoration: none; color: inherit;'>";
+                        echo "<div class='sale-product-item'>";
+                        echo "<div class='product-image-block'>";
+                        echo "<img src='data:{$mimeType};base64,{$encodedImg}' alt='goods img' class='sale-product-image'>";
+                        echo "</div>";
+                        echo "<div class='product-info'>";
+                        echo "<p class='sale-product-brand' data-i18n='brand'>" . $translations['Brand'] . "： {$rec['brand_name']}</p>";
+                        echo "<p class='sale-product-name' data-i18n='goods_name'>" . $translations['Product Name'] . " ：{$rec['goods']}</p>";
+                        echo "<p class='sale-product-price' data-i18n='price'>" . $translations['Price'] . "：{$rec['original_price']}円</p>";
+
+                        // 割引計算と表示
+                        if ($rec['sale_id'] && isset($rec['original_price'])) {
+                            $discounted_price = ceil($rec['original_price'] * (1 - $rec['sale'] / 100));
+                            echo "<p class='product-discount' data-i18n='discounted_price'>" . $translations['Discounted Price'] . "：{$discounted_price}円</p>";
+                        }
+
+                        echo "</div>";
+                        echo "</div>";
+                        echo "</a>";
+                    }
+                } else {
+                    echo "<p>このブランドの商品の情報は見つかりませんでした。</p>";
+                }
                 ?>
-                    <?php if ($page > 1): ?>
-                        <a href="?page=<?php echo $page - 1; ?>" data-i18n="previous">前へ</a>
-                    <?php endif; ?>
-
-                    <!-- 最初のページ -->
-                    <?php if ($page > 3): ?>
-                        <a href="?page=1">1</a>
-                        <span>...</span> <!-- 省略 -->
-                    <?php endif; ?>
-
-                    <!-- ページ番号のリンクを表示 -->
-                    <?php for ($i = max(1, $page - 1); $i <= min($totalPages, $page + 1); $i++): ?>
-                        <?php if ($i == $page): ?>
-                            <span><?php echo $i; ?></span> <!-- 現在のページ -->
-                        <?php else: ?>
-                            <a href="?page=<?php echo $i; ?>"><?php echo $i; ?></a> <!-- 他のページ -->
-                        <?php endif; ?>
-                    <?php endfor; ?>
-
-                    <!-- 最後のページ -->
-                    <?php if ($page < $totalPages - 2): ?>
-                        <span>...</span> <!-- 省略 -->
-                        <a href="?page=<?php echo $totalPages; ?>"><?php echo $totalPages; ?></a>
-                    <?php endif; ?>
-
-                    <?php if ($page < $totalPages): ?>
-                        <a href="?page=<?php echo $page + 1; ?>" data-i18n="next">次へ</a>
-                    <?php endif; ?>
-                <?php endif; ?>
             </div>
-
-            </html>
+        </div>
+    </div>
+</html>

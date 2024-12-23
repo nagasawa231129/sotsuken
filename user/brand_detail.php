@@ -15,8 +15,9 @@ $brand = isset($_GET['brand']) ? $_GET['brand'] : null;
 $sort = isset($_GET['sort']) ? $_GET['sort'] : 'default';
 
 // SQL文の初期設定
-$sql = "SELECT shop.*, sale.*,brand.* FROM shop LEFT OUTER JOIN sale ON sale.sale_id = shop.sale_id 
+$sql = "SELECT shop.*, sale.*,brand.*,`group`.shop_group FROM shop LEFT OUTER JOIN sale ON sale.sale_id = shop.sale_id 
     LEFT OUTER JOIN brand ON brand.brand_id = shop.brand_id
+    LEFT OUTER JOIN `group` ON `group`.shop_id = shop.shop_id
 WHERE 1";
 
 // ブランドフィルタがある場合の条件追加
@@ -223,7 +224,7 @@ $brands = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <?php if (count($products) > 0): ?>
                         <?php foreach ($products as $product): ?>
                             <li>
-                                <a href="goods.php?shop_id=<?php echo htmlspecialchars($product['shop_id'], ENT_QUOTES, 'UTF-8'); ?>">
+                                <a href="goods.php?shop_id=<?php echo htmlspecialchars($product['shop_id'], ENT_QUOTES, 'UTF-8'); ?>&shop_group=<?php echo htmlspecialchars($product['shop_group'], ENT_QUOTES, 'UTF-8'); ?>">
                                 <?php
                                 $imgBlob = $product['thumbnail'];
                                 $mimeType = 'image/png,image/jpg,image/svg'; // MIMEタイプはデフォルトを設定（例としてPNG）

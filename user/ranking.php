@@ -124,8 +124,8 @@ try {
             <?php if ($rankingData && count($rankingData) > 0): ?>
                 <div class="ranking-grid">
                     <?php foreach ($rankingData as $index => $item): ?>
-                        <a href="goods.php?shop_id=<?= (int)$item['shop_id'] ?>" class="ranking-item">
-                            <div class="ranking-label">#<?= $index + 1 ?></div>
+                        <a href="goods.php?shop_id=<?= (int)$item['shop_id'] ?>&group_id=<?= $item['group_id'] ?>" class="ranking-item">
+                        <div class="ranking-label">#<?= $index + 1 ?></div>
                             <?php if (!empty($item['thumbnail'])): ?>
                                 <?php
                                 $thumbnailBlob = $item['thumbnail'];

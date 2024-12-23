@@ -1,4 +1,8 @@
 <?php
+
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
 include "../../db_open.php"; // PDO接続のファイルをインクルード
 
 // レスポンスを初期化
@@ -10,7 +14,12 @@ if (isset($_POST['user_id']) && (isset($_POST['shop_id']) || isset($_POST['brand
 
     // shop_idがPOSTされていた場合
     if (isset($_POST['shop_id'])) {
+        // $userId = $_POST['user_id'];
         $shopId = $_POST['shop_id'];
+        $sizeId = $_POST['size'];
+        $colorId = $_POST['color'];
+
+        
 
         // すでにお気に入りに登録されているか確認
         $sql_check = "SELECT * FROM favorite WHERE user_id = :user_id AND shop_id = :shop_id";
@@ -31,10 +40,12 @@ if (isset($_POST['user_id']) && (isset($_POST['shop_id']) || isset($_POST['brand
             $response['action'] = 'removed'; // 削除された
         } else {
             // お気に入りに追加
-            $sql_insert = "INSERT INTO favorite (user_id, shop_id) VALUES (:user_id, :shop_id)";
+            $sql_insert = "INSERT INTO favorite (user_id, shop_id, size, color) VALUES (:user_id, :shop_id, :size, :color)";
             $stmt_insert = $dbh->prepare($sql_insert);
             $stmt_insert->bindParam(':user_id', $userId);
             $stmt_insert->bindParam(':shop_id', $shopId);
+            $stmt_insert->bindParam(':size', $sizeId); // size_id -> size
+            $stmt_insert->bindParam(':color', $colorId); // color_id -> color            
             $stmt_insert->execute();
 
             $response['success'] = true;

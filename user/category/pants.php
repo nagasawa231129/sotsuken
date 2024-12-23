@@ -11,10 +11,11 @@ $sort = isset($_GET['sort']) ? $_GET['sort'] : 'default';
 $brand = isset($_GET['brand']) && $_GET['brand'] !== '' ? $_GET['brand'] : null;
 
 $params = [];
-$sql = "SELECT shop.*, sale.* 
+$sql = "SELECT shop.*, sale.*, `group`.shop_group
         FROM shop 
         LEFT JOIN sale ON sale.sale_id = shop.sale_id 
         LEFT OUTER JOIN gender ON gender.gender_id = shop.gender
+        LEFT OUTER JOIN `group` ON `group`.shop_id = shop.shop_id
         WHERE shop.category_id = 3";
 
 // gender が ALL でない場合
@@ -205,16 +206,29 @@ $genders = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <?php if (!empty($products)): ?>
                         <?php foreach ($products as $product): ?>
                             <li>
+                                <?php
+                                $imgBlob = $product['thumbnail'];
+                                $mimeType = 'image/png,image/jpg,image/svg'; // MIMEタイプはデフォルトを設定（例としてPNG）
+
+                                // MIMEタイプを動的に取得
+                                $finfo = new finfo(FILEINFO_MIME_TYPE);
+                                $mimeType = $finfo->buffer($imgBlob); // BLOBデータからMIMEタイプを取得
+
+                                // Base64にエンコード
+                                $encodedImg = base64_encode($imgBlob);
+                                ?>
                                 <!-- 商品の詳細ページへのリンク -->
-                                <a href="../goods.php?shop_id=<?php echo htmlspecialchars($product['shop_id'], ENT_QUOTES, 'UTF-8'); ?>">
+                                <a href="../goods.php?shop_id=<?php echo htmlspecialchars($product['shop_id'], ENT_QUOTES, 'UTF-8'); ?>&shop_group=<?php echo htmlspecialchars($product['shop_group'], ENT_QUOTES, 'UTF-8') ?>">
+                                    <img src="data:<?php echo $mimeType; ?>;base64,<?php echo $encodedImg; ?>" alt="goods img" class="product-image">
+
                                     <div>
                                         <strong><?php echo htmlspecialchars($product['goods'], ENT_QUOTES, 'UTF-8'); ?></strong>
                                     </div>
                                     <div><?php echo $translations['Discounted Price'] ?>: ¥<?php echo htmlspecialchars(number_format($product['price']), ENT_QUOTES, 'UTF-8'); ?></div>
                                     <div><?php echo $translations['Price'] ?>: ¥<?php echo htmlspecialchars(number_format($product['original_price']), ENT_QUOTES, 'UTF-8'); ?></div>
                                     <div><?php echo $translations['Sale'] ?>: <?php echo htmlspecialchars($product['sale'], ENT_QUOTES, 'UTF-8'); ?>%</div>
+                                    <div><?php echo $translations['Brand'] ?>: <?php echo htmlspecialchars($product['brand_id'], ENT_QUOTES, 'UTF-8'); ?></div>
                                 </a>
-
                             </li>
                         <?php endforeach; ?>
                     <?php else: ?>

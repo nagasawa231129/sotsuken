@@ -123,9 +123,11 @@ $translations = [
     'Product Name' => '商品名',
     'Price' => '値段',
     'Discounted Price' => '割引後価格',
+    'Discount Rate' => '割引率',
     'Description' => '商品説明',
     'Previous' => '前へ',
     'Next' => '次へ',
+    'View All' => 'すべて見る',
 
     // トップス
     'Tops' => 'トップス',

@@ -219,6 +219,10 @@ h3, h2 {
     z-index: 10; /* 順位ラベルを前面に表示 */
 }
 
+.all_item{
+    padding-right: 100px;
+    text-align: end;
+}
 
 /* メディアクエリ: 小さい画面向け（モバイル対応） */
 @media (max-width: 768px) {

@@ -11,10 +11,11 @@ $sort = isset($_GET['sort']) ? $_GET['sort'] : 'default';
 $brand = isset($_GET['brand']) && $_GET['brand'] !== '' ? $_GET['brand'] : null;
 
 $params = [];
-$sql = "SELECT shop.*, sale.* 
+$sql = "SELECT shop.*, sale.*, `group`.shop_group
         FROM shop 
         LEFT JOIN sale ON sale.sale_id = shop.sale_id 
         LEFT OUTER JOIN gender ON gender.gender_id = shop.gender
+        LEFT OUTER JOIN `group` ON `group`.shop_id = shop.shop_id
         WHERE shop.category_id = 1";
 
 // gender が ALL でない場合
@@ -219,7 +220,7 @@ $genders = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 $encodedImg = base64_encode($imgBlob);
                                 ?>
                                 <!-- 商品の詳細ページへのリンク -->
-                                <a href="../goods.php?shop_id=<?php echo htmlspecialchars($product['shop_id'], ENT_QUOTES, 'UTF-8'); ?>">
+                                <a href="../goods.php?shop_id=<?php echo htmlspecialchars($product['shop_id'], ENT_QUOTES, 'UTF-8'); ?>&shop_group=<?php echo htmlspecialchars($product['shop_group'], ENT_QUOTES, 'UTF-8') ?>">
                                     <img src="data:<?php echo $mimeType; ?>;base64,<?php echo $encodedImg; ?>" alt="goods img" class="product-image">
 
                                     <div>

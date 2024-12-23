@@ -378,26 +378,39 @@ if (empty($results)) {
     echo "該当する商品はありません。";
 } else {
     // 検索結果の表示
+    echo "<div class='sale-product-container'>";
     foreach ($results as $row) {
-        // 商品IDを利用してリンクを生成
-        $product_id = htmlspecialchars($row['shop_id']); // 商品IDが `id` カラムに格納されている場合
-        $product_link = "goods.php?shop_id=" . $product_id; // 商品詳細ページへのリンク
-
-        echo "<a href=\"$product_link\" style=\"text-decoration: none; color: inherit;\">"; // リンク開始
-        echo "<span data-i18n='product_name'>商品名</span>:" . htmlspecialchars($row['goods']) . "<br>";
-        echo "<span data-i18n='price'>価格</span>:" . htmlspecialchars($row['price']) . "<br>";
-
-        // 割引率を計算
+        $product_id = htmlspecialchars($row['shop_id']);
+        $product_link = "goods.php?shop_id=" . $product_id;
+    
+        // 画像データの取得とBase64エンコード
+        $imgBlob = $row['thumbnail'];
+        $mimeType = 'image/png';  // デフォルトMIMEタイプ
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->buffer($imgBlob); // 実際のMIMEタイプを取得
+        $encodedImg = base64_encode($imgBlob); // Base64エンコード
+    
+        // 商品表示
+        echo "<div class='sale-product-item'>";
+        echo "<a href=\"$product_link\" style=\"text-decoration: none; color: inherit;\">";
+        echo "<img src='data:{$mimeType};base64,{$encodedImg}' alt='goods img' class='sale-product-image'></br>";
+        echo  htmlspecialchars($row['goods']) . "<br>";
+        echo  htmlspecialchars($row['price']) . "<br>";
+    
+        // 割引率の計算
         $sale_subject = $row['sale_subject'];
         if ($sale_subject >= 1 && $sale_subject <= 9) {
-            $discount_percentage = $sale_subject * 10;  // 1なら10%、2なら20%など
-            echo "<span data-i18n='discounted'>割引率</span>: " . $discount_percentage . "%<br>";
+            $discount_percentage = $sale_subject * 10;
+            echo  $discount_percentage . "%<br>";
         } else {
-            echo "<span data-i18n='discounted'>割引率</span>: 0% (セールなし)<br>";
+            echo " 0% (セールなし)<br>";
         }
-        echo "</a>"; // リンク終了
-        echo "<br>";
+    
+        echo "</a>";
+        echo "</div>";  // 商品アイテム終了
     }
+    echo "</div>";  // 商品コンテナ終了
+    
 }
 
 ?>

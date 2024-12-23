@@ -2,93 +2,10 @@
 include "../../db_open.php";
 include "../header.php";
 include "../head.php";
-if (isset($_SESSION['id'])) {
-    $userId = $_SESSION['id'];
-} else {
-    $userId = null;
-}
-$user_name = isset($_SESSION['login']) ? $_SESSION['display_name'] : 'ゲスト';
+echo "<link rel='stylesheet' href='header.css'>";
+echo "<link rel='stylesheet' href='all_item.css'>";
 
-$lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : 'ja';
-
-// // 言語ファイルのパスを設定
-$lang_file = __DIR__ . "/{$lang}.php";
-
-// // 言語ファイルを読み込み
-if (file_exists($lang_file)) {
-    include($lang_file);
-} else {
-    die("Error: Language file not found.");
-}
-// var_dump($_GET['query']);
-$searchQuery = $_GET['query'] ?? ''; // クエリパラメータ 'query' を取得
-$searchQuery = trim($searchQuery); // 前後の空白を削除
-// var_dump($searchQuery);
-// 初期化
-$results = [];
-// var_dump($results);
-if (!empty($searchQuery)) {
-    // SQLクエリで部分一致検索
-    // SQLクエリで部分一致検索
-    $sql = "SELECT shop.*, 
-               brand.brand_name, 
-               sale.sale_id, 
-               shop.thumbnail,
-               `group`.shop_group
-        FROM shop
-        LEFT OUTER JOIN brand ON brand.brand_id = shop.brand_id
-        LEFT OUTER JOIN sale ON sale.sale_id = shop.sale_id
-        LEFT OUTER JOIN `group` ON `group`.shop_id = shop.shop_id
-        WHERE shop.goods LIKE :searchQueryGoods  
-           OR brand.brand_name LIKE :searchQueryBrand  
-        ORDER BY shop.buy DESC";  // 並べ替え条件は適宜変更
-
-    // 準備とバインド
-    $stmt = $dbh->prepare($sql);
-
-    // 2つのパラメータをそれぞれにバインド
-    $stmt->bindValue(':searchQueryGoods', '%' . $searchQuery . '%', PDO::PARAM_STR);  // 商品名部分一致
-    $stmt->bindValue(':searchQueryBrand', '%' . $searchQuery . '%', PDO::PARAM_STR);  // ブランド名部分一致
-
-    // クエリ実行
-    $stmt->execute();
-
-
-    // 結果を取得
-    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
 ?>
-
-<!DOCTYPE html>
-<!-- <link rel="stylesheet" href="search.css"> -->
-<link rel="stylesheet" href="header.css">
-<link rel="stylesheet" href="toppage.css">
-<link rel="stylesheet" href="querysearch.css">
-
-<?php
-$itemsPerPage = 85;
-
-// 現在のページ番号を取得（デフォルトは1）
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-
-// ページ番号が1より小さい場合は1に設定
-if ($page < 1) {
-    $page = 1;
-}
-
-// OFFSETを計算
-$offset = ($page - 1) * $itemsPerPage;
-
-// 総企業数を取得
-$totalQuery = "SELECT COUNT(*) FROM shop";
-$totalResult = $dbh->query($totalQuery);
-$totalItems = $totalResult->fetchColumn();
-
-// 総ページ数を計算
-$totalPages = ceil($totalItems / $itemsPerPage);
-?>
-
-
 <div class="main-content">
     <aside class="sidebar">
         <h2 data-i18n="search"><?php echo $translations['Search'] ?></h2>
@@ -176,49 +93,83 @@ $totalPages = ceil($totalItems / $itemsPerPage);
         </ul>
     </aside>
 
-    <body>
+    <div class="products-wrapper">
+    <h2><?php echo $translations['Popular Ranking'] ?></h2>
+    <div class="products-container">
+        <?php
+        $sql = "SELECT shop.*, 
+        brand.brand_name, 
+        sale.sale_id, 
+        shop.thumbnail,
+        `group`.shop_group
+        FROM shop
+        LEFT OUTER JOIN brand ON brand.brand_id = shop.brand_id
+        LEFT OUTER JOIN sale ON sale.sale_id = shop.sale_id
+        LEFT OUTER JOIN `group` ON `group`.shop_id = shop.shop_id
+        ORDER BY shop.buy DESC";
+        
+        $stmt = $dbh->prepare($sql);
+        $stmt->execute();
 
-        <div class="main-content">
-            <div class="products-wrapper">
-                <h1><?php echo $translations['Search Results'] ?></h1>
+        if ($stmt->rowCount() > 0) {
+            while ($rec = $stmt->fetch()) {
+                // BLOB型の画像データをBase64エンコードして表示
+                $imgBlob = $rec['thumbnail'];
+                $mimeType = 'image/png'; // MIMEタイプはデフォルトを設定（例としてPNG）
 
-                <?php if (empty($results)): ?>
-                    <p>該当する商品が見つかりませんでした。</p>
-                <?php else: ?>
-                    <ul class="products-list">
-                        <?php foreach ($results as $item): ?>
-                            <li class="product-item">
-                                <?php
-                                // サムネイル画像の取得
-                                if (isset($item['thumbnail'])) {
-                                    $imgBlob = $item['thumbnail'];
-                                    $finfo = new finfo(FILEINFO_MIME_TYPE);
-                                    $mimeType = $finfo->buffer($imgBlob);
-                                    $encodedImg = base64_encode($imgBlob);
-                                } else {
-                                    // サムネイルがない場合の処理
-                                    $encodedImg = null;
-                                }
-                                ?>
-                                <a href='goods.php?shop_id=<?php echo $item['shop_id']; ?>&shop_group=<?php echo $item['shop_group']; ?>'>
-                                    <?php if ($encodedImg): ?>
-                                        <img src="data:<?php echo $mimeType; ?>;base64,<?php echo $encodedImg; ?>" alt="goods img" class="sale-product-image">
-                                    <?php else: ?>
-                                        <img src="default-thumbnail.jpg" alt="default img" class="sale-product-image"> <!-- デフォルト画像 -->
-                                    <?php endif; ?>
-                                    <h2><?php echo htmlspecialchars($item['goods']); ?></h2>
-                                    <p><?php echo $translations['Brand'] ?>: <?php echo htmlspecialchars($item['brand_name']); ?></p>
-                                    <div class="product-prices">
-                                        <span class="product-price"><?php echo "￥" . number_format($item['price']); ?></span>
-                                    </div>
-                                </a>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
-                <?php endif; ?>
-            </div>
-        </div>
+                // MIMEタイプを動的に取得
+                $finfo = new finfo(FILEINFO_MIME_TYPE);
+                $mimeType = $finfo->buffer($imgBlob); // BLOBデータからMIMEタイプを取得
 
-    </body>
+                // Base64にエンコード
+                $encodedImg = base64_encode($imgBlob);
 
-    </html>
+                // 商品詳細ページへのリンク生成
+                $productLink = "goods.php?shop_id={$rec['shop_id']}&shop_group={$rec['shop_group']}";
+
+                // 商品情報を全体リンクで表示
+                echo "<a href='{$productLink}' style='text-decoration: none; color: inherit;'>";
+                echo "<div class='sale-product-item'>";
+                echo "<div class='product-image-block'>";
+
+                // 画像表示
+                echo "<img src='data:{$mimeType};base64,{$encodedImg}' alt='goods img' class='sale-product-image'>";
+                echo "</div>";
+                echo "<div class='product-info'>";
+
+                // ブランド名
+                echo "<p class='sale-product-brand' data-i18n='brand'>" . $translations['Brand'] . "： {$rec['brand_name']}</p>";
+
+                // 商品名
+                echo "<p class='sale-product-name' data-i18n='goods_name'>" . $translations['Product Name'] . " ：{$rec['goods']}</p>";
+
+                // 価格
+                echo "<p class='sale-product-price' data-i18n='price'>" . $translations['Price'] . "：{$rec['original_price']}円</p>";
+
+                // 割引計算と表示
+                if ($rec['sale_id']) {
+                    $sale_id = $rec['sale_id'];
+                    $sql_sale = "SELECT sale, sale_id FROM sale WHERE sale_id = :sale_id";
+                    $stmt_sale = $dbh->prepare($sql_sale);
+                    $stmt_sale->bindParam(':sale_id', $sale_id);
+                    $stmt_sale->execute();
+                    $sale = $stmt_sale->fetch(PDO::FETCH_ASSOC);
+
+                    // 割引情報が取得でき、割引率が10ではない場合のみ処理
+                    if ($sale && isset($rec['original_price']) && $sale['sale_id'] != 10) {
+                        $discounted_price = ceil($rec['original_price'] * (1 - $sale['sale'] / 100)); // 小数点切り上げ
+                        echo "<p class='product-discount' data-i18n='discounted_price'>" . $translations['Discounted Price'] . "：{$discounted_price}円</p>";
+                    }
+                }
+                echo "</div>";
+                echo "</div>";
+                echo "</a>";
+            }
+        } else {
+            echo "<p>商品が見つかりません。</p>";
+        }
+        ?>
+    </div>
+</div>
+
+</div>

@@ -95,3 +95,35 @@ select {
         font-size: 16px;
     }
 }
+
+.sale-product-container {
+    display: flex;
+    flex-wrap: wrap;  /* 商品が折り返しされるように設定 */
+    justify-content: space-between;  /* 商品間のスペースを均等に配置 */
+    gap: 20px;  /* 商品間の隙間 */
+}
+
+.sale-product-item {
+    text-align: center;  /* 画像とテキストを中央揃え */
+    margin: 10px;        /* アイテム間にマージンを追加 */
+    padding: 10px;       /* アイテム内のパディング */
+}
+
+.sale-product-image {
+    width: 100%;         /* 親要素の幅に合わせて画像サイズ調整 */
+    max-width: 250px;    /* 最大幅を200pxに設定 */
+    height: auto;        /* 高さを自動調整 */
+    margin-bottom: 10px; /* 画像とテキストの間にスペースを追加 */
+}
+
+.sale-product-item span {
+    display: block;      /* spanをブロック要素として表示 */
+    margin-bottom: 5px;  /* 各テキスト間にスペースを追加 */
+}
+
+.sale-product-item:hover {
+    transform: scale(1.05);  /* ホバー時の拡大効果 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  /* ホバー時の影 */
+}
+
+

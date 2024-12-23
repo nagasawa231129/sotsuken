@@ -29,7 +29,7 @@ if (isset($_POST['shop_id']) && isset($_POST['user_id'])) {
         $stmt_update->execute();
     } else {
         // 商品がカートにない場合、新たに追加
-        $sql_insert = "INSERT INTO cart (shop_id, user_id, quantity,order_date) VALUES (:shop_id, :user_id, :quantity,CURRENT_TIMESTAMP)";
+        $sql_insert = "INSERT INTO cart (shop_id, user_id, quantity, order_date) VALUES (:shop_id, :user_id, :quantity, CURRENT_TIMESTAMP)";
         $stmt_insert = $dbh->prepare($sql_insert);
         $stmt_insert->bindParam(':shop_id', $shopId, PDO::PARAM_INT);
         $stmt_insert->bindParam(':user_id', $userId, PDO::PARAM_INT);

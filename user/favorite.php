@@ -32,10 +32,11 @@ if (isset($_SESSION['id'])) {
     }
 
     // 商品のお気に入りを取得
-    $sql_favorite = "SELECT DISTINCT shop.shop_id, shop.goods, shop.original_price, shop.price, brand.brand_name, shop.thumbnail
+    $sql_favorite = "SELECT DISTINCT shop.shop_id, shop.goods, shop.original_price, shop.price, brand.brand_name, shop.thumbnail, `group`.shop_group
                  FROM favorite
                  INNER JOIN shop ON favorite.shop_id = shop.shop_id 
                  LEFT JOIN brand ON shop.brand_id = brand.brand_id
+                 LEFT OUTER JOIN `group` ON `group`.shop_id = shop.shop_id
                  WHERE favorite.user_id = :user_id";
 
 
@@ -51,7 +52,7 @@ if (isset($_SESSION['id'])) {
 
             echo "
             <div class='favorite-card'>
-                <a href='goods.php?shop_id={$favorite['shop_id']}'>
+                <a href='goods.php?shop_id={$favorite['shop_id']}&shop_group={$favorite['shop_group']}'>
                     <img src='{$imgSrc}' alt='{$favorite['goods']}' class='favorite-image'>
                     <div class='favorite-info'>
                         <h2>{$favorite['goods']}</h2>

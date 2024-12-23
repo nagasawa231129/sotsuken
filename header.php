@@ -32,7 +32,7 @@ $unread_count = $notification_count_stmt->fetchColumn();
 <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next/21.6.0/i18next.min.js"></script>
 
 <header>
-    <link rel="stylesheet" href="./user/header.css">
+    <link rel="stylesheet" href="/sotsuken/sotsuken/user/header.css">
     <script>
         // カタカナと英語を統一するための関数
         function normalizeQuery(query) {

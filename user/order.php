@@ -13,19 +13,19 @@ if (isset($_SESSION['id'])) {
 }
 
 // 各注文状態の情報を取得
-$history_sql = "SELECT c.cart_id, c.shop_id, s.goods, c.quantity, s.price, c.order_date, c.trade_situation, r.review_id
+$history_sql = "SELECT c.cart_id, c.shop_id, s.goods, c.quantity, s.price, c.order_date, c.trade_situation, r.review_id, s.thumbnail
                 FROM cart_detail c
                 JOIN shop s ON c.shop_id = s.shop_id
                 LEFT JOIN reviews r ON c.shop_id = r.shop_id
                 WHERE c.user_id = :user_id";
 
-$pending_sql = "SELECT c.cart_id, c.shop_id, s.goods, c.quantity, s.price, c.order_date, c.trade_situation, r.review_id
+$pending_sql = "SELECT c.cart_id, c.shop_id, s.goods, c.quantity, s.price, c.order_date, c.trade_situation, r.review_id, s.thumbnail
                 FROM cart_detail c
                 JOIN shop s ON c.shop_id = s.shop_id
                 LEFT JOIN reviews r ON c.shop_id = r.shop_id
                 WHERE c.user_id = :user_id AND c.trade_situation = '2'";
 
-$shipped_sql = "SELECT c.cart_id, c.shop_id, s.goods, c.quantity, s.price, c.order_date, c.trade_situation, r.review_id
+$shipped_sql = "SELECT c.cart_id, c.shop_id, s.goods, c.quantity, s.price, c.order_date, c.trade_situation, r.review_id, s.thumbnail
                 FROM cart_detail c
                 JOIN shop s ON c.shop_id = s.shop_id
                 LEFT JOIN reviews r ON c.shop_id = r.shop_id
@@ -82,7 +82,14 @@ $result_review = $stmt_review->fetchAll(PDO::FETCH_ASSOC);
         <?php
         if (count($result_history) > 0) {
             foreach ($result_history as $row) {
+                // 画像データの取得とBase64エンコード
+        $imgBlob = $row['thumbnail'];
+        $mimeType = 'image/png';  // デフォルトMIMEタイプ
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->buffer($imgBlob); // 実際のMIMEタイプを取得
+        $encodedImg = base64_encode($imgBlob); // Base64エンコード
                 echo "<div class='order-item'>";
+                echo "<img class='image' src='data:{$mimeType};base64,{$encodedImg}' alt='goods img' class='sale-product-image'></br>";
                 echo "<p>商品名: {$row['goods']}</p>";
                 echo "<p>購入日: {$row['order_date']}</p>";
                 // echo "<p>ステータス: {$row['trade_situation']}</p>";
@@ -105,7 +112,14 @@ $result_review = $stmt_review->fetchAll(PDO::FETCH_ASSOC);
         <?php
         if (count($result_pending) > 0) {
             foreach ($result_pending as $row) {
+                $imgBlob = $row['thumbnail'];
+        $mimeType = 'image/png';  // デフォルトMIMEタイプ
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->buffer($imgBlob); // 実際のMIMEタイプを取得
+        $encodedImg = base64_encode($imgBlob); // Base64エンコード
                 echo "<div class='order-item'>";
+                echo "<img class='image' src='data:{$mimeType};base64,{$encodedImg}' alt='goods img' class='sale-product-image'></br>";
+
                 echo "<p>商品名: {$row['goods']}</p>";
                 echo "<p>購入日: {$row['order_date']}</p>";
                 if ($row['trade_situation'] != 'shipped' && !isset($row['review_id'])) {
@@ -127,7 +141,14 @@ $result_review = $stmt_review->fetchAll(PDO::FETCH_ASSOC);
         <?php
         if (count($result_shipped) > 0) {
             foreach ($result_shipped as $row) {
+                $imgBlob = $row['thumbnail'];
+        $mimeType = 'image/png';  // デフォルトMIMEタイプ
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->buffer($imgBlob); // 実際のMIMEタイプを取得
+        $encodedImg = base64_encode($imgBlob); // Base64エンコード
                 echo "<div class='order-item'>";
+                echo "<img class='image' src='data:{$mimeType};base64,{$encodedImg}' alt='goods img' class='sale-product-image'></br>";
+
                 echo "<p>商品名: {$row['goods']}</p>";
                 echo "<p>購入日: {$row['order_date']}</p>";
                 if ($row['trade_situation'] != 'shipped' && !isset($row['review_id'])) {

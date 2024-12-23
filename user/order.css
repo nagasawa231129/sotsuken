@@ -20,3 +20,7 @@
 .tab-content.active {
     display: block;
 }
+
+.image{
+    width: 250px;
+}
