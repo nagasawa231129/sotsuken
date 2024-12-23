@@ -113,6 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply_discount'])) {
     }
 }
 ?>
+<a href="goods_info.php">戻る</a>
 <!-- 検索フォーム -->
 <form id="search-form" method="GET">
     <!-- 商品名で検索 -->
