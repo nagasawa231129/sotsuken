@@ -9,9 +9,10 @@ echo "<link rel='stylesheet' href='toppage.css'>"; // 必要に応じてCSSを�
 
 // ランキングデータを取得
 try {
-    $sql = "SELECT shop.*, brand.brand_name 
+    $sql = "SELECT shop.*, brand.brand_name, `group`.shop_group
             FROM shop 
-            LEFT JOIN brand ON shop.brand_id = brand.brand_id 
+            LEFT JOIN brand ON shop.brand_id = brand.brand_id
+            LEFT OUTER JOIN `group` ON `group`.shop_id = shop.shop_id
             ORDER BY shop.buy DESC 
             LIMIT 100"; // TOP 10のランキング
     $stmt = $dbh->prepare($sql);
@@ -124,7 +125,7 @@ try {
             <?php if ($rankingData && count($rankingData) > 0): ?>
                 <div class="ranking-grid">
                     <?php foreach ($rankingData as $index => $item): ?>
-                        <a href="goods.php?shop_id=<?= (int)$item['shop_id'] ?>&group_id=<?= $item['group_id'] ?>" class="ranking-item">
+                        <a href="goods.php?shop_id=<?= (int)$item['shop_id'] ?>&shop_group=<?= $item['shop_group'] ?>" class="ranking-item">
                         <div class="ranking-label">#<?= $index + 1 ?></div>
                             <?php if (!empty($item['thumbnail'])): ?>
                                 <?php

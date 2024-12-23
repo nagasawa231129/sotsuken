@@ -47,7 +47,7 @@ $stmt_shipped->bindParam(1, $userId, PDO::PARAM_INT);
 $stmt_shipped->execute();
 $result_shipped = $stmt_shipped->fetchAll(PDO::FETCH_ASSOC);
 
-$review_sql = "SELECT r.review_id, r.shop_id, r.review_content, r.created_at, s.goods 
+$review_sql = "SELECT r.review_id, r.shop_id, r.review_content, r.created_at, s.goods, r.rate
                FROM reviews r
                JOIN shop s ON r.shop_id = s.shop_id
                WHERE r.user_id = :user_id";
@@ -173,6 +173,7 @@ $result_review = $stmt_review->fetchAll(PDO::FETCH_ASSOC);
             foreach ($result_review as $review) {
                 echo "<div class='review-item'>";
                 echo "<p>商品名: {$review['goods']}</p>";
+                echo "<p>評価: {$review['rate']}</p>";
                 echo "<p>レビュー内容: {$review['review_content']}</p>";
                 echo "<p>投稿日: {$review['created_at']}</p>";
                 echo "</div><hr>";
