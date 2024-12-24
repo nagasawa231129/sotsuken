@@ -13,22 +13,25 @@ if (isset($_SESSION['id'])) {
 }
 
 // 各注文状態の情報を取得
-$history_sql = "SELECT c.cart_id, c.shop_id, s.goods, c.quantity, s.price, c.order_date, c.trade_situation, r.review_id, s.thumbnail
+$history_sql = "SELECT c.cart_id, c.shop_id, s.goods, c.quantity, s.price, c.order_date, c.trade_situation, r.review_id, s.thumbnail, g.shop_group
                 FROM cart_detail c
                 JOIN shop s ON c.shop_id = s.shop_id
                 LEFT JOIN reviews r ON c.shop_id = r.shop_id
+                LEFT OUTER JOIN `group` g ON g.shop_id = s.shop_id
                 WHERE c.user_id = :user_id";
 
-$pending_sql = "SELECT c.cart_id, c.shop_id, s.goods, c.quantity, s.price, c.order_date, c.trade_situation, r.review_id, s.thumbnail
+$pending_sql = "SELECT c.cart_id, c.shop_id, s.goods, c.quantity, s.price, c.order_date, c.trade_situation, r.review_id, s.thumbnail, g.shop_group
                 FROM cart_detail c
                 JOIN shop s ON c.shop_id = s.shop_id
                 LEFT JOIN reviews r ON c.shop_id = r.shop_id
+                LEFT OUTER JOIN `group` g ON g.shop_id = s.shop_id
                 WHERE c.user_id = :user_id AND c.trade_situation = '2'";
 
-$shipped_sql = "SELECT c.cart_id, c.shop_id, s.goods, c.quantity, s.price, c.order_date, c.trade_situation, r.review_id, s.thumbnail
+$shipped_sql = "SELECT c.cart_id, c.shop_id, s.goods, c.quantity, s.price, c.order_date, c.trade_situation, r.review_id, s.thumbnail, g.shop_group
                 FROM cart_detail c
                 JOIN shop s ON c.shop_id = s.shop_id
                 LEFT JOIN reviews r ON c.shop_id = r.shop_id
+                LEFT OUTER JOIN `group` g ON g.shop_id = s.shop_id
                 WHERE c.user_id = :user_id AND c.trade_situation = '3'";
 
 
@@ -47,9 +50,10 @@ $stmt_shipped->bindParam(1, $userId, PDO::PARAM_INT);
 $stmt_shipped->execute();
 $result_shipped = $stmt_shipped->fetchAll(PDO::FETCH_ASSOC);
 
-$review_sql = "SELECT r.review_id, r.shop_id, r.review_content, r.created_at, s.goods, r.rate
+$review_sql = "SELECT r.review_id, r.shop_id, r.review_content, r.created_at, s.goods, r.rate, g.shop_group
                FROM reviews r
                JOIN shop s ON r.shop_id = s.shop_id
+               LEFT OUTER JOIN `group` g ON g.shop_id = s.shop_id
                WHERE r.user_id = :user_id";
 
 $stmt_review = $dbh->prepare($review_sql);
@@ -89,7 +93,9 @@ $result_review = $stmt_review->fetchAll(PDO::FETCH_ASSOC);
         $mimeType = $finfo->buffer($imgBlob); // 実際のMIMEタイプを取得
         $encodedImg = base64_encode($imgBlob); // Base64エンコード
                 echo "<div class='order-item'>";
+                echo "<a href='goods.php?shop_id={$row['shop_id']}&shop_group={$row['shop_group']}'>";
                 echo "<img class='image' src='data:{$mimeType};base64,{$encodedImg}' alt='goods img' class='sale-product-image'></br>";
+                echo "</a>";
                 echo "<p>商品名: {$row['goods']}</p>";
                 echo "<p>購入日: {$row['order_date']}</p>";
                 // echo "<p>ステータス: {$row['trade_situation']}</p>";
@@ -118,8 +124,9 @@ $result_review = $stmt_review->fetchAll(PDO::FETCH_ASSOC);
         $mimeType = $finfo->buffer($imgBlob); // 実際のMIMEタイプを取得
         $encodedImg = base64_encode($imgBlob); // Base64エンコード
                 echo "<div class='order-item'>";
+                echo "<a href='goods.php?shop_id={$row['shop_id']}&shop_group={$row['shop_group']}'>";
                 echo "<img class='image' src='data:{$mimeType};base64,{$encodedImg}' alt='goods img' class='sale-product-image'></br>";
-
+                echo "</a>";
                 echo "<p>商品名: {$row['goods']}</p>";
                 echo "<p>購入日: {$row['order_date']}</p>";
                 if ($row['trade_situation'] != 'shipped' && !isset($row['review_id'])) {
@@ -147,8 +154,9 @@ $result_review = $stmt_review->fetchAll(PDO::FETCH_ASSOC);
         $mimeType = $finfo->buffer($imgBlob); // 実際のMIMEタイプを取得
         $encodedImg = base64_encode($imgBlob); // Base64エンコード
                 echo "<div class='order-item'>";
+                echo "<a href='goods.php?shop_id={$row['shop_id']}&shop_group={$row['shop_group']}'>";
                 echo "<img class='image' src='data:{$mimeType};base64,{$encodedImg}' alt='goods img' class='sale-product-image'></br>";
-
+                echo "</a>";
                 echo "<p>商品名: {$row['goods']}</p>";
                 echo "<p>購入日: {$row['order_date']}</p>";
                 if ($row['trade_situation'] != 'shipped' && !isset($row['review_id'])) {
@@ -172,6 +180,9 @@ $result_review = $stmt_review->fetchAll(PDO::FETCH_ASSOC);
         if (count($result_review) > 0) {
             foreach ($result_review as $review) {
                 echo "<div class='review-item'>";
+                echo "<a href='goods.php?shop_id={$row['shop_id']}&shop_group={$row['shop_group']}'>";
+                echo "<img class='image' src='data:{$mimeType};base64,{$encodedImg}' alt='goods img' class='sale-product-image'></br>";
+                echo "</a>";
                 echo "<p>商品名: {$review['goods']}</p>";
                 echo "<p>評価: {$review['rate']}</p>";
                 echo "<p>レビュー内容: {$review['review_content']}</p>";
