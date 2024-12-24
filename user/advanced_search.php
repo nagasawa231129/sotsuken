@@ -13,7 +13,7 @@ $brands = $stmt->fetchAll();
 
 ?>
 
-<form action="advanced_search.php" method="get">
+<form action="advanced_search.php" method="get" id="searchForm">
     <!-- キーワード -->
     <label for="keyword" data-i18n="keyword_label"><?php echo $translations['Keyword Label'] ?></label>
     <input type="text" name="keyword" placeholder="<?php echo $translations['Keyword Placeholder'] ?>" value="<?php echo isset($_GET['keyword']) ? htmlspecialchars($_GET['keyword']) : ''; ?>" data-i18n="keyword_placeholder" />
@@ -77,9 +77,23 @@ $brands = $stmt->fetchAll();
     </select>
 
     <input type="submit" value="検索" data-i18n="search_button" />
+    <button type="button" onclick="resetForm()">リセット</button>
 </form>
 
+<script>
+    function resetForm() {
+    // フォーム全体をリセット
+    const form = document.getElementById('searchForm');
+    form.reset();
 
+    // サブカテゴリーのオプションをリセット
+    const subcategorySelect = document.getElementById('subcategory');
+    subcategorySelect.innerHTML = '<option value=""><?php echo $translations['All']; ?></option>';
+
+    // 必要であれば特定の初期化ロジックを追加
+    console.log("フォームがリセットされました。");
+}
+</script>
 
 <script>
     // カテゴリーごとのサブカテゴリー
@@ -310,10 +324,11 @@ $sale_subject = isset($_GET['sale_subject']) && $_GET['sale_subject'] !== '' ? $
 
 // SQLクエリの作成
 $sql = "
-    SELECT DISTINCT shop.*, subcategory.*, category.*
+    SELECT DISTINCT shop.*, subcategory.*, category.*, `group`.shop_group
     FROM shop
     LEFT OUTER JOIN subcategory ON subcategory.subcategory_id = shop.subcategory_id
     LEFT OUTER JOIN category ON category.category_id = shop.category_id
+    LEFT OUTER JOIN `group` ON `group`.shop_id = shop.shop_id
     WHERE 1 = 1
 ";
 
@@ -381,7 +396,8 @@ if (empty($results)) {
     echo "<div class='sale-product-container'>";
     foreach ($results as $row) {
         $product_id = htmlspecialchars($row['shop_id']);
-        $product_link = "goods.php?shop_id=" . $product_id;
+        $shop_group = htmlspecialchars($row['shop_group']);
+        $product_link = "goods.php?shop_id=" . $product_id . "&shop_group=" . $shop_group;
     
         // 画像データの取得とBase64エンコード
         $imgBlob = $row['thumbnail'];
