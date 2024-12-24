@@ -6,19 +6,7 @@ include './../../db_open.php';
 $hasError = false;
 $errorMessages = [];
 
-// サムネイル画像のチェック
-if (!isset($_FILES['thumbnail']['tmp_name'][0]) || $_FILES['thumbnail']['error'][0] !== UPLOAD_ERR_OK) {
-    $hasError = true;
-    $errorMessages[] = "サムネイル画像が正しくアップロードされていません。";
-}
-
-// サブサムネイル画像のチェック
-if (empty($_FILES['subthumbnail']['tmp_name'][0])) {
-    $hasError = true;
-    $errorMessages[] = "サブ画像が選択されていません。";
-}
-
-// POSTデータのバリデーション
+// 必須項目のバリデーション
 $requiredFields = ['brand', 'goods', 'price', 'color', 'category', 'subcategory', 'gender', 'goods_info'];
 foreach ($requiredFields as $field) {
     if (empty($_POST[$field])) {
@@ -32,17 +20,37 @@ if ($hasError) {
     exit;
 }
 
-// グループごとの最大shop_group値を取得する関数
-function getNewShopGroup($dbh)
+// 現在の最大 shop_group 値を取得する関数
+function getMaxShopGroup($dbh)
 {
-    // shop_groupの最大値を取得
     $stmt = $dbh->prepare("SELECT MAX(shop_group) FROM `group`");
     $stmt->execute();
-    $maxGroup = $stmt->fetchColumn();
-    return $maxGroup ? $maxGroup + 1 : 1; // 最大値が存在しない場合は1から開始
+    return $stmt->fetchColumn() ?: 0;
 }
 
-// データの取得
+// グループ指定を処理する関数
+function assignShopGroup($dbh, $groupRequests)
+{
+    $maxGroup = getMaxShopGroup($dbh); // 現在の最大値
+    $newGroup = $maxGroup + 1;  // 新しいグループ番号
+
+    // グループ指定を追跡する配列
+    $groupAssignments = [];
+
+    foreach ($groupRequests as $groupRequest) {
+        // 既に存在するグループ番号を再利用する
+        if (isset($groupAssignments[$groupRequest])) {
+            $groupAssignments[] = $groupAssignments[$groupRequest];  // 以前のグループを再利用
+        } else {
+            $groupAssignments[$groupRequest] = $newGroup;
+            $newGroup++;  // 新しいグループ番号をインクリメント
+        }
+    }
+
+    return $groupAssignments;
+}
+
+// フォームデータの取得
 $brands = $_POST['brand'];
 $goods = $_POST['goods'];
 $prices = $_POST['price'];
@@ -54,20 +62,17 @@ $genders = $_POST['gender'];
 $goods_info = $_POST['goods_info'];
 $thumbnailData = file_get_contents($_FILES['thumbnail']['tmp_name'][0]);
 
+// グループ指定（例）
+$groupRequests = ['指定なし', '指定1', '指定1', '指定2', '指定3'];  // フォームからのグループ指定（例）
+
+// グループ番号の割り当て
+$groupAssignments = assignShopGroup($dbh, $groupRequests);
+
 // トランザクション開始
 $dbh->beginTransaction();
 try {
     foreach ($brands as $index => $brand_id) {
-        // サイズごとに同じグループを使用するための準備
-        $newShopGroup = null;
-
         foreach ($sizes as $size) {
-            // shop_groupを初期化または再利用
-            if ($newShopGroup === null) {
-                // 新しいshop_groupを取得
-                $newShopGroup = getNewShopGroup($dbh);
-            }
-
             // shopテーブルにデータ挿入
             $sql = "INSERT INTO shop (thumbnail, brand_id, goods, price, size, color, category_id, subcategory_id, gender, exp, original_price)
                     VALUES (:thumbnail, :brand_id, :goods_name, :price, :size, :color, :category_id, :subcategory_id, :gender_id, :goods_info, :original_price)";
@@ -89,10 +94,13 @@ try {
             // 挿入したshopのIDを取得
             $shop_id = $dbh->lastInsertId();
 
+            // グループ番号を取得
+            $group = $groupAssignments[$groupRequests[$index]];
+
             // groupテーブルにデータ挿入
             $groupStmt = $dbh->prepare("INSERT INTO `group` (shop_group, shop_id) VALUES (:shop_group, :shop_id)");
             $groupStmt->execute([
-                ':shop_group' => $newShopGroup,
+                ':shop_group' => $group,  // 割り当てたグループ番号を使用
                 ':shop_id' => $shop_id
             ]);
         }

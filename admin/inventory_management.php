@@ -8,6 +8,7 @@
 </head>
 
 <body>
+<a href="admin_toppage.php">トップページ</a>
     <h2 style="text-align: center;">在庫管理ページ</h2>
 
     <!-- 検索フォーム -->
@@ -30,9 +31,9 @@
     session_start();
 
     // 検索処理
-    if (isset($_GET['query']) && !empty($_GET['query'])) {
-        $query = htmlspecialchars($_GET['query'], ENT_QUOTES, 'UTF-8');
-        $stmt = $dbh->prepare("SELECT s.shop_id, s.goods, s.price,s.sale_id, s.material, sz.size, c.color, b.brand_name, s.thumbnail
+    $query = isset($_GET['query']) ? htmlspecialchars($_GET['query'], ENT_QUOTES, 'UTF-8') : '';
+    if (!empty($query)) {
+        $stmt = $dbh->prepare("SELECT s.shop_id, s.goods, s.price,s.sale_id, s.material, sz.size, c.ja_color, b.brand_name, s.thumbnail
                                FROM shop s
                                LEFT JOIN size sz ON s.size = sz.size_id
                                LEFT JOIN color c ON s.color = c.color_id
@@ -43,7 +44,7 @@
         $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         if (count($products) === 0) {
-            $stmt = $dbh->prepare("SELECT s.shop_id, s.goods, s.sale_id, s.price, s.material, sz.size, c.color, b.brand_name, s.thumbnail
+            $stmt = $dbh->prepare("SELECT s.shop_id, s.goods, s.sale_id, s.price, s.material, sz.size, c.ja_color, b.brand_name, s.thumbnail
                                    FROM shop s
                                    LEFT JOIN size sz ON s.size = sz.size_id
                                    LEFT JOIN color c ON s.color = c.color_id
@@ -54,8 +55,7 @@
             $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
     } else {
-        $query = '';
-        $stmt = $dbh->prepare("SELECT s.shop_id, s.goods,s.sale_id, s.price, s.material, sz.size, c.color, s.thumbnail, b.brand_name
+        $stmt = $dbh->prepare("SELECT s.shop_id, s.goods,s.sale_id, s.price, s.material, sz.size, c.ja_color, s.thumbnail, b.brand_name
                                FROM shop s
                                LEFT JOIN size sz ON s.size = sz.size_id
                                LEFT JOIN color c ON s.color = c.color_id
@@ -93,7 +93,9 @@
         $stmt->execute();
         
         $_SESSION['flash_message'] = '在庫が更新されました。';
-        header("Location: inventory_management.php");
+        
+        // 検索条件を保持してリダイレクト
+        header("Location: inventory_management.php?query=" . urlencode($query));
         exit();
     }
     ?>
@@ -155,25 +157,18 @@
                                     case 7:
                                         echo ' <span style="color: red;">70%OFF中</span>';
                                         break;
-                                    case 8:
-                                        echo ' <span style="color: red;">80%OFF中</span>';
-                                        break;
-                                    case 9:
-                                        echo ' <span style="color: red;">90%OFF中</span>';
-                                        break;
                                     default:
-                                        // 他のsale_idの場合は表示しない
                                         break;
                                 }
                             }
-                            ?></td>
+                ?></td>
                 <td><?= htmlspecialchars($product['material']) ?></td>
                 <td><?= htmlspecialchars($product['size']) ?></td>
-                <td><?= htmlspecialchars($product['color']) ?></td>
+                <td><?= htmlspecialchars($product['ja_color']) ?></td>
                 <td>
-                    <form method="post" action="">
+                    <form method="post">
                         <input type="hidden" name="shop_id" value="<?= htmlspecialchars($product['shop_id']) ?>">
-                        <input type="number" name="stock_change" placeholder="増減数">
+                        <input type="number" name="stock_change" style="width: 60px;">
                         <input type="submit" name="update_stock" value="更新">
                     </form>
                 </td>
@@ -181,56 +176,15 @@
         <?php endforeach; ?>
     </table>
 
-    <!-- モーダルのHTML -->
-    <div id="imageModal" class="modal">
-        <div class="modal-content" id="modalContent">
-            <!-- ここに画像が追加されます -->
-        </div>
-        <span id="closeModal" class="close">&times;</span>
-    </div>
-
     <script>
-        // サムネイル画像をクリックした時の処理
-        const thumbnails = document.querySelectorAll('.thumbnail');
-        const modal = document.getElementById('imageModal');
-        const modalContent = document.getElementById('modalContent');
-        const closeModal = document.getElementById('closeModal');
-
-        thumbnails.forEach(thumbnail => {
-            thumbnail.addEventListener('click', function() {
-                const shopId = this.dataset.shopId;  // クリックしたサムネイルのshop_idを取得
-                fetch(`show_images.php?shop_id=${shopId}`)  // shop_idを渡して画像を取得
-                    .then(response => response.json())  // 画像のBase64エンコードされた配列を取得
-                    .then(images => {
-                        // モーダル内のコンテンツをクリア
-                        modalContent.innerHTML = '';
-
-                        if (images.length > 0) {
-                            // 画像を順にモーダルに追加
-                            images.forEach(encodedImg => {
-                                const imgElement = document.createElement('img');
-                                imgElement.src = encodedImg;  // Base64エンコードされた画像をセット
-                                imgElement.alt = '商品画像';
-                                modalContent.appendChild(imgElement);  // モーダル内に画像を追加
-                            });
-                            modal.style.display = 'flex';  // モーダルを表示
-                        } else {
-                            modalContent.innerHTML = "画像が見つかりません";  // 画像がない場合
-                            modal.style.display = 'flex';  // モーダルを表示
-                        }
-                    });
+        window.addEventListener('load', function() {
+            const thumbnails = document.querySelectorAll('.thumbnail');
+            thumbnails.forEach(thumbnail => {
+                thumbnail.addEventListener('click', function() {
+                    const shopId = this.getAttribute('data-shop-id');
+                    window.location.href = `product_detail.php?shop_id=${shopId}`;
+                });
             });
-        });
-
-        closeModal.addEventListener('click', function() {
-            modal.style.display = 'none';  // モーダルを閉じる
-        });
-
-        // モーダル外部をクリックして閉じる
-        window.addEventListener('click', function(event) {
-            if (event.target === modal) {
-                modal.style.display = 'none';  // モーダルを閉じる
-            }
         });
     </script>
 </body>

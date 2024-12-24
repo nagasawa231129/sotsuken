@@ -85,12 +85,12 @@
                                     }
                                     ?>
                                 </select>
-
                             </td>
-
                         </tr>
                     </tbody>
                 </table>
+
+                <!-- 他の商品の詳細情報を記入するためのフォーム -->
                 <table>
                     <thead>
                         <tr>
@@ -178,71 +178,31 @@
             </div>
         </form>
     </div>
+
     <div class="button-container">
         <button type="button" id="add-row">＋ 1行追加</button>
         <button type="button" onclick="submitForms()">追加</button>
     </div>
 
     <script>
-        // ページのスクロール位置を保存
-        window.addEventListener("beforeunload", () => {
-            localStorage.setItem("scrollPosition", window.scrollY);
-        });
-
-        // ページ読み込み時にスクロール位置を復元
-        window.addEventListener("load", () => {
-            const scrollPosition = localStorage.getItem("scrollPosition");
-            if (scrollPosition) {
-                window.scrollTo(0, parseInt(scrollPosition));
-            }
-        });
-
-        function deleteForm(button) {
-            const form = button.closest('.single-form');
-            if (form) {
-                form.remove();
-            }
-        }
-
-
-        function updateSubcategory(categoryElement) {
-            var categoryId = categoryElement.value;
-            var subcategorySelect = categoryElement.closest('tr').querySelector('.subcategory');
-
-            // AJAXを使用してサーバーにリクエストを送信
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', 'get_subcategories.php?category_id=' + categoryId, true);
-            xhr.onload = function() {
-                if (xhr.status === 200) {
-                    // サブカテゴリーを更新
-                    subcategorySelect.innerHTML = xhr.responseText;
-                }
-            };
-            xhr.send();
-        }
-
-        document.getElementById('add-row').addEventListener('click', function() {
+        function addRow() {
             const formContainer = document.getElementById('form-container');
             const forms = document.querySelectorAll('.goods-form');
             const lastForm = forms[forms.length - 1];
             const newForm = lastForm.cloneNode(true);
 
-            // フォームの中のフィールドをリセット
-            newForm.reset();
-
-            // 各フォームのフィールドに一意の名前を付与
-            const newIndex = forms.length; // 現在のフォーム数を基にインデックスを設定
             newForm.querySelectorAll('input, select, textarea').forEach((input) => {
                 const name = input.getAttribute('name');
                 if (name) {
-                    input.setAttribute('name', name.replace(/\[\d+\]/, `[${newIndex}]`)); // インデックスを更新
+                    input.setAttribute('name', name.replace(/\[\d+\]/, `[${forms.length}]`)); // 新しいインデックスを設定
                 }
             });
 
             formContainer.appendChild(newForm);
-        });
+        }
 
-        // 商品の送信
+        document.getElementById('add-row').addEventListener('click', addRow);
+
         function submitForms() {
             const forms = document.querySelectorAll('.goods-form');
             let allFormsSubmitted = true;
@@ -268,8 +228,7 @@
 
                     xhr.onload = function() {
                         if (xhr.status === 200) {
-                            // フォームをリセット
-                            form.reset();
+                            form.reset(); // フォームをリセット
                         } else {
                             console.error(`フォーム ${index + 1} の送信に失敗しました。`);
                             alert('送信に失敗しました。もう一度試してください。');
