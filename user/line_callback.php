@@ -106,6 +106,7 @@ if ($userExists) {
 
     // 新規登録後、セッションにIDを保存
     $_SESSION['id'] = $dbh->lastInsertId();
+    $_SESSION['display_name'] = $displayName;
     echo "新規登録が完了しました";
 }
 

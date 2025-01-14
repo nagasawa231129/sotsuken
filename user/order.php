@@ -18,7 +18,7 @@ $history_sql = "SELECT c.cart_id, c.shop_id, s.goods, c.quantity, s.price, c.ord
                 JOIN shop s ON c.shop_id = s.shop_id
                 LEFT JOIN reviews r ON c.shop_id = r.shop_id
                 LEFT OUTER JOIN `group` g ON g.shop_id = s.shop_id
-                WHERE c.user_id = :user_id";
+                WHERE c.user_id = :user_id and c.trade_situation = '3'";
 
 $pending_sql = "SELECT c.cart_id, c.shop_id, s.goods, c.quantity, s.price, c.order_date, c.trade_situation, r.review_id, s.thumbnail, g.shop_group
                 FROM cart_detail c
@@ -33,7 +33,6 @@ $shipped_sql = "SELECT c.cart_id, c.shop_id, s.goods, c.quantity, s.price, c.ord
                 LEFT JOIN reviews r ON c.shop_id = r.shop_id
                 LEFT OUTER JOIN `group` g ON g.shop_id = s.shop_id
                 WHERE c.user_id = :user_id AND c.trade_situation = '3'";
-
 
 $stmt_history = $dbh->prepare($history_sql);
 $stmt_history->bindParam(1, $userId, PDO::PARAM_INT);
@@ -60,7 +59,6 @@ $stmt_review = $dbh->prepare($review_sql);
 $stmt_review->bindParam(1, $userId, PDO::PARAM_INT);
 $stmt_review->execute();
 $result_review = $stmt_review->fetchAll(PDO::FETCH_ASSOC);
-
 ?>
 
 <!DOCTYPE html>
@@ -88,11 +86,11 @@ $result_review = $stmt_review->fetchAll(PDO::FETCH_ASSOC);
         if (count($result_history) > 0) {
             foreach ($result_history as $row) {
                 // 画像データの取得とBase64エンコード
-        $imgBlob = $row['thumbnail'];
-        $mimeType = 'image/png';  // デフォルトMIMEタイプ
-        $finfo = new finfo(FILEINFO_MIME_TYPE);
-        $mimeType = $finfo->buffer($imgBlob); // 実際のMIMEタイプを取得
-        $encodedImg = base64_encode($imgBlob); // Base64エンコード
+                $imgBlob = $row['thumbnail'];
+                $mimeType = 'image/png';  // デフォルトMIMEタイプ
+                $finfo = new finfo(FILEINFO_MIME_TYPE);
+                $mimeType = $finfo->buffer($imgBlob); // 実際のMIMEタイプを取得
+                $encodedImg = base64_encode($imgBlob); // Base64エンコード
                 echo "<div class='order-item'>";
                 echo "<a href='goods.php?shop_id={$row['shop_id']}&shop_group={$row['shop_group']}'>";
                 echo "<img class='image' src='data:{$mimeType};base64,{$encodedImg}' alt='goods img' class='sale-product-image'></br>";
@@ -116,67 +114,66 @@ $result_review = $stmt_review->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
     <div id="unpaid-content" class="tab-content <?php echo isset($_GET['tab']) && $_GET['tab'] == 'unpaid' ? 'active' : ''; ?>">
-<?php
-if (isset($userId)) {
-    // カートの未入金商品を取得するSQL（order_dateでグループ化）
-    $sql = "SELECT cart_detail.order_date, cart_detail.shop_id, shop.thumbnail, shop.goods, cart_detail.cart_id
+        <?php
+        if (isset($userId)) {
+            // カートの未入金商品を取得するSQL（order_dateでグループ化）
+            $sql = "SELECT cart_detail.order_date, cart_detail.shop_id, shop.thumbnail, shop.goods, cart_detail.cart_id
             FROM cart_detail
             JOIN shop ON cart_detail.shop_id = shop.shop_id
             WHERE cart_detail.user_id = :user_id AND cart_detail.trade_situation = '1'
-            ORDER BY cart_detail.order_date ASC";  // 未入金の状態を指定し、order_dateで並び替え
-    $stmt = $dbh->prepare($sql);
-    $stmt->bindParam(':user_id', $userId);
-    $stmt->execute();
+            ORDER BY cart_detail.order_date ASC";
+            $stmt = $dbh->prepare($sql);
+            $stmt->bindParam(':user_id', $userId);
+            $stmt->execute();
 
-    // 結果の表示
-    if ($stmt->rowCount() > 0) {
-        // 変数の初期化
-        $currentOrderDate = null;
-        
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            // 同じorder_dateの商品をまとめて表示
-            if ($currentOrderDate != $row['order_date']) {
-                // 新しい注文が始まった場合、注文日時を表示
-                if ($currentOrderDate !== null) {
-                    echo "</div><hr>"; // 前の注文が終了していれば区切りを入れる
+            // 結果の表示
+            if ($stmt->rowCount() > 0) {
+                // 変数の初期化
+                $currentOrderDate = null;
+
+                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                    // 同じorder_dateの商品をまとめて表示
+                    if ($currentOrderDate != $row['order_date']) {
+                        // 新しい注文が始まった場合、注文日時を表示
+                        if ($currentOrderDate !== null) {
+                            echo "</div><hr>"; // 前の注文が終了していれば区切りを入れる
+                        }
+                        $currentOrderDate = $row['order_date'];
+                        echo "<h3>注文日: {$currentOrderDate}</h3>"; // 注文日を表示
+                        echo "<div class='order-group'>";
+                    }
+
+                    // 商品情報の表示
+                    $imgBlob = $row['thumbnail'];
+                    $mimeType = 'image/png';  // デフォルトMIMEタイプ
+                    $finfo = new finfo(FILEINFO_MIME_TYPE);
+                    $mimeType = $finfo->buffer($imgBlob); // 実際のMIMEタイプを取得
+                    $encodedImg = base64_encode($imgBlob); // Base64エンコード
+
+                    echo "<div class='product-item'>";
+                    echo "<p>商品名: {$row['goods']}</p>";
+                    echo "<img class='image' src='data:{$mimeType};base64,{$encodedImg}' alt='goods img' class='sale-product-image'></br>";
+                    // echo "<p>カートID: {$row['cart_id']}</p>";
+                    echo "<p>バーコード：</p>";
+                    echo "</div>";
                 }
-                $currentOrderDate = $row['order_date'];
-                echo "<h3>注文日: {$currentOrderDate}</h3>"; // 注文日を表示
-                echo "<div class='order-group'>";
+                echo "</div>";  // 最後の注文グループを閉じる
+            } else {
+                echo "<p>未入金の商品はありません。</p>";
             }
-
-            // 商品情報の表示
-            $imgBlob = $row['thumbnail'];
-            $mimeType = 'image/png';  // デフォルトMIMEタイプ
-            $finfo = new finfo(FILEINFO_MIME_TYPE);
-            $mimeType = $finfo->buffer($imgBlob); // 実際のMIMEタイプを取得
-            $encodedImg = base64_encode($imgBlob); // Base64エンコード
-
-            echo "<div class='product-item'>";
-            echo "<p>商品名: {$row['goods']}</p>";
-            echo "<img class='image' src='data:{$mimeType};base64,{$encodedImg}' alt='goods img' class='sale-product-image'></br>";
-            // echo "<p>カートID: {$row['cart_id']}</p>";
-            echo "<p>バーコード：</p>";
-            echo "</div>";
         }
-        echo "</div>";  // 最後の注文グループを閉じる
-    } else {
-        echo "<p>未入金の商品はありません。</p>";
-    }
-}
-?>
-</div>
-
+        ?>
+    </div>
 
     <div id="pending-content" class="tab-content <?php echo isset($_GET['tab']) && $_GET['tab'] == 'pending' ? 'active' : ''; ?>">
         <?php
         if (count($result_pending) > 0) {
             foreach ($result_pending as $row) {
                 $imgBlob = $row['thumbnail'];
-        $mimeType = 'image/png';  // デフォルトMIMEタイプ
-        $finfo = new finfo(FILEINFO_MIME_TYPE);
-        $mimeType = $finfo->buffer($imgBlob); // 実際のMIMEタイプを取得
-        $encodedImg = base64_encode($imgBlob); // Base64エンコード
+                $mimeType = 'image/png';  // デフォルトMIMEタイプ
+                $finfo = new finfo(FILEINFO_MIME_TYPE);
+                $mimeType = $finfo->buffer($imgBlob); // 実際のMIMEタイプを取得
+                $encodedImg = base64_encode($imgBlob); // Base64エンコード
                 echo "<div class='order-item'>";
                 echo "<a href='goods.php?shop_id={$row['shop_id']}&shop_group={$row['shop_group']}'>";
                 echo "<img class='image' src='data:{$mimeType};base64,{$encodedImg}' alt='goods img' class='sale-product-image'></br>";
@@ -203,10 +200,10 @@ if (isset($userId)) {
         if (count($result_shipped) > 0) {
             foreach ($result_shipped as $row) {
                 $imgBlob = $row['thumbnail'];
-        $mimeType = 'image/png';  // デフォルトMIMEタイプ
-        $finfo = new finfo(FILEINFO_MIME_TYPE);
-        $mimeType = $finfo->buffer($imgBlob); // 実際のMIMEタイプを取得
-        $encodedImg = base64_encode($imgBlob); // Base64エンコード
+                $mimeType = 'image/png';  // デフォルトMIMEタイプ
+                $finfo = new finfo(FILEINFO_MIME_TYPE);
+                $mimeType = $finfo->buffer($imgBlob); // 実際のMIMEタイプを取得
+                $encodedImg = base64_encode($imgBlob); // Base64エンコード
                 echo "<div class='order-item'>";
                 echo "<a href='goods.php?shop_id={$row['shop_id']}&shop_group={$row['shop_group']}'>";
                 echo "<img class='image' src='data:{$mimeType};base64,{$encodedImg}' alt='goods img' class='sale-product-image'></br>";
