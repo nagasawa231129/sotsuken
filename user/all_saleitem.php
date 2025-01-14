@@ -98,9 +98,11 @@ echo "<link rel='stylesheet' href='all_item.css'>";
     <div class="products-container">
         <?php
         $sql = "SELECT shop.*, 
+        `group`.shop_group,
         brand.brand_name, 
         sale.sale_id
         FROM shop
+        LEFT OUTER JOIN `group` ON `group`.shop_id = shop.shop_id
         LEFT OUTER JOIN brand ON brand.brand_id = shop.brand_id
         LEFT OUTER JOIN sale ON sale.sale_id = shop.sale_id
         WHERE shop.sale_id != 0  -- saleカラムが0以外の商品を表示

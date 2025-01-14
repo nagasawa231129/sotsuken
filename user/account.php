@@ -61,6 +61,7 @@ if (file_exists($lang_file)) {
                 <!-- 注文履歴 -->
                 <li><strong><?php echo $translations['Order'] ?></strong></li>
                 <li><a href="order.php#history"><?php echo $translations['Order History'] ?></a></li>
+                <li><a href="order.php#unpaid"><?php echo $translations['Unpaid'] ?></a></li>
                 <li><a href="order.php#pending"><?php echo $translations['Items Pending Shipment'] ?></a></li>
                 <li><a href="order.php#shipped"><?php echo $translations['Shipped Items'] ?></a></li>
                 <li><a href="order.php#review"><?php echo $translations['Review'] ?></a></li>

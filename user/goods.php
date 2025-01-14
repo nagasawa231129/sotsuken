@@ -88,7 +88,7 @@ if ($shop_id) {
                 $variations = $stmt_variations->fetchAll(PDO::FETCH_ASSOC);
 
                 // var_dump($variations);
-                
+
                 // サイズとカラーごとに表示
                 foreach ($variations as $variation) {
                     $size = $variation['size'];
@@ -193,7 +193,7 @@ if ($shop_id) {
             LEFT JOIN `group` AS g ON g.shop_id = s.shop_id
             WHERE s.shop_id = :shop_id AND g.shop_group = :shop_group
         ";
-                    if (empty($sql_thumbnail)) {
+            if (empty($sql_thumbnail)) {
                 echo "<p>SQLクエリが空です。</p>";
             }
 
@@ -231,7 +231,7 @@ if ($shop_id) {
         LEFT JOIN `group` ON `group`.shop_id = shop.shop_id
         WHERE `group`.shop_group = :shop_group
     ";
-    
+
 
         $stmt_shop_images = $dbh->prepare($sql_shop_images);
         // $stmt_shop_images->bindParam(':shop_id', $shop_id);
@@ -267,10 +267,10 @@ if ($shop_id) {
     LIMIT 1
 ";
 
-$stmt_shop_id = $dbh->prepare($sql_shop_id);
-$stmt_shop_id->bindParam(':shop_group', $shop_group, PDO::PARAM_INT);
-$stmt_shop_id->bindParam(':color', $color, PDO::PARAM_STR);
-$stmt_shop_id->execute();
+        $stmt_shop_id = $dbh->prepare($sql_shop_id);
+        $stmt_shop_id->bindParam(':shop_group', $shop_group, PDO::PARAM_INT);
+        $stmt_shop_id->bindParam(':color', $color, PDO::PARAM_STR);
+        $stmt_shop_id->execute();
 
 
         // shop_id を取得
@@ -284,13 +284,13 @@ $stmt_shop_id->execute();
             LEFT JOIN `group` AS g ON g.shop_id = i.shop_id
             WHERE g.shop_group = :shop_group
         ";
-        
-        $stmt_sub_images = $dbh->prepare($sql_sub_images);
-        $stmt_sub_images->bindParam(':shop_group', $shop_group, PDO::PARAM_INT);
-        $stmt_sub_images->execute();
-        
-        // $sub_images = $stmt_sub_images->fetchAll(PDO::FETCH_ASSOC);
-        
+
+            $stmt_sub_images = $dbh->prepare($sql_sub_images);
+            $stmt_sub_images->bindParam(':shop_group', $shop_group, PDO::PARAM_INT);
+            $stmt_sub_images->execute();
+
+            // $sub_images = $stmt_sub_images->fetchAll(PDO::FETCH_ASSOC);
+
 
             // サブ画像があれば表示
             if ($stmt_sub_images->rowCount() > 0) {
@@ -346,55 +346,55 @@ $stmt_shop_id->execute();
                 ?>
             </div>
             <div id="size" class="tab-content">
-    <?php
-    if ($shop_id && $shop_group) {
-        // カラーとサイズ情報を取得するクエリ
-        $sql = "SELECT shop.color, size.size, color.ja_color
+                <?php
+                if ($shop_id && $shop_group) {
+                    // カラーとサイズ情報を取得するクエリ
+                    $sql = "SELECT shop.color, size.size, color.ja_color
                 FROM shop
                 LEFT OUTER JOIN size ON size.size_id = shop.size
                 LEFT OUTER JOIN color ON color.color_id = shop.color
-                LEFT OUTER JOIN group ON group.shop_id = shop.shop_id
-                WHERE group.shop_group = :shop_group
+                LEFT OUTER JOIN `group` ON `group`.shop_id = shop.shop_id
+                WHERE `group`.shop_group = :shop_group
                 ORDER BY shop.color";
 
-        // クエリの準備と実行
-        $stmt = $dbh->prepare($sql);
-        $stmt->bindParam(':shop_group', $shop_group, PDO::PARAM_INT);
-        $stmt->execute();
+                    // クエリの準備と実行
+                    $stmt = $dbh->prepare($sql);
+                    $stmt->bindParam(':shop_group', $shop_group, PDO::PARAM_INT);
+                    $stmt->execute();
 
-        // 結果を取得
-        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    // 結果を取得
+                    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        if ($results) {
-            // カラーごとにグループ化
-            $groupedColors = [];
-            foreach ($results as $row) {
-                $color = $row['ja_color'];
-                $size = $row['size'];
+                    if ($results) {
+                        // カラーごとにグループ化
+                        $groupedColors = [];
+                        foreach ($results as $row) {
+                            $color = $row['ja_color'];
+                            $size = $row['size'];
 
-                if (!isset($groupedColors[$color])) {
-                    $groupedColors[$color] = [];
+                            if (!isset($groupedColors[$color])) {
+                                $groupedColors[$color] = [];
+                            }
+                            $groupedColors[$color][] = $size;
+                        }
+
+                        // カラーとサイズを表示
+                        foreach ($groupedColors as $color => $sizes) {
+                            echo "<h3>" . htmlspecialchars($translations['Color'] ?? 'Color', ENT_QUOTES, 'UTF-8') . ": " . htmlspecialchars($color, ENT_QUOTES, 'UTF-8') . "</h3>";
+                            echo "<ul>";
+                            foreach ($sizes as $size) {
+                                echo "<li>" . htmlspecialchars($translations['Size'] ?? 'Size', ENT_QUOTES, 'UTF-8') . ": " . htmlspecialchars($size, ENT_QUOTES, 'UTF-8') . "</li>";
+                            }
+                            echo "</ul>";
+                        }
+                    } else {
+                        echo "<p>この商品のカラーとサイズ情報は見つかりませんでした。</p>";
+                    }
+                } else {
+                    echo "<p>商品情報が無効です。</p>";
                 }
-                $groupedColors[$color][] = $size;
-            }
-
-            // カラーとサイズを表示
-            foreach ($groupedColors as $color => $sizes) {
-                echo "<h3>" . htmlspecialchars($translations['Color'] ?? 'Color', ENT_QUOTES, 'UTF-8') . ": " . htmlspecialchars($color, ENT_QUOTES, 'UTF-8') . "</h3>";
-                echo "<ul>";
-                foreach ($sizes as $size) {
-                    echo "<li>" . htmlspecialchars($translations['Size'] ?? 'Size', ENT_QUOTES, 'UTF-8') . ": " . htmlspecialchars($size, ENT_QUOTES, 'UTF-8') . "</li>";
-                }
-                echo "</ul>";
-            }
-        } else {
-            echo "<p>この商品のカラーとサイズ情報は見つかりませんでした。</p>";
-        }
-    } else {
-        echo "<p>商品情報が無効です。</p>";
-    }
-    ?>
-</div>
+                ?>
+            </div>
 
 
 
@@ -487,21 +487,27 @@ $stmt_shop_id->execute();
                 ?>
             </div>
             <script>
-                // タブボタンのクリックイベント
                 document.querySelectorAll('.tab-button').forEach(button => {
                     button.addEventListener('click', () => {
-                        // すべてのタブコンテンツとタブボタンのactiveクラスをリセット
-                        document.querySelectorAll('.tab-content').forEach(tab => {
-                            tab.classList.remove('active-tab');
-                        });
+                        // すべてのタブボタンからactiveクラスを削除
                         document.querySelectorAll('.tab-button').forEach(tabButton => {
                             tabButton.classList.remove('active');
                         });
 
-                        // クリックされたタブボタンと対応するタブコンテンツにactiveクラスを追加
-                        const targetId = button.getAttribute('data-target');
-                        document.getElementById(targetId).classList.add('active-tab');
+                        // すべてのタブコンテンツからactive-tabクラスを削除
+                        document.querySelectorAll('.tab-content').forEach(tab => {
+                            tab.classList.remove('active-tab');
+                        });
+
+                        // クリックされたタブボタンにactiveクラスを追加
                         button.classList.add('active');
+
+                        // 対応するタブコンテンツにactive-tabクラスを追加
+                        const targetId = button.getAttribute('data-target');
+                        const targetTab = document.getElementById(targetId);
+                        if (targetTab) {
+                            targetTab.classList.add('active-tab');
+                        }
                     });
                 });
             </script>

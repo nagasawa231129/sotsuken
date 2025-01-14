@@ -46,7 +46,7 @@ $translations = [
     'There are no new notices' => '新しいお知らせはありません',
     'Search Results' => '検索結果',
     'Let\'s do a fashion diagnosis!' => 'あなたのファッション診断をしよう!',
-    '' => '',
+    'Unpaid' => '未入金',
 
     'Welcome message' => 'ようこそ！',
     'Language Select' => '言語を選択',

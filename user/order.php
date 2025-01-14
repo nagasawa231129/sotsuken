@@ -77,6 +77,7 @@ $result_review = $stmt_review->fetchAll(PDO::FETCH_ASSOC);
 
     <div class="tabs">
         <div class="tab <?php echo isset($_GET['tab']) && $_GET['tab'] == 'history' ? 'active' : ''; ?>" id="history-tab" onclick="showTab('history')"><?php echo $translations['Order History'] ?></div>
+        <div class="tab <?php echo isset($_GET['tab']) && $_GET['tab'] == 'unpaid' ? 'active' : ''; ?>" id="unpaid-tab" onclick="showTab('unpaid')"><?php echo $translations['Unpaid'] ?></div>
         <div class="tab <?php echo isset($_GET['tab']) && $_GET['tab'] == 'pending' ? 'active' : ''; ?>" id="pending-tab" onclick="showTab('pending')"><?php echo $translations['Items Pending Shipment'] ?></div>
         <div class="tab <?php echo isset($_GET['tab']) && $_GET['tab'] == 'shipped' ? 'active' : ''; ?>" id="shipped-tab" onclick="showTab('shipped')"><?php echo $translations['Shipped Items'] ?></div>
         <div class="tab <?php echo isset($_GET['tab']) && $_GET['tab'] == 'review' ? 'active' : ''; ?>" id="review-tab" onclick="showTab('review')"><?php echo $translations['Review'] ?></div>
@@ -113,6 +114,59 @@ $result_review = $stmt_review->fetchAll(PDO::FETCH_ASSOC);
         }
         ?>
     </div>
+
+    <div id="unpaid-content" class="tab-content <?php echo isset($_GET['tab']) && $_GET['tab'] == 'unpaid' ? 'active' : ''; ?>">
+<?php
+if (isset($userId)) {
+    // カートの未入金商品を取得するSQL（order_dateでグループ化）
+    $sql = "SELECT cart_detail.order_date, cart_detail.shop_id, shop.thumbnail, shop.goods, cart_detail.cart_id
+            FROM cart_detail
+            JOIN shop ON cart_detail.shop_id = shop.shop_id
+            WHERE cart_detail.user_id = :user_id AND cart_detail.trade_situation = '1'
+            ORDER BY cart_detail.order_date ASC";  // 未入金の状態を指定し、order_dateで並び替え
+    $stmt = $dbh->prepare($sql);
+    $stmt->bindParam(':user_id', $userId);
+    $stmt->execute();
+
+    // 結果の表示
+    if ($stmt->rowCount() > 0) {
+        // 変数の初期化
+        $currentOrderDate = null;
+        
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            // 同じorder_dateの商品をまとめて表示
+            if ($currentOrderDate != $row['order_date']) {
+                // 新しい注文が始まった場合、注文日時を表示
+                if ($currentOrderDate !== null) {
+                    echo "</div><hr>"; // 前の注文が終了していれば区切りを入れる
+                }
+                $currentOrderDate = $row['order_date'];
+                echo "<h3>注文日: {$currentOrderDate}</h3>"; // 注文日を表示
+                echo "<div class='order-group'>";
+            }
+
+            // 商品情報の表示
+            $imgBlob = $row['thumbnail'];
+            $mimeType = 'image/png';  // デフォルトMIMEタイプ
+            $finfo = new finfo(FILEINFO_MIME_TYPE);
+            $mimeType = $finfo->buffer($imgBlob); // 実際のMIMEタイプを取得
+            $encodedImg = base64_encode($imgBlob); // Base64エンコード
+
+            echo "<div class='product-item'>";
+            echo "<p>商品名: {$row['goods']}</p>";
+            echo "<img class='image' src='data:{$mimeType};base64,{$encodedImg}' alt='goods img' class='sale-product-image'></br>";
+            // echo "<p>カートID: {$row['cart_id']}</p>";
+            echo "<p>バーコード：</p>";
+            echo "</div>";
+        }
+        echo "</div>";  // 最後の注文グループを閉じる
+    } else {
+        echo "<p>未入金の商品はありません。</p>";
+    }
+}
+?>
+</div>
+
 
     <div id="pending-content" class="tab-content <?php echo isset($_GET['tab']) && $_GET['tab'] == 'pending' ? 'active' : ''; ?>">
         <?php

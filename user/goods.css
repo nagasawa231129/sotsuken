@@ -148,19 +148,19 @@ p {
     background-color: #e9ecef;
 }
 
-.tab-button.active {
-    background-color: lightblue;
-    /* border-bottom: 2px solid #28a745; */
-}
-
 .tab-content {
     display: none;
-    margin-top: 20px;
 }
 
 .tab-content.active-tab {
     display: block;
 }
+
+.tab-button.active {
+    font-weight: bold;
+    /* border-bottom: 2px solid #000; 例としてボタンの見た目を変更 */
+}
+
 
 .star-rating {
     display: flex;
