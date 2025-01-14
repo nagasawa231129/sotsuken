@@ -94,6 +94,16 @@ function delete(){
 
     // 実行
     $stmt->execute();
+
+        // 商品を削除するSQLクエリ
+        $cart_delete_sql = "DELETE FROM cart WHERE shop_id = :shop_id";
+
+        // SQLの準備
+        $stmt = $dbh->prepare($cart_delete_sql);
+        $stmt->bindParam(':shop_id', $shop_id);
+    
+        // 実行
+        $stmt->execute();
 }
 
 function s_reset(){
