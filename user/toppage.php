@@ -177,7 +177,7 @@ $totalPages = ceil($totalItems / $itemsPerPage);
                         $encodedImg = base64_encode($imgBlob);
 
                         // 商品詳細ページへのリンク生成
-                        $productLink = "goods.php?shop_id={$rec['shop_id']}";
+                        $productLink = "goods.php?shop_id={$rec['shop_id']}&shop_group={$rec['shop_group']}";
 
                         // 商品情報を全体リンクで表示
                         echo "<a href='{$productLink}' style='text-decoration: none; color: inherit;'>";
@@ -260,7 +260,7 @@ $totalPages = ceil($totalItems / $itemsPerPage);
                         $encodedImg = base64_encode($imgBlob);
 
                         // 商品詳細ページへのリンク生成
-                        $productLink = "goods.php?shop_id={$rec['shop_id']}";
+                        $productLink = "goods.php?shop_id={$rec['shop_id']}&shop_group={$rec['shop_group']}";
 
                         // 商品情報を全体リンクで表示
                         echo "<a href='{$productLink}' style='text-decoration: none; color: inherit;'>";
@@ -345,7 +345,7 @@ $totalPages = ceil($totalItems / $itemsPerPage);
                         $encodedImg = base64_encode($imgBlob);
 
                         // 商品詳細ページへのリンク生成
-                        $productLink = "goods.php?shop_id={$rec['shop_id']}";
+                        $productLink = "goods.php?shop_id={$rec['shop_id']}&shop_group={$rec['shop_group']}";
 
                         // 商品情報を全体リンクで表示
                         echo "<a href='{$productLink}' style='text-decoration: none; color: inherit;'>";

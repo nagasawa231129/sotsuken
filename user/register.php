@@ -36,12 +36,7 @@ if ($dbh) {
 
         // カートのデータを処理
         while($row = $result->fetch(PDO::FETCH_ASSOC)){
-            $cart_id = $row['cart_id'];
-            $user_id = $row['user_id'];
-            $shop_id = $row['shop_id'];
-            $quantity = $row['quantity'];
-            $trade_situation = $row['trade_situation'];
-            $order_date = $row['order_date'];
+            
 
             // shopテーブルから商品情報を取得
             $sqlGoods = "SELECT goods, price,thumbnail FROM shop WHERE shop_id = :shop_id";
@@ -201,7 +196,7 @@ if ($dbh) {
         const closeModalButton = document.getElementById('closeModalBtn');
 
         openModalButton.onclick = function() {
-            modal.style.display = 'block';
+            modal.style.display = 'flex';
         };
 
         // モーダルの閉じるボタン

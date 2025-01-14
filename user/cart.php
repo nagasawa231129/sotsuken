@@ -83,16 +83,20 @@
 
                             // 商品情報を表示
                             echo "<div class='cart-item'>";
+                            echo "<form method='POST' action='update_quantity.php'>";
                             echo "<img src='data:$mimeType;base64,$encodedImg' alt='商品画像' style='width:100px; height:auto;'><br>";
                             echo "<p>商品名: <span class='info-text'>" . htmlspecialchars($goods, ENT_QUOTES, 'UTF-8') . "</span><br>";
                             echo "価格: <span class='info-text'>" . htmlspecialchars($price, ENT_QUOTES, 'UTF-8') . "円</span><br>";
                             echo "サイズ: <span class='info-text'>" . htmlspecialchars($size, ENT_QUOTES, 'UTF-8') . "</span><br>";
                             echo "カラー: <span class='info-text'>" . htmlspecialchars($color, ENT_QUOTES, 'UTF-8') . "</span><br>";
                             echo "<div class='item-actions'>";
-                            echo "<button id='decreaseBtn_$shopId' class='decrease-btn' data-shop-id='$shopId' data-price='$price' data-quantity='$quantity' onClick='updateQuantityHandler(this)'>-</button>";
-                            echo " <span id='quantity_$shopId'>" . $item['quantity'] .  "</span> ";
-                            echo "<button id='increaseBtn_$shopId' class='increase-btn' data-shop-id='$shopId' data-price='$price' data-quantity='$quantity' onClick='updateQuantityHandler(this)'>+</button>";
+                            echo '<button type="submit" name="action" value="decrease">-</button>';
+                            echo "<span id='quantity_$shopId'>" . htmlspecialchars($item['quantity'], ENT_QUOTES, 'UTF-8') . "</span>";
+                            echo "<button type='submit' name='action' value='increase'>+</button>";
                             echo "<br> <span id='totalAmount_$shopId'>" . $totalPrice . "円</span>";
+                            echo "<input type='hidden' name='shop_id' value='" . htmlspecialchars($shopId, ENT_QUOTES, 'UTF-8') . "'>";
+                            echo "<input type='hidden' name='current_quantity' value='" . htmlspecialchars($item['quantity'], ENT_QUOTES, 'UTF-8') . "'>";
+                            echo "</form>";
                             echo "</div>";
                             echo "</div>";
                         } else {
