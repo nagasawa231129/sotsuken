@@ -1,4 +1,16 @@
 <?php
+if (session_status() == PHP_SESSION_NONE) {
+  session_start(); // セッション開始
+}
+if (empty($_SESSION['admin_id'])) {
+    echo "<script>
+            alert('ログインしてください');
+            window.location.href = 'admin_login.php'; // ログインページにリダイレクト
+          </script>";
+    exit();
+}
+
+
 // 未読メール数を取得
 // $unreadCount = include('get_unread_count.php');
 include './../../db_open.php';
@@ -24,11 +36,11 @@ $orderCount = $result['count'];
     <span class="notification-badge" id="orderBadge">
       <?php echo htmlspecialchars($orderCount, ENT_QUOTES, 'UTF-8'); ?>
     </span>
-  </a>
+  <!-- </a>
   <a href="https://mail.google.com/mail/u/1/#inbox" class="admin-button">
     メール管理
    
-  </a>
+  </a> -->
   <a href="inventory_management.php" class="admin-button">
     在庫管理
   </a>

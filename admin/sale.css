@@ -1,3 +1,19 @@
+a.back-link {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #4CAF50; /* ボタンの背景色 */
+    color: white; /* 文字色 */
+    text-decoration: none; /* 下線を消す */
+    border-radius: 5px; /* 角を丸くする */
+    font-size: 16px; /* フォントサイズ */
+    text-align: center; /* 中央揃え */
+    transition: background-color 0.3s ease; /* 背景色変更のアニメーション */
+}
+
+/* 戻るリンクホバー時のスタイル */
+a.back-link:hover {
+    background-color: #45a049; /* ホバー時に色が変わる */
+}
 
 /* 全体のフォントと背景 */
 body {
@@ -7,6 +23,94 @@ body {
     margin: 0;
     padding: 20px;
     line-height: 1.6;  /* 行間を少し広げて読みやすく */
+}
+/* 全体のスタイル */
+#search-form {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* 入力フィールド共通 */
+#search-form input[type="text"],
+#search-form input[type="number"],
+#search-form select {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 200px;
+    box-sizing: border-box; /* ボーダーを含めた幅計算 */
+}
+
+/* 入力フィールドにフォーカス時のスタイル */
+#search-form input[type="text"]:focus,
+#search-form input[type="number"]:focus,
+#search-form select:focus {
+    border-color: #4CAF50;
+    outline: none;
+}
+
+/* 検索ボタン */
+#search-form button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+/* 検索ボタンにホバー時のスタイル */
+#search-form button:hover {
+    background-color: #45a049;
+}
+
+/* すべて表示ボタン */
+#search-form .button {
+    background-color: #f1f1f1;
+    color: #333;
+    padding: 12px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    text-decoration: none;
+    display: inline-block;
+    border: 1px solid #ccc;
+    transition: background-color 0.3s;
+}
+
+/* すべて表示ボタンにホバー時のスタイル */
+#search-form .button:hover {
+    background-color: #ddd;
+}
+
+/* 各要素の間隔調整 */
+#search-form input[type="text"],
+#search-form select,
+#search-form input[type="number"] {
+    margin-bottom: 10px; /* 各項目間の隙間 */
+}
+
+/* レスポンシブデザイン（モバイル対応） */
+@media (max-width: 768px) {
+    #search-form {
+        flex-direction: column;
+        align-items: center;
+    }
+    #search-form input[type="text"],
+    #search-form input[type="number"],
+    #search-form select {
+        width: 100%;
+        margin-bottom: 10px;
+    }
 }
 
 /* テーブルのスタイル */

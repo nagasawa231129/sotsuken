@@ -43,7 +43,7 @@
 </head>
 
 <body>
-    <a href="admin_toppage.php">トップページ</a>
+<a href="goods_info.php" class="back-link">情報管理へ</a>
     <h1>商品追加フォーム</h1>
     <div class="form-container" id="form-container">
         <form method="post" action="add_goods_process.php" enctype="multipart/form-data" class="goods-form">

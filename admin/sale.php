@@ -1,5 +1,5 @@
 <link rel="stylesheet" href="sale.css">
-
+<a href="goods_info.php" class="back-link">情報管理へ</a>
 <?php
 // データベース接続
 include './../../db_open.php';
@@ -151,7 +151,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply_discount'])) {
 }
 ?>
 
-
 <!-- 検索フォーム -->
 <form id="search-form" method="GET">
     <!-- 商品名で検索 -->
@@ -201,6 +200,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply_discount'])) {
     <!-- すべて表示ボタン -->
     <a href="sale.php" class="button">すべて表示</a>
 </form>
+
 
 <!-- 商品リストの表示 -->
 <h3>商品一覧</h3>

@@ -4,6 +4,47 @@
     display: inline-block;
     margin-right: 10px;
 }
+/* 戻るリンクのスタイル */
+a.back-link {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #4CAF50; /* ボタンの背景色 */
+    color: white; /* 文字色 */
+    text-decoration: none; /* 下線を消す */
+    border-radius: 5px; /* 角を丸くする */
+    font-size: 16px; /* フォントサイズ */
+    text-align: center; /* 中央揃え */
+    transition: background-color 0.3s ease; /* 背景色変更のアニメーション */
+}
+
+/* 戻るリンクホバー時のスタイル */
+a.back-link:hover {
+    background-color: #45a049; /* ホバー時に色が変わる */
+}
+/* ボタンコンテナ */
+.select {
+    position: fixed; /* 固定配置 */
+    top: 20px; /* 上から20pxの位置 */
+    right: 20px; /* 右から20pxの位置 */
+    z-index: 1000; /* 他の要素の前に表示 */
+}
+
+/* ボタンのスタイル */
+.select button {
+    background-color: #4CAF50; /* ボタンの背景色 */
+    color: white; /* 文字色 */
+    font-size: 16px; /* フォントサイズ */
+    padding: 10px 20px; /* パディング */
+    border: none; /* 枠線なし */
+    border-radius: 5px; /* 角を丸くする */
+    cursor: pointer; /* カーソルをポインタに */
+    margin-left: 10px; /* ボタン間のスペース */
+}
+
+/* ボタンホバー時のスタイル */
+.select button:hover {
+    background-color: #45a049; /* ホバー時に背景色が変わる */
+}
 
 /* 画像スタイル */
 .subthumbnail {

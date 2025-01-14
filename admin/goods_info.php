@@ -1,6 +1,5 @@
 <link rel="stylesheet" href="goods_info.css">
-
-<a href="admin_toppage.php">戻る</a>
+<a href="admin_toppage.php" class="back-link">戻る</a>
 
 <head>
     <script>
@@ -95,10 +94,7 @@
     $total_pages = ceil($total_items / $limit); // 総ページ数
 
     ?>
-    <div class="select">
-        <button id="add-button" onclick="location.href='add_goods.php'">追加</button>
-        <button id="sale-button" onclick="location.href='sale.php'">セール</button>
-    </div>
+
 
     <div class="form-container">
         <!-- 商品名検索フォーム -->
@@ -109,7 +105,10 @@
             <button type="submit" name="reset_search">全て表示する</button>
         </form>
     </div>
-
+    <div class="select">
+        <button id="add-button" onclick="location.href='add_goods.php'">追加</button>
+        <button id="sale-button" onclick="location.href='sale.php'">セール</button>
+    </div>
     <?php
     // 「全て表示する」ボタンが押された場合、検索条件をリセット
     if (isset($_POST['reset_search'])) {
@@ -284,5 +283,26 @@
         <a href="?page=<?= $page + 1 ?>&search_query=<?= urlencode($search_query) ?>#"><?= '次のページ' ?></a>
     <?php endif; ?>
 </div>
-
+<script>
+// 画像削除の処理
+function deleteImage(shopId, imageId) {
+    // 確認ダイアログを表示
+    if (confirm('この画像を削除してもよろしいですか？')) {
+        // Ajaxで削除リクエストを送信
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "delete_image.php", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                // 削除が成功した場合、画面から画像を削除
+                var imageContainer = document.getElementById("imageContainer" + imageId);
+                imageContainer.remove();
+            } else {
+                alert("削除に失敗しました");
+            }
+        };
+        xhr.send("shop_id=" + shopId + "&image_id=" + imageId);
+    }
+}
+</script>
 </body>
