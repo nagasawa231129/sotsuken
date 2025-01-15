@@ -1,22 +1,26 @@
+html, body {
+    margin: 0; /* デフォルトの余白を削除 */
+    padding: 0; /* デフォルトの余白を削除 */
+    width: 100%; /* 横幅を100%に設定 */
+    overflow-x: hidden; /* 横方向のスクロールを無効化 */
+    box-sizing: border-box; /* ボックスサイズ計算を安定させる */
+}
+
 .main-content {
-    display: flex;
-    justify-content: space-between;
-    padding: 20px;
-    box-sizing: border-box;
-    background-color: #f8f9fa;
-    width: 100%; /* 親要素の幅を100%に */
+    display: flex; /* サイドバーとコンテンツを横並び */
+    gap: 10px; /* 間隔を狭める（デフォルト20px→10px） */
+    width: 100%; /* 横幅100% */
 }
 
 /* サイドバーのスタイル */
 .sidebar {
-    width: 250px;
-    padding: 20px;
-    background-color: #fff;
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-    box-sizing: border-box;
-    height: auto; /* コンテンツに合わせて高さを自動調整 */
-    position: relative; /* サブカテゴリーを親要素内に収めるための位置設定 */
-    overflow-y: auto; /* コンテンツが多くなった場合、スクロールできるようにする */
+    flex: 0 0 250px; /* サイドバーの幅を固定 */
+    background: #f5f5f5; /* 背景色 */
+    padding: 20px; /* 内側余白 */
+    border-radius: 8px; /* 角を丸める */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 影 */
+    /* margin-right: px; 右側の余白を微調整 */
+
 }
 
 /* メインカテゴリのリスト */
@@ -33,7 +37,7 @@
 }
 
 /* メインカテゴリリンク */
-.sidebar ul li > a {
+.sidebar ul li>a {
     text-decoration: none;
     color: #333;
     display: block;
@@ -47,11 +51,12 @@
 }
 
 .category-item {
-    position: relative; /* サブカテゴリーのドロップダウンに必要 */
+    position: relative;
+    /* サブカテゴリーのドロップダウンに必要 */
 }
 
 /* 各カテゴリリンクのスタイル */
-.category-item > a {
+.category-item>a {
     display: block;
     padding: 10px 15px;
     text-decoration: none;
@@ -62,7 +67,7 @@
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.category-item > a:hover {
+.category-item>a:hover {
     background-color: #007bff;
     color: white;
 }
@@ -71,9 +76,11 @@
 .sub-category {
     display: none;
     list-style: none;
-    padding-left: 20px; /* サブカテゴリーのインデント */
+    padding-left: 20px;
+    /* サブカテゴリーのインデント */
     margin: 0;
-    background-color: #f8f9fa; /* サブカテゴリも親カテゴリと同じ背景色 */
+    background-color: #f8f9fa;
+    /* サブカテゴリも親カテゴリと同じ背景色 */
 }
 
 /* 親カテゴリリンクをホバーした時にサブカテゴリーを表示 */
@@ -100,64 +107,121 @@
 }
 
 /* サブカテゴリーにサブサブカテゴリーがあった場合のスタイル */
-.sub-category li:hover > .sub-category {
-    display: block; /* サブサブカテゴリーも表示 */
-    position: absolute; /* 親カテゴリーの右側に表示 */
+.sub-category li:hover>.sub-category {
+    display: block;
+    /* サブサブカテゴリーも表示 */
+    position: absolute;
+    /* 親カテゴリーの右側に表示 */
     left: 100%;
     top: 0;
     padding-left: 10px;
 }
 
-/* 商品カードのレイアウト */
-.products-container {
-    display: flex;  /* フレックスボックスに設定 */
-    justify-content: space-between;  /* 商品を均等に配置 */
-    gap: 20px;  /* 商品間のスペースを調整 */
+.products-wrapper {
+    display: flex;
+    flex-direction: column; /* 縦方向に並べる */
+    gap: 20px; /* セール商品と通常商品の間隔 */
+    margin: 20px; /* 全体の外側余白 */
 }
 
-/* 商品カードのスタイル */
-.product-card {
-    background-color: #fff;
-    border: 1px solid #ccc;
+.products-container, .sale-products-container {
+    margin-right: 50px;
+    margin-bottom: 20px;
+    /* width: 80%; */
+    height: 410px;
+    max-width: 1200px;
+    /* margin: 0 auto; */
     border-radius: 8px;
-    padding: 15px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease-in-out;
-    text-decoration: none;
-    color: inherit;
+    background: #f9f9f9;
+    overflow: hidden;
 }
 
-.product-card:hover {
-    transform: translateY(-5px);
+.product-scroll, .sale-product-scroll {
+    display: flex;
+    overflow-x: auto; /* 横スクロールを有効化 */
+    gap: 10px; /* 商品間のスペース */
+    /* padding: 10px; 内側の余白 */
+    height: 100%; /* 高さを設定して整列を保つ */
+    flex-direction: row;
 }
 
-/* 商品カード内の画像 */
-.product-card .product-img {
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
+.product-item, .sale-product-item {
+    width: 200px; /* 固定の幅 */
+    height: 370px; /* 固定の高さ */
+    display: flex;
+    flex-direction: column; /* 縦並びに配置 */
+    align-items: center; /* 中央揃え */
+    min-width: 200px; /* 商品ボックスの最小幅 */
+    max-width: 200px; /* 商品ボックスの最大幅 */
+    border: 1px solid #ccc; /* 枠線 */
+    border-radius: 8px; /* 角を丸く */
+    padding: 10px; /* 内側の余白 */
+    background: #fff; /* 背景色 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 影 */
+    flex-shrink: 0; /* 縮小を防ぐ */
+    text-align: center; /* 中央揃え */
+}
+
+.product-image-block {
+    width: 100%; /* 幅を商品全体に合わせる */
+    display: flex;
+    justify-content: center; /* 中央揃え */
+    margin-bottom: 10px; /* 下部に余白 */
+}
+
+.product-image, .sale-product-image {
+    max-width: 100%; /*画像の幅をボックスに合わせる */
+    height: 170; /*縦横比を維持 */
+    border-radius: 4px; /*画像の角を丸める */
+    margin-bottom: 10px; /*画像下に余白を追加 */
+
+    /* width: 100%; カードの横幅に合わせる */
+    /* height: 160px; 固定の高さ */
+    object-fit: cover; /* アスペクト比を保持して枠内に収める */
+    /* border-bottom: 1px solid #eee; 画像下に区切り線 */
+}
+
+.product-info {
+    display: flex;
+    flex-direction: column; /* 縦並び */
+    /* gap: 5px; 各要素間の間隔 */
+}
+
+.product-name, .sale-product-name {
+    font-size: 14px; /* 名前のフォントサイズ */
+    font-weight: bold; /* 名前を強調 */
+    color: #333; /* テキストの色 */
+}
+
+.product-price, .product-discount, .sale-product-price, .sale-product-discount {
+    font-size: 12px; /* 値段や割引のフォントサイズ */
+    color: #555; /* テキストの色 */
+    margin: 8px 0; /* 上下の余白を小さく設定 */
+    line-height: 1.2; /* 行間を詰める */
+}
+
+
+h3, h2 {
+    margin-bottom: 10px;
+    text-align: center; /* 見出しを中央揃え */
+}
+
+.ranking-label {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: #e74c3c; /* 赤色背景 */
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 5px 8px;
     border-radius: 5px;
+    z-index: 10; /* 順位ラベルを前面に表示 */
 }
 
-/* 商品情報のスタイル */
-.product-card .brand-name,
-.product-card .product-name,
-.product-card .price {
-    text-align: center;
-    margin: 10px 0;
-}
-
-.product-card .price {
-    font-weight: bold;
-    color: #e74c3c; /* 価格は赤色に */
-}
-
-/* 割引後価格のスタイル */
-.product-card .discounted-price {
-    color: red;
-    font-size: 1.1em;
-    font-weight: bold;
-    text-align: center;
+.all_item{
+    padding-right: 100px;
+    text-align: end;
 }
 
 /* メディアクエリ: 小さい画面向け（モバイル対応） */
@@ -167,15 +231,17 @@
         height: auto;
         box-shadow: none;
     }
-    
+
     .main-content {
         width: 100%;
     }
 }
 
 .pagination {
-    text-align: center; /* ページネーションを中央に配置 */
-    margin-top: 20px;   /* 上部にスペースを追加 */
+    text-align: center;
+    /* ページネーションを中央に配置 */
+    margin-top: 20px;
+    /* 上部にスペースを追加 */
 }
 
 .pagination a,
@@ -187,9 +253,11 @@
 }
 
 .pagination a:hover {
-    background-color: #ddd; /* ホバー時の背景色 */
+    background-color: #ddd;
+    /* ホバー時の背景色 */
 }
 
 .pagination span {
-    font-weight: bold; /* 現在のページの表示を強調 */
+    font-weight: bold;
+    /* 現在のページの表示を強調 */
 }

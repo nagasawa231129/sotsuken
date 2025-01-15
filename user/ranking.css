@@ -1,0 +1,74 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    /* text-align: center; */
+}
+
+h1 {
+    margin: 20px 0;
+    font-size: 24px;
+}
+
+.ranking-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    padding: 10px;
+}
+
+.ranking-item {
+    width: 22%; /* 4つ並ぶように調整 */
+    position: relative; /* ラベルを配置するために相対位置 */
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    text-align: center;
+    background-color: #fff;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.ranking-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* ラベルのスタイル */
+.ranking-label {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    background-color: #ff6347; /* ラベルの背景色 */
+    color: #fff; /* 文字色 */
+    font-size: 14px;
+    font-weight: bold;
+    padding: 5px 8px;
+    border-radius: 3px;
+    z-index: 10;
+}
+
+.product-image {
+    max-width: 100%;
+    height: 170px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    object-fit: cover;
+}
+
+.item-details {
+    padding: 10px;
+}
+
+.item-title {
+    font-size: 16px;
+    margin: 10px 0 5px;
+    font-weight: bold;
+}
+
+.brand-name, .price {
+    font-size: 14px;
+    margin: 5px 0;
+    color: #555;
+}

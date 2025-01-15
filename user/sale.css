@@ -1,0 +1,101 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    padding: 20px;
+}
+
+.product-container {
+    display: flex;
+    flex-wrap: wrap;
+    /* 行がいっぱいになったら次の列に移る */
+    gap: 20px;
+    /* 商品間の間隔 */
+    justify-content: center;
+    /* コンテンツを中央揃え */
+    margin: 0 auto;
+}
+
+.product-card {
+    width: calc(20% - 16px);
+    /* 5商品並べるために20%幅 */
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    /* コンテンツを中央揃え */
+    transition: transform 0.2s ease-in-out;
+    flex: 1 0 calc(20% - 16px);
+    /* 幅を固定しつつフレックス */
+    height: auto;
+    /* 高さを自動調整 */
+}
+
+.product-card img {
+    max-width: 100%;
+    /* 横幅を親要素に合わせる */
+    height: auto;
+    /* 高さを自動調整 */
+    margin-bottom: 10px;
+    /* 画像とテキストの間に余白 */
+    border-radius: 5px;
+}
+
+.product-name {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #333;
+    font-weight: bold;
+    word-wrap: break-word;
+    /* 商品名が長い場合に折り返す */
+}
+
+.product-price {
+    margin-top: 8px;
+    font-size: 16px;
+    color: #007bff;
+    font-weight: bold;
+}
+
+.original-price {
+    margin-top: 5px;
+    font-size: 14px;
+    color: #888;
+    text-decoration: line-through;
+}
+
+@media (max-width: 768px) {
+    .product-card {
+        width: calc(50% - 20px);
+        /* スマホでは2列表示 */
+    }
+}
+
+/* リンクのスタイル */
+a {
+    color: inherit;
+    /* 親要素の色を継承 (リンクの色を変更しない) */
+    text-decoration: none;
+    /* 下線をなくす */
+}
+
+/* リンクがホバーされたとき */
+a:hover {
+    color: inherit;
+    /* 色を変えない */
+    text-decoration: none;
+    /* ホバー時にも下線をなくす */
+}
+
+/* リンクがクリックされたとき (アクティブ) */
+a:active {
+    color: inherit;
+    /* 色を変えない */
+}
+
+/* リンクがフォーカスされたとき */
+a:focus {
+    color: inherit;
+    /* 色を変えない */
+}

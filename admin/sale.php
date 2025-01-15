@@ -3,17 +3,14 @@
 <?php
 // データベース接続
 include './../../db_open.php';
-
 // 検索フォームからの値を取得
 $search_query = '';
 $search_params = [];
-
 // 商品名の検索
 if (isset($_GET['search']) && $_GET['search'] !== '') {
     $search_query .= "WHERE goods LIKE :search";
     $search_params[':search'] = '%' . $_GET['search'] . '%';
 }
-
 // ブランドで絞り込み
 if (isset($_GET['brand_id']) && $_GET['brand_id'] !== '') {
     if ($search_query === '') {
@@ -23,7 +20,6 @@ if (isset($_GET['brand_id']) && $_GET['brand_id'] !== '') {
     }
     $search_params[':brand_id'] = $_GET['brand_id'];
 }
-
 // 価格で絞り込み
 if (isset($_GET['min_price']) && $_GET['min_price'] !== '') {
     if ($search_query === '') {
@@ -33,7 +29,6 @@ if (isset($_GET['min_price']) && $_GET['min_price'] !== '') {
     }
     $search_params[':min_price'] = $_GET['min_price'];
 }
-
 if (isset($_GET['max_price']) && $_GET['max_price'] !== '') {
     if ($search_query === '') {
         $search_query .= "WHERE price <= :max_price";
@@ -42,7 +37,6 @@ if (isset($_GET['max_price']) && $_GET['max_price'] !== '') {
     }
     $search_params[':max_price'] = $_GET['max_price'];
 }
-
 // 割引率で絞り込み
 if (isset($_GET['sale_select']) && $_GET['sale_select'] !== '') {
     if ($search_query === '') {
@@ -52,17 +46,13 @@ if (isset($_GET['sale_select']) && $_GET['sale_select'] !== '') {
     }
     $search_params[':sale_select'] = $_GET['sale_select'];
 }
-
-
 // 商品検索結果の取得
-$stmt = $dbh->prepare("SELECT shop_id, goods,price, original_price, size, color, brand_id, category_id, subcategory_id,sale_id, gender FROM shop $search_query");
+$stmt = $dbh->prepare("SELECT shop_id, goods, price, size, color, brand_id, category_id, subcategory_id,sale_id, gender FROM shop $search_query");
 $stmt->execute($search_params);
-
 // POSTされた割引IDと選択された商品
 $sale_id = $_POST['sale_id'] ?? null;
 $selected_items = $_POST['selected_items'] ?? []; // 選択された商品（配列）
 $sale_percentage = 0;
-
 // 割引率を取得（POST送信された場合）
 if ($sale_id) {
     $sale_stmt = $dbh->prepare("SELECT sale FROM sale WHERE sale_id = :sale_id");
@@ -73,18 +63,7 @@ if ($sale_id) {
         $sale_percentage = $sale['sale'];
     }
 }
-
-
-
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply_discount'])) {
-    // 割引を適用する
-    // $selected_items = $_POST['selected_items'] ?? [];
-
-    // // デバッグ表示
-    // echo '<pre>';
-    // print_r($selected_items);
-    // echo '</pre>';
     if (!empty($selected_items)) {
         foreach ($selected_items as $shop_id) {
             // 割引前の価格を取得
@@ -93,10 +72,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply_discount'])) {
             $get_price_stmt->execute();
             $price_data = $get_price_stmt->fetch(PDO::FETCH_ASSOC);
             $original_price = $price_data['original_price'];
-    
             // 割引後の価格を計算
             $discounted_price = $original_price * (1 - $sale_percentage / 100);
-    
+            // sale_idを取得（$_POST['sale_id']から）
             $sale_id = $_POST['sale_id'];
     
             // `price`に割引後の価格を、`sale_id`を更新
@@ -150,12 +128,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply_discount'])) {
     
 }
 ?>
-
+<a href="goods_info.php">戻る</a>
 <!-- 検索フォーム -->
 <form id="search-form" method="GET">
     <!-- 商品名で検索 -->
     <input type="text" name="search" placeholder="商品名で検索" value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>">
-
     <!-- ブランドで絞り込み -->
     <select name="brand_id">
         <option value="">ブランド選択</option>
@@ -168,18 +145,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply_discount'])) {
         }
         ?>
     </select>
-
     <!-- 価格で絞り込み -->
     <input type="number" name="min_price" placeholder="最小価格" value="<?php echo htmlspecialchars($_GET['min_price'] ?? ''); ?>">
     <input type="number" name="max_price" placeholder="最大価格" value="<?php echo htmlspecialchars($_GET['max_price'] ?? ''); ?>">
-
     <!-- 割引で絞り込み -->
     <select name="sale_select" id="sale_select">
         <option value="">全ての商品</option>
         <?php
         $sale_select = $dbh->query("SELECT * FROM sale");
         $counter = 0;
-
         while ($sale_sele = $sale_select->fetch(PDO::FETCH_ASSOC)) {
             $counter++;
             if ($counter === 10) {
@@ -193,10 +167,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply_discount'])) {
         }
         ?>
     </select>
-
     <!-- 検索ボタン -->
     <button type="submit">検索</button>
-
     <!-- すべて表示ボタン -->
     <a href="sale.php" class="button">すべて表示</a>
 </form>
@@ -204,7 +176,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply_discount'])) {
 
 <!-- 商品リストの表示 -->
 <h3>商品一覧</h3>
-
 <form method="POST">
     <table>
         <thead>
@@ -225,7 +196,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply_discount'])) {
                 <?php while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                     $original_price = $row['price'];
                     $discounted_price = $original_price;
-
                     // 割引を適用
                     if (in_array($row['shop_id'], $selected_items) && $sale_percentage > 0) {
                         // 割引を計算
@@ -248,7 +218,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply_discount'])) {
                         <td>
                             <?php
                             echo number_format($discounted_price) . '円';
-
                             // sale_idに基づいて割引パーセンテージを表示
                             if ($row['sale_id'] != null) {
                                 switch ($row['sale_id']) {
@@ -286,9 +255,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply_discount'])) {
                             }
                             ?>
                         </td>
-
-
-
                         <td>
                             <?php
                             // サイズ名の取得
@@ -337,11 +303,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply_discount'])) {
                             $ge_stmt->execute();
                             $ge = $ge_stmt->fetch(PDO::FETCH_ASSOC);
                             echo htmlspecialchars($ge['gender']);
-
                             ?>
                         </td>
                     </tr>
-
                 <?php } ?>
             <?php } else { ?>
                 <tr>
@@ -350,9 +314,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply_discount'])) {
             <?php } ?>
         </tbody>
     </table>
-
-
-
     <label for="sale_id">割引率を選択:</label>
     <select name="sale_id" id="sale_id">
         <option value="">割引なし</option>
@@ -368,8 +329,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply_discount'])) {
 </form>
 <script>
     // 割引適用ボタンと割引解除ボタンの送信前にチェックボックスが選択されているかを確認
-
-
     // すべて選択のチェックボックス
     document.getElementById("select-all").addEventListener("click", function() {
         var checkboxes = document.querySelectorAll('input[name="selected_items[]"]');

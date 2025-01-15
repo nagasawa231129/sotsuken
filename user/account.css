@@ -1,0 +1,99 @@
+.container {
+    display: flex;
+    width: 100%;
+}
+
+aside {
+    margin-left: 100px;
+    width: 20%; /* サイドメニューの幅 */
+    /* background-color: #f4f4f4; */
+    padding: 15px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    overflow-y: auto; /* サブメニューが多い場合にスクロール可能にする */
+}
+
+aside h2 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+aside ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+aside ul li {
+    margin-bottom: 8px;
+}
+
+aside ul li a {
+    text-decoration: none;
+    color: #333;
+    display: block;
+    padding: 8px 10px;
+    border-radius: 4px;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+aside ul li a:hover {
+    background-color: #007BFF;
+    color: white;
+}
+
+main {
+
+    margin-right: 100px;
+    margin-left: 15px;
+    background-color: #f4f4f4;
+    flex: 1; /* メイン部分を残りの幅に広げる */
+    padding: 20px;
+    overflow-y: auto; /* コンテンツが多い場合にスクロール可能にする */
+}
+
+main h1 {
+    margin-top: 0;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid #ccc;
+    margin: 10px 0;
+}
+
+.button-container {
+    display: flex;
+    text-align: right; /* ボタンを右寄せ */
+    margin-top: 10px;
+    float: right;  /* 右寄せ */
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+/* 各tdに適切な余白を追加 */
+td {
+    padding-right: 15px;  /* 右側に余白を追加 */
+    padding-left: 10px;   /* 左側にも余白を追加 */
+    vertical-align: middle; /* 垂直方向に中央揃え */
+}
+
+/* ボタンが配置されているセルを右寄せ */
+td button {
+    margin-top: 10px;  /* 上部の余白を調整 */
+    margin-right: 10px;  /* 右部の余白を調整 */
+}
+
+td:first-child {
+    padding-left: 20px; /* 1列目の文字にもう少し余白を追加 */
+}
