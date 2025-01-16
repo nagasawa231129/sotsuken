@@ -251,11 +251,7 @@ if (file_exists($lang_file)) {
 
                         // 商品名
                         echo "<p class='sale-product-name' data-i18n='goods_name'>" . $translations['Product Name'] . " ：{$rec['goods']}</p>";
-
-                        // 価格
-                        echo "<p class='sale-product-price' data-i18n='price'>" . $translations['Price'] . "：{$rec['original_price']}円</p>";
-
-                        // 割引計算と表示
+                       
                         if ($rec['sale_id']) {
                             $sale_id = $rec['sale_id'];
                             $sql_sale = "SELECT sale, sale_id FROM sale WHERE sale_id = :sale_id";
@@ -267,9 +263,14 @@ if (file_exists($lang_file)) {
                             // 割引情報が取得でき、割引率が10ではない場合のみ処理
                             if ($sale && isset($rec['original_price']) && $sale['sale_id'] != 10) {
                                 $discounted_price = ceil($rec['original_price'] * (1 - $sale['sale'] / 100)); // 小数点切り上げ
-                                echo "<p class='product-discount' data-i18n='discounted_price'>" . $translations['Discounted Price'] . "：{$discounted_price}円</p>";
+                                echo "<div class='product-discount' data-i18n='discounted_price'> ¥{$discounted_price}</div>";
                             }
                         }
+                        // 価格
+                        echo "<div class='sale-product-price' data-i18n='price'>¥{$rec['original_price']}</div>";
+                     
+                        // 割引計算と表示
+                       
                         echo "</div>";
                         echo "</div>";
                         echo "</a>";
