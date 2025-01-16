@@ -1,46 +1,36 @@
 // グローバル変数を宣言（スクリプトの冒頭に追加）
 let isUpdating = false;
-
 // 増加ボタンをクリックした時の処理
 function increaseQuantity(shopId, currentQuantity, price) {
     var newQuantity = currentQuantity + 1;
-
     // ボタンを無効化
     var increaseButton = document.getElementById('increaseBtn_' + shopId);
     var decreaseButton = document.getElementById('decreaseBtn_' + shopId);
     increaseButton.disabled = true;
     decreaseButton.disabled = true;
-
     // 即時に数量を更新
     document.getElementById('quantity_' + shopId).innerText = newQuantity;
     document.getElementById('increaseBtn_' + shopId).setAttribute('data-quantity', newQuantity);
     document.getElementById('decreaseBtn_' + shopId).setAttribute('data-quantity', newQuantity);
-                                                    
     // 商品ごとの合計金額を即座に更新
     updateTotalAmount(shopId, price, newQuantity);
-
     // サーバーに数量更新リクエストを送信
     updateQuantity(shopId, newQuantity, function(success) {
         if (success) {
             // サーバーからの成功応答後にボタンを再度有効化
             increaseButton.disabled = false;
             decreaseButton.disabled = false;
-
             // location.reload();
         } else {
             alert('更新に失敗しました。再度お試しください。');
         }
     });
 }
-
-
 function updateQuantityHandler(button) {
     const shopId = button.getAttribute('data-shop-id');
     const currentQuantity = parseInt(button.getAttribute('data-quantity'));
     const price = parseInt(button.getAttribute('data-price'));
-
     console.log(`Shop ID: ${shopId}, Current Quantity: ${currentQuantity}, Price: ${price}`); // デバッグ用
-
     let newQuantity;
     if (button.classList.contains('increase-btn')) {
         newQuantity = currentQuantity + 1; // 数量を1増加
@@ -50,13 +40,10 @@ function updateQuantityHandler(button) {
         } else {
             newQuantity = 0;
             deleteItemFromCart(shopId);
-            
         }
     }
-
     // ボタンを無効化して二重送信を防止
     button.disabled = true;
-
     // サーバーに数量更新リクエストを送信
     updateQuantity(shopId, newQuantity, function
         (success) {
@@ -64,27 +51,21 @@ function updateQuantityHandler(button) {
             // 成功時のみ数量を更新
             document.getElementById('quantity_' + shopId).innerText = newQuantity;
             button.setAttribute('data-quantity', newQuantity); // ボタンのデータを更新
-
             // 合計金額を更新
             updateTotalAmount(shopId, price, newQuantity);
-
             // location.reload();
         } else {
             alert('更新に失敗しました。再度お試しください。update');
             console.log(`shop_id=${shopId}&quantity=${newQuantity}`); // リクエスト内容を確認
-
             // const quantityStr = button.getAttribute('data-quantity');
             // console.log('quantityStr:', quantityStr); // ここで値を確認
             // const currentQuantity = parseInt(quantityStr);
             // console.log('currentQuantity:', currentQuantity); // ここでparseIntの結                                                                                                                                                                                                                                              を確認
-
         }
-
         // ボタンを再度有効化
         button.disabled = false;
     });
 }
-
 function deleteItemFromCart(shopId) {
     const xhr = new XMLHttpRequest();
     xhr.open('POST', 'delete_cart.php', true);
@@ -97,10 +78,8 @@ function deleteItemFromCart(shopId) {
                     if (itemElement) {
                         itemElement.remove(); // 商品要素を削除
                     }
-
                     // 合計金額を更新
                     updateTotalAmount(shopId, 0, 0);
-
                     // カートが空の場合、支払いボタンを非表示
                     const cartItems = document.querySelectorAll('[id^="item_"]');
                     if (cartItems.length === 0) {
@@ -119,13 +98,9 @@ function deleteItemFromCart(shopId) {
     };
     xhr.send(JSON.stringify({ shop_id: shopId }));
 }
-
-
-
 function updateQuantity(shopId, newQuantity, callback) {
     if (isUpdating) return; // 更新中のリクエストを防止
     isUpdating = true;
-
     const xhr = new XMLHttpRequest();
     xhr.open('POST', 'update_quantity.php', true);
     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -136,18 +111,15 @@ function updateQuantity(shopId, newQuantity, callback) {
                 if (xhr.responseText.trim().startsWith('success')) {
                     const updatedQuantity = parseInt(xhr.responseText.split(':')[1]);
                     document.getElementById('quantity_' + shopId).innerText = updatedQuantity;
-
                     // ボタン要素を確認してから更新
                     const increaseButton = document.getElementById('increaseBtn_' + shopId);
                     const decreaseButton = document.getElementById('decreaseBtn_' + shopId);
-
                     if (increaseButton && decreaseButton) {
                         increaseButton.setAttribute('data-quantity', updatedQuantity);
                         decreaseButton.setAttribute('data-quantity', updatedQuantity);
                     } else {
                         console.error('ボタン要素が見つかりません: shopId=' + shopId);
                     }
-
                     callback(true);
                 } else {
                     callback(false);
@@ -160,9 +132,6 @@ function updateQuantity(shopId, newQuantity, callback) {
     };
     xhr.send(`shop_id=${shopId}&quantity=${newQuantity}`);
 }
-
-
-
 // 合計金額を更新する関数
 function updateTotalAmount(shopId, price, quantity) {
     // 商品ごとの合計金額を即座に更新
@@ -170,7 +139,6 @@ function updateTotalAmount(shopId, price, quantity) {
     if (totalAmountElement) {
         totalAmountElement.innerText = (price * quantity) + "円";
     }
-
     // 全体金額の更新
     let totalSum = 0;
     document.querySelectorAll('[id^="totalAmount_"]').forEach(element => {
@@ -179,34 +147,27 @@ function updateTotalAmount(shopId, price, quantity) {
             totalSum += amount;
         }
     });
-
     // 合計金額を更新
     const totalSumElement = document.getElementById('totalSum');
     if (totalSumElement) {
         totalSumElement.innerText = totalSum + "円";
     }
 }
-
-
 // 減少ボタンをクリックした時の処理
 function decreaseQuantity(shopId, currentQuantity, price) {
     if (currentQuantity > 1) {
         const newQuantity = currentQuantity - 1;
-
         // ボタンを無効化
         const increaseButton = document.getElementById('increaseBtn_' + shopId);
         const decreaseButton = document.getElementById('decreaseBtn_' + shopId);
         increaseButton.disabled = true;
         decreaseButton.disabled = true;
-
         // 即時に数量を更新
         document.getElementById('quantity_' + shopId).innerText = newQuantity;
         document.getElementById('increaseBtn_' + shopId).setAttribute('data-quantity', newQuantity);
         document.getElementById('decreaseBtn_' + shopId).setAttribute('data-quantity', newQuantity);
-
         // 商品ごとの合計金額を更新
         updateTotalAmount(shopId, price, newQuantity);
-
         // サーバーに数量更新リクエストを送信
         updateQuantity(shopId, newQuantity, function(success) {
             if (success) {
@@ -220,11 +181,8 @@ function decreaseQuantity(shopId, currentQuantity, price) {
         deleteItemFromCart(shopId); // 数量1の場合、削除処理
     }
 }
-
 var totalSum = 0;
 var totalElements;
-
-
 var paymentButton = document.getElementById('submit');
 if(paymentButton.style.display === none){
     console.log("カートの中身は空です");

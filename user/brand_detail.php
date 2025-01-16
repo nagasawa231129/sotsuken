@@ -22,10 +22,14 @@ WHERE 1";
 
 // ブランドフィルタがある場合の条件追加
 $params = [];
-if ($brand !== null) {
+// ブランドフィルタがある場合の条件追加
+if ($brand !== null && $brand !== 'all') {
     $sql .= " AND shop.brand_id = :brand_id";
     $params[':brand_id'] = $brand;
+} elseif ($brand === 'all') {
+    // "all" の場合は条件を追加しない（すべての商品を取得）
 }
+
 
 // ソート条件に応じてクエリを追加
 switch ($sort) {
@@ -64,46 +68,11 @@ $brands = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <title>ブランド詳細</title>
 
 <body>
-    <?php
-    // ユーザーがログインしているかを確認
-    if ($userId) {
-        // ブランドごとにお気に入りをチェック
-        $brandIds = array(); // 既に表示したブランドIDを記録するための配列
-
-        // 商品ごとに処理
-        foreach ($products as $product) {
-            // ブランドIDがまだ表示されていない場合
-            if (!in_array($product['brand_id'], $brandIds)) {
-                // ブランドごとにお気に入りをチェック
-                $sql_favorite_check = "SELECT * FROM favorite WHERE user_id = :user_id AND brand_id = :brand_id";
-                $stmt_favorite_check = $dbh->prepare($sql_favorite_check);
-                $stmt_favorite_check->bindParam(':user_id', $userId);
-                $stmt_favorite_check->bindParam(':brand_id', $product['brand_id']);
-                $stmt_favorite_check->execute();
-                $is_favorite = $stmt_favorite_check->rowCount() > 0; // 既にお気に入りに追加されているかどうか
-
-                // ブランドIDを記録して、次回のブランドに対して同じ処理をしないようにする
-                $brandIds[] = $product['brand_id'];
-
-                // ブランド名とお気に入りボタンの表示（ブランド名がボタンの左に表示されるように）
-                echo "<div class='favorite-container'>";
-                echo "<span class='brand-name'>{$product['brand_name']}</span>"; // ブランド名を表示
-                if ($is_favorite) {
-                    echo "<button class='favorite-button filled' data-brand-id='{$product['brand_id']}' data-user-id='{$userId}' title='お気に入り済み'>❤️</button>";
-                } else {
-                    echo "<button class='favorite-button' data-brand-id='{$product['brand_id']}' data-user-id='{$userId}' title='お気に入りに追加'>♡</button>";
-                }
-                echo "</div>"; // お気に入りボタンとブランド名を囲む
-            }
-        }
-    } else {
-        // ログインしていない場合はボタンを無効化
-        echo "<button class='favorite-button' disabled>♡</button>"; // ログインしていない場合
-    }
-    ?>
+<div class="main-content">
 
 
-    <div class="main-content">
+
+
         <aside class="sidebar">
             <h2 data-i18n="search"><?php echo $translations['Search'] ?></h2>
             <ul>
@@ -190,10 +159,43 @@ $brands = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </li>
                 </ul>
         </aside>
-
+    
         <div class="products-section">
+            
             <form method="get" class="sort-form">
+            <?php
+   if ($userId) {
+    $brandIds = [];
+    foreach ($products as $product) {
+        if (!in_array($product['brand_id'], $brandIds)) {
+            $sql_favorite_check = "SELECT * FROM favorite WHERE user_id = :user_id AND brand_id = :brand_id";
+            $stmt_favorite_check = $dbh->prepare($sql_favorite_check);
+            $stmt_favorite_check->bindParam(':user_id', $userId);
+            $stmt_favorite_check->bindParam(':brand_id', $product['brand_id']);
+            $stmt_favorite_check->execute();
+            $is_favorite = $stmt_favorite_check->rowCount() > 0;
 
+            $brandIds[] = $product['brand_id'];
+
+            $favoriteClass = $is_favorite ? 'filled' : '';
+            $icon = $is_favorite ? '❤️' : '♡';
+            $title = $is_favorite ? 'お気に入り済み' : 'お気に入りに追加';
+
+            echo <<<HTML
+            <div class='favorite-container'>
+                <span class='brand-name'>{$product['brand_name']}</span>
+                <button class='favorite-button {$favoriteClass}' data-brand-id='{$product['brand_id']}' data-user-id='{$userId}' title='{$title}'>
+                    {$icon}
+                </button>
+            </div>
+            HTML;
+        }
+    }
+} else {
+    echo "<p>ログインするとお気に入り機能を利用できます。</p>";
+}
+
+    ?>
                 <select name="sort" id="sort" onchange="this.form.submit()">
                     <option value="sale" <?php echo $sort === 'sale' ? 'selected' : ''; ?>><?php echo $translations['Recommendation'] ?></option>
                     <option value="favorite" <?php echo $sort === 'favorite' ? 'selected' : ''; ?>><?php echo $translations['Popular'] ?></option>
@@ -203,7 +205,7 @@ $brands = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </select>
 
                 <select name="brand" id="brand" onchange="this.form.submit()">
-                    <option value=""><?php echo $translations['All'] ?></option> <!-- デフォルトで「すべて」選択肢を表示 -->
+                    <option value="all"><?php echo $translations['All'] ?></option> <!-- デフォルトで「すべて」選択肢を表示 -->
                     <?php
                     // ブランドを表示
                     foreach ($brands as $brand_option) {

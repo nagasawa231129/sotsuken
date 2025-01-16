@@ -5,6 +5,28 @@ body {
     background-color: #f4f4f9;
     color: #333;
 }
+.title{
+    text-align: center;
+}
+/* ボタンスタイル */
+/* 戻るリンクのスタイル */
+a.back-link {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #4CAF50; /* ボタンの背景色 */
+    color: white; /* 文字色 */
+    text-decoration: none; /* 下線を消す */
+    border-radius: 5px; /* 角を丸くする */
+    font-size: 16px; /* フォントサイズ */
+    text-align: center; /* 中央揃え */
+    transition: background-color 0.3s ease; /* 背景色変更のアニメーション */
+}
+
+/* 戻るリンクホバー時のスタイル */
+a.back-link:hover {
+    background-color: #45a049; /* ホバー時に色が変わる */
+}
+
 
 h2 {
     text-align: center;
@@ -15,38 +37,76 @@ h2 {
 /* 検索フォームコンテナ */
 .search-container {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column;  /* 縦に並べる */
+    align-items: center;     /* 水平方向に中央揃え */
+    justify-content: center; /* 垂直方向に中央揃え */
     margin: 20px 0;
-    padding: 10px;
-    background-color: #fff;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+/* フォーム全体を中央に配置 */
+form {
+    display: flex;
+    justify-content: center; /* 水平方向に中央揃え */
+    align-items: center;     /* 垂直方向に中央揃え */
+    gap: 10px;               /* 入力フィールドとボタンの間隔 */
+    border: 1px solid #ccc;  /* フォームの枠線 */
+    padding: 20px;           /* フォーム内の余白 */
+    border-radius: 5px;      /* 枠の角を丸く */
+}
+
+/* 入力フィールド */
 .search-container input[type="text"] {
-    padding: 10px;
-    margin-right: 10px;
-    border: 1px solid #ccc;
+    padding: 8px 12px;
+    border: 1px solid #ccc; /* 入力フィールドの枠線 */
     border-radius: 5px;
-    width: 250px;
+    font-size: 14px;
+    width: 250px; /* フォームの幅を調整 */
 }
 
-.search-container input[type="submit"],
-.search-container button {
-    padding: 10px 20px;
-    background-color: #4CAF50;
+/* 入力フィールドのフォーカス時 */
+.search-container input[type="text"]:focus {
+    border-color: #007bff; /* フォーカス時の枠線色 */
+    outline: none;
+}
+
+/* 検索ボタン */
+.search-container input[type="submit"] {
+    padding: 8px 12px;
+    background-color: #007bff;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    font-size: 14px;
 }
 
-.search-container input[type="submit"]:hover,
-.search-container button:hover {
-    background-color: #45a049;
+/* 検索ボタンのホバー時 */
+.search-container input[type="submit"]:hover {
+    background-color: #0056b3;
 }
+
+/* 全て表示ボタン */
+.search-container button {
+    padding: 8px 16px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+/* 全て表示ボタンのホバー時 */
+.search-container button:hover {
+    background-color: #218838;
+}
+
+/* リンクボタンを表示しない場合 */
+.search-container a {
+    display: inline-block;
+}
+
+
 
 /* 商品情報テーブル */
 table {

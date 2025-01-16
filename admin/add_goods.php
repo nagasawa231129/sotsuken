@@ -6,19 +6,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="add_goods.css">
     <title>商品追加フォーム</title>
+    <style>
+        .checkbox-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .checkbox-container label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-container input {
+            margin: 0;
+        }
+
+        .delete-form-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
 </head>
+
 <body>
-    <a href="admin_toppage.php">トップページ</a>
+<a href="goods_info.php" class="back-link">情報管理へ</a>
     <h1>商品追加フォーム</h1>
     <div class="form-container" id="form-container">
         <form method="post" action="add_goods_process.php" enctype="multipart/form-data" class="goods-form">
+            
             <div class="single-form">
+
                 <table id="goods-table">
                     <thead>
                         <tr>
                             <th class="thumbnail">サムネ</th>
                             <th class="thumbnail">サブimg</th>
                             <th class="goods_info">商品の説明</th>
+                            <th class="group_sele">グループ指定</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -38,10 +76,21 @@
                                     <textarea name="goods_info[]" rows="4" cols="50" required></textarea>
                                 </div>
                             </td>
+                            <td>
+                                <select name="group[]" class="group-select">
+                                    <option value="">指定なし</option>
+                                    <?php
+                                    for ($i = 1; $i <= 50; $i++) {
+                                        echo "<option value='{$i}'>{$i}</option>";
+                                    }
+                                    ?>
+                                </select>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
 
+                <!-- 他の商品の詳細情報を記入するためのフォーム -->
                 <table>
                     <thead>
                         <tr>
@@ -71,16 +120,18 @@
                             <td><input type="text" name="goods[]" required></td>
                             <td><input type="number" name="price[]" required></td>
                             <td>
-                                <select name="size[]" class="wide-select" required>
+                                <!-- サイズの選択肢をチェックボックスで複数選択 -->
+                                <div class="checkbox-container">
                                     <?php
                                     $size_sql = "SELECT size_id, size FROM size";
                                     foreach ($dbh->query($size_sql) as $size) {
-                                        echo "<option value='{$size['size_id']}'>{$size['size']}</option>";
+                                        echo "<label><input type='checkbox' name='size[]' value='{$size['size_id']}'> {$size['size']}</label>";
                                     }
                                     ?>
-                                </select>
+                                </div>
                             </td>
                             <td>
+                                <!-- 色の選択肢は単一選択 -->
                                 <select name="color[]" class="wide-select" required>
                                     <?php
                                     $color_sql = "SELECT color_id, ja_color FROM color";
@@ -123,6 +174,7 @@
                         </tr>
                     </tbody>
                 </table>
+                
             </div>
         </form>
     </div>
@@ -133,107 +185,70 @@
     </div>
 
     <script>
+        function addRow() {
+            const formContainer = document.getElementById('form-container');
+            const forms = document.querySelectorAll('.goods-form');
+            const lastForm = forms[forms.length - 1];
+            const newForm = lastForm.cloneNode(true);
 
-        // ページのスクロール位置を保存
-        window.addEventListener("beforeunload", () => {
-            localStorage.setItem("scrollPosition", window.scrollY);
-        });
-
-        // ページ読み込み時にスクロール位置を復元
-        window.addEventListener("load", () => {
-            const scrollPosition = localStorage.getItem("scrollPosition");
-            if (scrollPosition) {
-                window.scrollTo(0, parseInt(scrollPosition));
-            }
-        });
-
-        function updateSubcategory(categoryElement) {
-            var categoryId = categoryElement.value;
-            var subcategorySelect = categoryElement.closest('tr').querySelector('.subcategory');
-
-            // AJAXを使用してサーバーにリクエストを送信
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', 'get_subcategories.php?category_id=' + categoryId, true);
-            xhr.onload = function() {
-                if (xhr.status === 200) {
-                    // サブカテゴリーを更新
-                    subcategorySelect.innerHTML = xhr.responseText;
+            newForm.querySelectorAll('input, select, textarea').forEach((input) => {
+                const name = input.getAttribute('name');
+                if (name) {
+                    input.setAttribute('name', name.replace(/\[\d+\]/, `[${forms.length}]`)); // 新しいインデックスを設定
                 }
-            };
-            xhr.send();
+            });
+
+            formContainer.appendChild(newForm);
         }
 
-        document.getElementById('add-row').addEventListener('click', function () {
-    const formContainer = document.getElementById('form-container');
-    const forms = document.querySelectorAll('.goods-form');
-    const lastForm = forms[forms.length - 1];
-    const newForm = lastForm.cloneNode(true);
+        document.getElementById('add-row').addEventListener('click', addRow);
 
-    // フォームの中のフィールドをリセット
-    newForm.reset();
+        function submitForms() {
+            const forms = document.querySelectorAll('.goods-form');
+            let allFormsSubmitted = true;
 
-    // 各フォームのフィールドに一意の名前を付与
-    const newIndex = forms.length; // 現在のフォーム数を基にインデックスを設定
-    newForm.querySelectorAll('input, select, textarea').forEach((input) => {
-        const name = input.getAttribute('name');
-        if (name) {
-            input.setAttribute('name', name.replace(/\[\d+\]/, `[${newIndex}]`)); // インデックスを更新
-        }
-    });
+            forms.forEach(function(form, index) {
+                const inputs = form.querySelectorAll('input[required], select[required], textarea[required]');
+                let allFieldsFilled = true;
 
-    formContainer.appendChild(newForm);
-});
+                // 必須フィールドのチェック
+                inputs.forEach(input => {
+                    if (!input.value) {
+                        allFieldsFilled = false;
+                        input.style.border = '2px solid red'; // 未入力のフィールドを強調表示
+                    } else {
+                        input.style.border = ''; // 入力済みのフィールドの強調表示を解除
+                    }
+                });
 
-function submitForms() {
-    const forms = document.querySelectorAll('.goods-form');
-    let allFormsSubmitted = true;
+                if (allFieldsFilled) {
+                    const formData = new FormData(form);
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('POST', 'add_goods_process.php', true);
 
-    forms.forEach(function (form, index) {
-        const inputs = form.querySelectorAll('input[required], select[required], textarea[required]');
-        let allFieldsFilled = true;
+                    xhr.onload = function() {
+                        if (xhr.status === 200) {
+                            form.reset(); // フォームをリセット
+                        } else {
+                            console.error(`フォーム ${index + 1} の送信に失敗しました。`);
+                            alert('送信に失敗しました。もう一度試してください。');
+                            allFormsSubmitted = false;
+                        }
+                    };
 
-        // 必須フィールドのチェック
-        inputs.forEach(input => {
-            if (!input.value) {
-                allFieldsFilled = false;
-                input.style.border = '2px solid red'; // 未入力のフィールドを強調表示
-            } else {
-                input.style.border = ''; // 入力済みのフィールドの強調表示を解除
-            }
-        });
-
-        if (allFieldsFilled) {
-            const formData = new FormData(form);
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', 'add_goods_process.php', true);
-
-            xhr.onload = function () {
-                if (xhr.status === 200) {
-                    // console.log(`フォーム ${index + 1} が正常に送信されました。`);
-                    // alert('商品を追加しました！');
-                    
-                    // フォームをリセット
-                    form.reset();
+                    xhr.send(formData);
                 } else {
-                    console.error(`フォーム ${index + 1} の送信に失敗しました。`);
-                    alert('送信に失敗しました。もう一度試してください。');
                     allFormsSubmitted = false;
                 }
-            };
+            });
 
-            xhr.send(formData);
-        } else {
-            allFormsSubmitted = false;
+            if (allFormsSubmitted) {
+                alert('すべての商品が正常に追加されました。');
+            } else {
+                alert('必須項目をすべて入力してください。');
+            }
         }
-    });
-
-    if (allFormsSubmitted) {
-        alert('すべての商品が正常に追加されました。');
-    } else {
-        alert('必須項目をすべて入力してください。');
-    }
-}
-
     </script>
 </body>
+
 </html>
