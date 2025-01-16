@@ -1,0 +1,144 @@
+/* 全体のレイアウト */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+/* 見出し */
+h2 {
+    text-align: center;
+    font-size: 24px;
+    color: #333;
+    margin-top: 20px;
+}
+
+/* お気に入り商品のリスト */
+.favorite-products {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* 各商品カード */
+.favorite-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* 商品カードにホバーしたときのエフェクト */
+.favorite-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* 商品画像 */
+.favorite-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+/* 商品カード内の情報 */
+.favorite-info {
+    padding: 15px;
+    text-align: center;
+}
+
+.favorite-info h2 {
+    font-size: 18px;
+    color: #333;
+    margin: 10px 0;
+    font-weight: bold;
+}
+
+.favorite-info p {
+    font-size: 14px;
+    color: #777;
+    margin: 5px 0;
+}
+
+/* ボタン */
+.btn {
+    display: inline-block;
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-top: 20px;
+    text-align: center;
+}
+
+.btn:hover {
+    background-color: #45a049;
+}
+
+p {
+    text-align: center;
+    font-size: 16px;
+    color: #333;
+}
+
+/* タブコンテナを中央に配置 */
+.tab-container {
+    display: flex;                /* 横並びにする */
+    justify-content: center;      /* 水平方向に中央揃え */
+    gap: 20px;                    /* タブ間に間隔を設ける */
+    padding: 20px 0;              /* 上下に余白を追加 */
+  }
+  
+  /* タブのスタイル */
+  .tab {
+    padding: 10px 20px;           /* タブの内側に余白を設定 */
+    background-color: #f0f0f0;    /* 背景色 */
+    border: 1px solid #ccc;       /* 境界線 */
+    border-radius: 5px;           /* 角を丸める */
+    cursor: pointer;              /* ポインタを表示 */
+    font-size: 16px;               /* フォントサイズ */
+    transition: background-color 0.3s, color 0.3s; /* スムーズな変化 */
+  }
+  
+  /* タブのホバー時 */
+  .tab:hover {
+    background-color: #ddd;       /* 背景色の変更 */
+  }
+  
+  /* アクティブなタブのスタイル */
+  .tab.active {
+    background-color: #007bff;    /* アクティブタブの背景色 */
+    color: white;                 /* アクティブタブの文字色 */
+  }
+  
+
+/* タブコンテンツ */
+.tab-content {
+    display: none;
+    
+}
+
+/* 商品とブランドのカードスタイル */
+.favorite-card {
+    width: 200px;
+    margin: 10px;
+    display: inline-block;
+    vertical-align: top;
+    text-align: center;
+}
+
+.favorite-image {
+    width: 100%;
+    height: auto;
+}
+
+.favorite-info {
+    padding: 10px;
+}

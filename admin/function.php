@@ -7,11 +7,12 @@ function update() {
     $original_price = $_POST['price'];
     $goods_info = $_POST['goods_info'];
 
+    //f
     // その他のフォームデータを取得
     $size = $_POST['size'];
     $color = $_POST['color'];
-    $category = $_POST['category'];
-    $subcategory = $_POST['subcategory'];
+    $category = $_POST['category_id'];
+    $subcategory = $_POST['subcategory_id'];
     $gender = $_POST['gender'];
     $brand = $_POST['brand'];
 
@@ -93,6 +94,16 @@ function delete(){
 
     // 実行
     $stmt->execute();
+
+        // 商品を削除するSQLクエリ
+        $cart_delete_sql = "DELETE FROM cart WHERE shop_id = :shop_id";
+
+        // SQLの準備
+        $stmt = $dbh->prepare($cart_delete_sql);
+        $stmt->bindParam(':shop_id', $shop_id);
+    
+        // 実行
+        $stmt->execute();
 }
 
 function s_reset(){

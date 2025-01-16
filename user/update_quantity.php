@@ -2,41 +2,48 @@
 // データベース接続設定
 include '../../db_open.php';
 session_start();
-
-// POSTデータを受け取る
-$shopId = isset($_POST['shop_id']) ? (int)$_POST['shop_id'] : 0;
-$newQuantity = isset($_POST['quantity']) ? (int)$_POST['quantity'] : 0;
-$userId = $_SESSION['id'];  // セッションからユーザーIDを取得
-
-// 変数が正しいかチェック
-if ($shopId > 0 && $newQuantity > 0) {
-    try {
-        // カート内の商品数量を更新するSQL文
-        $sql = "UPDATE cart SET quantity = :quantity WHERE shop_id = :shop_id AND user_id = :user_id";
-        $stmt = $dbh->prepare($sql);
-        
-        // プレースホルダに値をバインド
-        $stmt->bindParam(':quantity', $newQuantity, PDO::PARAM_INT);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // 'shopId' が存在する場合のみ処理を実行
+    if (isset($_POST['shop_id'])) {
+        $shopId = $_POST['shop_id'];
+    } else {
+        // 'shopId' が存在しない場合、エラーメッセージを表示
+        die("エラー: 商品IDが指定されていません。");
+    }
+}
+$currentQuantity = intval($_POST['current_quantity']);
+$action = $_POST['action'];
+$newQuantity = $currentQuantity;
+if($action == 'increase'){
+    $newQuantity = $currentQuantity + 1;
+}else if($action == 'decrease'){
+    if($currentQuantity == 1){
+        $deleteSql = "DELETE FROM cart WHERE user_id = :user_id AND shop_id = :shop_id";
+        $stmt = $dbh->prepare($deleteSql);
+        $stmt->bindParam(':user_id', $_SESSION['id'], PDO::PARAM_INT);
         $stmt->bindParam(':shop_id', $shopId, PDO::PARAM_INT);
-        $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
-
-        // SQLを実行
         if ($stmt->execute()) {
-            // 更新成功
-            echo 'success';
+            header("Location: cart.php"); // カートページにリダイレクト
+            exit();
         } else {
-            // 更新失敗
-            echo 'failure: 更新に失敗しました。';
+            echo "削除に失敗しました。";
         }
-    } catch (PDOException $e) {
-        // エラーハンドリング
-        echo 'error: ' . $e->getMessage();
+        }
+        $newQuantity = $currentQuantity - 1;
+}
+if($dbh){
+    $sql = "UPDATE cart SET quantity = :quantity WHERE user_id = :user_id AND shop_id = :shop_id";
+    $stmt = $dbh->prepare($sql);
+    $stmt->bindParam(':quantity', $newQuantity, PDO::PARAM_INT);
+    $stmt->bindParam(':user_id', $_SESSION['id'], PDO::PARAM_INT);
+    $stmt->bindParam(':shop_id', $shopId, PDO::PARAM_INT);
+    if ($stmt->execute()) {
+        header("Location: cart.php"); // カートページにリダイレクト
+        exit();
+    } else {
+        echo "更新に失敗しました。";
     }
 } else {
-    // 不正なデータの場合
-    echo 'invalid_input: shop_id または quantity が不正です';
+    echo "データベース接続に失敗しました。";
 }
-
-// データベース接続を閉じる
-$dbh = null;
 ?>

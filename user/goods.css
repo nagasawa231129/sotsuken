@@ -1,28 +1,194 @@
-.tabs {
+.main-content{
     display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    width: 100%;
+}
+/* 商品ページの基本スタイル */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+}
+
+h1, h2 {
+    margin-bottom: 1rem;
+}
+
+h1 {
+    font-size: 2.5rem;
+    color: #333;
+}
+
+h2 {
+    font-size: 1.8rem;
+    color: #666;
+}
+
+p {
+    font-size: 1rem;
+    color: #333;
+    line-height: 1.5;
+}
+
+/* 商品情報のセクション */
+.product-info {
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.product-info p {
+    font-size: 1.2rem;
+}
+
+.product-info .brand-link {
+    text-decoration: none;
+    color: #007BFF;
+}
+
+.product-info .brand-link:hover {
+    text-decoration: underline;
+}
+
+/* ボタンコンテナ */
+.button-container {
+    display: flex;
+    flex-direction: column; /* ボタンを縦に並べる */
+    gap: 10px; /* ボタン間のスペース */
+    align-items: flex-end; /* 左寄せにする */
+}
+
+/* 各ボタンのスタイル */
+.button-row {
+    display: flex;
+    align-items: center; /* ボタンを横並びにして、縦位置を揃える */
+    gap: 10px; /* サイズ、ボタン、♡の間のスペース */
+}
+
+/* 各ボタン */
+.cart-button, .favorite-button {
+    width: 150px; /* ボタンの横幅 */
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    text-align: center;
+}
+
+/* お気に入りボタンがクリック済みの状態 */
+.favorite-button.filled {
+    background-color: #FF6347; /* お気に入り済みの場合 */
+}
+
+.favorite-button:disabled {
+    background-color: #ccc; /* お気に入りボタンが無効な場合 */
+    cursor: not-allowed;
+}
+
+/* ホバー時のエフェクト */
+.cart-button:hover, .favorite-button:hover {
+    opacity: 0.8;
+}
+
+
+
+
+/* 画像関連 */
+.main-thumbnail {
+    width: 100%;
+    max-width: 500px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+}
+
+.sub-images {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    align-items: baseline;
+}
+
+.sub-thumbnail {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
     cursor: pointer;
 }
 
+.sub-thumbnail:hover {
+    opacity: 0.7;
+}
+
+/* タブ */
+.tabs {
+    display: flex;
+    margin-top: 30px;
+    border-bottom: 2px solid #ccc;
+}
+
 .tab-button {
-    padding: 10px;
-    border: 1px solid #ddd;
-    margin-right: 5px;
+    padding: 10px 20px;
+    font-size: 1.2rem;
     cursor: pointer;
+    border: none;
+    background-color: #f1f1f1;
+    color: #333;
+    transition: background-color 0.3s;
+}
+
+.tab-button:hover {
+    background-color: #e9ecef;
 }
 
 .tab-content {
     display: none;
 }
 
-.active-tab {
+.tab-content.active-tab {
     display: block;
 }
 
 .tab-button.active {
     font-weight: bold;
-    background-color: #f0f0f0;
+    /* border-bottom: 2px solid #000; 例としてボタンの見た目を変更 */
 }
 
-.tab-button:hover {
-    background-color: #e0e0e0;
+
+.star-rating {
+    display: flex;
+    gap: 5px;
+}
+
+.star {
+    font-size: 1.5rem;
+    color: #ccc;
+}
+
+.star.selected {
+    color: #ffc107;
+}
+
+.star.half-selected {
+    color: #ffcd38;
+}
+
+/* レビュー */
+.review-card {
+    padding: 15px;
+    background-color: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    border-radius: 8px;
+}
+
+.review-card p {
+    margin: 5px 0;
 }

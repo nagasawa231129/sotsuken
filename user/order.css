@@ -1,0 +1,26 @@
+.tabs {
+    display: flex;
+    cursor: pointer;
+    padding: 10px;
+    background-color: #f1f1f1;
+}
+.tab {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+}
+.tab.active {
+    background-color: #ddd;
+}
+.tab-content {
+    display: none;
+    padding: 20px;
+    background-color: #fff;
+}
+.tab-content.active {
+    display: block;
+}
+
+.image{
+    width: 250px;
+}

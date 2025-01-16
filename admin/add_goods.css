@@ -98,7 +98,23 @@ input:invalid {
 input:valid {
     border-color: #2ecc71;
 }
+/* 戻るリンクのスタイル */
+a.back-link {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #4CAF50; /* ボタンの背景色 */
+    color: white; /* 文字色 */
+    text-decoration: none; /* 下線を消す */
+    border-radius: 5px; /* 角を丸くする */
+    font-size: 16px; /* フォントサイズ */
+    text-align: center; /* 中央揃え */
+    transition: background-color 0.3s ease; /* 背景色変更のアニメーション */
+}
 
+/* 戻るリンクホバー時のスタイル */
+a.back-link:hover {
+    background-color: #45a049; /* ホバー時に色が変わる */
+}
 /* フォームのボタン */
 button {
     background-color: #4CAF50;
@@ -128,6 +144,10 @@ input:invalid {
 
 input:valid {
     border-color: #2ecc71;
+}
+
+.goods_info{
+    width: 600px;
 }
 
 /* 商品追加フォームのテーブルのスタイル */
