@@ -111,7 +111,7 @@
                             echo '<button type="submit" name="action" value="decrease">-</button>';
                             echo "<span id='quantity_$shopId'>" . htmlspecialchars($item['quantity'], ENT_QUOTES, 'UTF-8') . "</span>";
                             echo "<button type='submit' name='action' value='increase'>+</button>";
-                            echo "<br> <span id='totalAmount_$shopId'>" . $totalPrice . "円</span>";
+                            // echo "<br> <span id='totalAmount_$shopId'>" . $totalPrice . "円</span>";
                             echo "<input type='hidden' name='shop_id' value='" . htmlspecialchars($shopId, ENT_QUOTES, 'UTF-8') . "'>";
                             echo "<input type='hidden' name='current_quantity' value='" . htmlspecialchars($item['quantity'], ENT_QUOTES, 'UTF-8') . "'>";
                             echo "</form>";
