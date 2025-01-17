@@ -28,7 +28,7 @@ $unread_count = $notification_count_stmt->fetchColumn();
 
 ?>
 
-<script src="https://cdn.i18next.com/i18next.min.js"></script>
+<!-- <script src="https://cdn.i18next.com/i18next.min.js"></script> -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/i18next/21.6.0/i18next.min.js"></script>
 
 <header>

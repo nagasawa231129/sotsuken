@@ -14,13 +14,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (!empty($mail) && empty($message)) {
         try {
             // メールアドレスが既に仮登録されているか確認
-            $stmt = $dbh->prepare('SELECT COUNT(*) FROM pre_user WHERE mail = :mail');
+            $stmt = $dbh->prepare('SELECT COUNT(*) FROM user WHERE mail = :mail');
             $stmt->execute(['mail' => $mail]);
             $emailCount = $stmt->fetchColumn();
 
             // メールアドレスが既に仮登録されている場合
             if ($emailCount > 0) {
-                $message = "<p class='error'>このメールアドレスは既に仮登録されています。</p>";
+                $message = "このメールアドレスは既に登録されています。";
+                echo "<script>
+                    alert('$message');
+                    window.location.href = 'login.php';
+                </script>";
+                exit;                
             } else {
                 // 仮登録テーブルにメールアドレスを挿入
                 $stmt = $dbh->prepare('INSERT INTO pre_user (mail) VALUES (:mail)');
@@ -29,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 // OTP（ワンタイムパスワード）を生成
                 $otp = rand(100000, 999999); // 6桁のランダムな数値
                 $otp_timestamp = date("Y-m-d H:i:s", strtotime("+1 hour")); // 1時間後のタイムスタンプ
-                $stmt = $dbh->prepare('UPDATE pre_user SET otp = :otp, otp_timestamp = :otp_timestamp  WHERE mail = :mail');
+                $stmt = $dbh->prepare('UPDATE pre_user SET otp = :otp, otp_timestamp = :otp_timestamp WHERE mail = :mail');
                 $stmt->execute(['otp' => $otp, 'otp_timestamp' => $otp_timestamp, 'mail' => $mail]);
 
                 // OTPをメールで送信

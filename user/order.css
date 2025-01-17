@@ -24,3 +24,9 @@
 .image{
     width: 250px;
 }
+
+.barcode-image {
+    max-width: 200px;
+    height: auto;
+    margin-top: 10px;
+}
