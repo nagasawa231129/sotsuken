@@ -11,7 +11,19 @@ html, body {
     gap: 10px; /* 間隔を狭める（デフォルト20px→10px） */
     width: 100%; /* 横幅100% */
 }
+.product-price {
+    margin-top: 8px;
+    font-size: 16px;
+    color: #007bff;
+    font-weight: bold;
+}
 
+.original-price {
+    margin-top: 5px;
+    font-size: 16px;
+    color: #888;
+    text-decoration: line-through;
+}
 /* サイドバーのスタイル */
 .sidebar {
     flex: 0 0 250px; /* サイドバーの幅を固定 */

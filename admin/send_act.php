@@ -10,11 +10,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['selected_items'])) {
 
  
 
-
-
-
-
-
         try {
         include './../../db_open.php'; // データベース接続
 
@@ -57,11 +52,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['selected_items'])) {
     
         $headers = "From: yamibaito@jp.com";
     
-        if (mb_send_mail($mail, $subject, $message, $headers)) {
-            echo "メールが送信されました。<br>";
-        } else {
-            echo "メール送信に失敗しました。<br>";
-        }
+        // if (mb_send_mail($mail, $subject, $message, $headers)) {
+        //     echo "メールが送信されました。<br>";
+        // } else {
+        //     echo "メール送信に失敗しました。<br>";
+        // }
     
 
 

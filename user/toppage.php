@@ -61,7 +61,7 @@ if (file_exists($lang_file)) {
                 </ul>
             </li>
             <li class="category-item">
-                <a href="./category/jacket.php" data-i18n="jacket/outer"><?php echo $translations['Outerwear'] ?></a>
+                <a href="./category/jacket-outerwear.php" data-i18n="jacket/outer"><?php echo $translations['Outerwear'] ?></a>
                 <ul class="sub-category">
                     <li><a href="./category/jacket-outerwear/collarless-coat.php" data-i18n="collarless-coat"><?php echo $translations['Collarless Coat'] ?></a></li>
                     <li><a href="./category/jacket-outerwear/collarless-jacket.php" data-i18n="collarless-jacket"><?php echo $translations['Collarless Jacket'] ?></a></li>
@@ -169,11 +169,8 @@ if (file_exists($lang_file)) {
                         // 商品名
                         echo "<p class='sale-product-name' data-i18n='goods_name'>" . $translations['Product Name'] . " ：{$rec['goods']}</p>";
 
-                        // 価格
-                        echo "<p class='sale-product-price' data-i18n='price'>" . $translations['Price'] . "：{$rec['original_price']}円</p>";
-
-                        // 割引計算と表示
-                        if ($rec['sale_id']) {
+                         // 割引計算と表示
+                         if ($rec['sale_id']) {
                             $sale_id = $rec['sale_id'];
                             $sql_sale = "SELECT sale, sale_id FROM sale WHERE sale_id = :sale_id";
                             $stmt_sale = $dbh->prepare($sql_sale);
@@ -184,8 +181,13 @@ if (file_exists($lang_file)) {
                             // 割引情報が取得でき、割引率が10ではない場合のみ処理
                             if ($sale && isset($rec['original_price']) && $sale['sale_id'] != 10) {
                                 $discounted_price = ceil($rec['original_price'] * (1 - $sale['sale'] / 100)); // 小数点切り上げ
-                                echo "<p class='product-discount' data-i18n='discounted_price'>" . $translations['Discounted Price'] . "：{$discounted_price}円</p>";
+                                echo "<div class='product-price' style='color: #007bff; margin-top: 8px; font-size: 16px; font-weight: bold;' data-i18n='discounted_price'>¥{$discounted_price}({$sale['sale']}%OFF)</div>";
+
                             }
+                            echo "<div class='original-price' data-i18n='price' style='font-size: 18px;'>¥{$rec['original_price']}</div>";
+                        }else{
+                        // 価格
+                        echo "<div class='sale-product-price' data-i18n='price' style='font-size: 18px;'>¥{$rec['original_price']}</div>";
                         }
                         echo "</div>";
                         echo "</div>";
@@ -252,6 +254,8 @@ if (file_exists($lang_file)) {
                         // 商品名
                         echo "<p class='sale-product-name' data-i18n='goods_name'>" . $translations['Product Name'] . " ：{$rec['goods']}</p>";
                        
+                          
+                        // 割引計算と表示
                         if ($rec['sale_id']) {
                             $sale_id = $rec['sale_id'];
                             $sql_sale = "SELECT sale, sale_id FROM sale WHERE sale_id = :sale_id";
@@ -263,14 +267,14 @@ if (file_exists($lang_file)) {
                             // 割引情報が取得でき、割引率が10ではない場合のみ処理
                             if ($sale && isset($rec['original_price']) && $sale['sale_id'] != 10) {
                                 $discounted_price = ceil($rec['original_price'] * (1 - $sale['sale'] / 100)); // 小数点切り上げ
-                                echo "<div class='product-discount' data-i18n='discounted_price'> ¥{$discounted_price}</div>";
+                                echo "<div class='product-price' style='color: #007bff; margin-top: 8px; font-size: 16px; font-weight: bold;' data-i18n='discounted_price'>¥{$discounted_price}({$sale['sale']}%OFF)</div>";
+
                             }
-                        }
+                            echo "<div class='original-price' data-i18n='price'>¥{$rec['original_price']}</div>";
+                        }else{
                         // 価格
                         echo "<div class='sale-product-price' data-i18n='price'>¥{$rec['original_price']}</div>";
-                     
-                        // 割引計算と表示
-                       
+                        }
                         echo "</div>";
                         echo "</div>";
                         echo "</a>";
@@ -335,11 +339,9 @@ if (file_exists($lang_file)) {
                         echo "<p class='sale-product-brand' data-i18n='brand'>" . $translations['Brand'] . "： {$rec['brand_name']}</p>";
 
                         // 商品名
-                        echo "<p class='sale-product-name' data-i18n='goods_name'>" . $translations['Product Name'] . " ：{$rec['goods']}</p>";
+                        echo "<div class='sale-product-name' data-i18n='goods_name'>{$rec['goods']}</div>";
 
-                        // 価格
-                        echo "<p class='sale-product-price' data-i18n='price'>" . $translations['Price'] . "：{$rec['original_price']}円</p>";
-
+                        
                         // 割引計算と表示
                         if ($rec['sale_id']) {
                             $sale_id = $rec['sale_id'];
@@ -352,8 +354,13 @@ if (file_exists($lang_file)) {
                             // 割引情報が取得でき、割引率が10ではない場合のみ処理
                             if ($sale && isset($rec['original_price']) && $sale['sale_id'] != 10) {
                                 $discounted_price = ceil($rec['original_price'] * (1 - $sale['sale'] / 100)); // 小数点切り上げ
-                                echo "<p class='product-discount' data-i18n='discounted_price'>" . $translations['Discounted Price'] . "：{$discounted_price}円</p>";
+                                echo "<div class='product-price' style='color: #007bff; margin-top: 8px; font-size: 16px; font-weight: bold;' data-i18n='discounted_price'>¥{$discounted_price}({$sale['sale']}%OFF)</div>";
+
                             }
+                            echo "<div class='original-price' data-i18n='price'>¥{$rec['original_price']}</div>";
+                        }else{
+                        // 価格
+                        echo "<div class='sale-product-price' data-i18n='price'>¥{$rec['original_price']}</div>";
                         }
                         echo "</div>";
                         echo "</div>";
