@@ -11,6 +11,7 @@ if (isset($_SESSION['id'])) {
     $userId = null;
 }
 
+$gender = isset($_GET['gender']) ? $_GET['gender'] : 'ALL';
 $brand = isset($_GET['brand']) ? $_GET['brand'] : null;
 $sort = isset($_GET['sort']) ? $_GET['sort'] : 'default';
 
@@ -30,6 +31,14 @@ if ($brand !== null && $brand !== 'all') {
     // "all" の場合は条件を追加しない（すべての商品を取得）
 }
 
+// gender が ALL でない場合
+if ($gender == '0') {
+    $sql .= " AND (shop.gender IN (0, 1, 2, 3))";
+} elseif ($gender !== 'ALL') {
+    // gender が ALL でない場合（1, 2, 3）のみフィルタリング
+    $sql .= " AND shop.gender IN (0,:gender)";
+    $params[':gender'] = $gender;
+}
 
 // ソート条件に応じてクエリを追加
 switch ($sort) {
@@ -61,6 +70,11 @@ $sql = "SELECT * FROM brand";
 $stmt = $dbh->prepare($sql);
 $stmt->execute();
 $brands = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$sql = "SELECT * FROM gender";
+$stmt = $dbh->prepare($sql);
+$stmt->execute();
+$genders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -215,6 +229,18 @@ $brands = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         // 選択されているブランドを保持
                         $selected = (isset($_GET['brand']) && $_GET['brand'] === $brand_id) ? 'selected' : '';
                         echo "<option value=\"$brand_id\" $selected>$brand_name</option>";
+                    }
+                    ?>
+                </select>
+
+                <select name="gender" id="gender" onchange="this.form.submit()">
+                    <?php
+                    foreach ($genders as $gender_option) {
+                        $gender_id = htmlspecialchars($gender_option['gender_id']);
+                        $gender_name = htmlspecialchars($gender_option['gender']);
+
+                        $selected = (isset($_GET['gender']) && $_GET['gender'] === $gender_id) ? 'selected' : '';
+                        echo "<option value=\"$gender_id\" $selected>$gender_name</option>";
                     }
                     ?>
                 </select>
