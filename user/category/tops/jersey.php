@@ -26,7 +26,7 @@ if ($gender == '0') {
     $sql .= " AND (shop.gender IN (0, 1, 2, 3))";
 } elseif ($gender !== 'ALL') {
     // gender が ALL でない場合（1, 2, 3）のみフィルタリング
-    $sql .= " AND shop.gender = :gender";
+    $sql .= " AND shop.gender IN (0,:gender)";
     $params[':gender'] = $gender;
 }
 

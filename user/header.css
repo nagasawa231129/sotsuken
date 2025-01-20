@@ -171,3 +171,18 @@ header a[href="favorite.php"]::after {
     text-align: center;
 }
 
+@media (max-width: 768px) {
+    .icon {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .search-bar {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .icon a {
+        margin-bottom: 10px;
+    }
+}

@@ -45,7 +45,24 @@ if (file_exists($lang_file)) {
 
 <!DOCTYPE html>
 <html lang="ja">
+<head>
+<script>
+        // スマホ用遷移またはPC用スクロール
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelector('a[href="#profile"]').addEventListener('click', function (event) {
+                event.preventDefault(); // デフォルトのリンク動作を防ぐ
 
+                // スマホの場合
+                if (window.innerWidth <= 700) {
+                    window.location.href = "account.php#profile"; // ページ遷移
+                } else {
+                    // PCの場合
+                    document.getElementById("profile").scrollIntoView({ behavior: "smooth" }); // スムーズにスクロール
+                }
+            });
+        });
+    </script>
+</head>
 <body>
     <div class="container">
         <!-- サブ項目 -->
