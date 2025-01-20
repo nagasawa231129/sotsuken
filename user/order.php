@@ -114,7 +114,7 @@ $result_review = $stmt_review->fetchAll(PDO::FETCH_ASSOC);
 
     <div id="history-content" class="tab-content <?php echo isset($_GET['tab']) && $_GET['tab'] == 'history' ? 'active' : ''; ?>">
         <?php
-            if (count($result_history) > 0) {
+        if (count($result_history) > 0) {
             $currentCartGroup = null;
 
             foreach ($result_history as $row) {
@@ -150,76 +150,6 @@ $result_review = $stmt_review->fetchAll(PDO::FETCH_ASSOC);
             echo "</div>";
         } else {
             echo $translations['No order history available'];
-        }
-        ?>
-    </div>
-
-    <div id="unpaid-content" class="tab-content <?php echo isset($_GET['tab']) && $_GET['tab'] == 'unpaid' ? 'active' : ''; ?>">
-        <?php
-        if (isset($userId)) {
-            $sql = "SELECT cart_detail.order_date, cart_detail.shop_id, shop.thumbnail, shop.goods, cart_detail.cart_id, cart_detail.cart_group, g.shop_group
-            FROM cart_detail
-            JOIN `group` g ON g.shop_id = cart_detail.shop_id
-            JOIN shop ON cart_detail.shop_id = shop.shop_id
-            WHERE cart_detail.user_id = :user_id AND cart_detail.trade_situation = '1'
-            ORDER BY cart_detail.order_date ASC, cart_detail.cart_group ASC";
-            $stmt = $dbh->prepare($sql);
-            $stmt->bindParam(':user_id', $userId);
-            $stmt->execute();
-        ?>
-
-        <?php
-            if ($stmt->rowCount() > 0) {
-                $currentCartGroup = null;
-
-                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                    if ($currentCartGroup != $row['cart_group']) {
-                        if ($currentCartGroup !== null) {
-                            echo <<<EOF
-                        <form method="GET" action="result.php">
-                            <input type="hidden" name="cart_group" value="{$encodedCartGroup}">
-                            <input type="hidden" name="user_id" value="{$encodedUserId}">
-                            <input type="submit" value="支払う">
-                        </form>
-                        </div><hr>
-                        EOF;
-                        }
-
-                        $currentCartGroup = $row['cart_group'];
-                        $encodedCartGroup = urlencode($currentCartGroup);
-                        $encodedUserId = urlencode($userId);
-
-                        echo "<h3>Cart Group: {$currentCartGroup}</h3>";
-                        echo "<div class='cart-group'>";
-                    }
-
-                    $imgBlob = $row['thumbnail'];
-                    $mimeType = 'image/png';
-                    $finfo = new finfo(FILEINFO_MIME_TYPE);
-                    $mimeType = $finfo->buffer($imgBlob);
-                    $encodedImg = base64_encode($imgBlob);
-
-                    echo "<div class='product-item'>";
-                    echo "<a href='goods.php?shop_id={$row['shop_id']}&shop_group={$row['shop_group']}'>";
-                    echo "<img class='image' src='data:{$mimeType};base64,{$encodedImg}' alt='goods img' class='sale-product-image'></br>";
-                    echo "</a>";
-                    echo "<p>商品名: {$row['goods']}</p>";
-                    echo "<p>購入日: {$row['order_date']}</p>";
-                }
-
-                if ($currentCartGroup !== null) {
-                    echo <<<EOF
-                <form method="GET" action="result.php">
-                    <input type="hidden" name="cart_group" value="{$encodedCartGroup}">
-                    <input type="hidden" name="user_id" value="{$encodedUserId}">
-                    <input type="submit" value="支払う">
-                </form>
-                </div>
-                EOF;
-                }
-            } else {
-                echo "<p>未入金の商品はありません。</p>";
-            }
         }
         ?>
     </div>
@@ -326,6 +256,75 @@ $result_review = $stmt_review->fetchAll(PDO::FETCH_ASSOC);
         ?>
     </div>
 
+    <div id="unpaid-content" class="tab-content <?php echo isset($_GET['tab']) && $_GET['tab'] == 'unpaid' ? 'active' : ''; ?>">
+        <?php
+        if (isset($userId)) {
+            $unpaid_sql = "SELECT cart_detail.order_date, cart_detail.shop_id, shop.thumbnail, shop.goods, cart_detail.cart_id, cart_detail.cart_group, g.shop_group
+        FROM cart_detail
+        JOIN `group` g ON g.shop_id = cart_detail.shop_id
+        JOIN shop ON cart_detail.shop_id = shop.shop_id
+        WHERE cart_detail.user_id = :user_id AND cart_detail.trade_situation = '1'
+        ORDER BY cart_detail.order_date ASC, cart_detail.cart_group ASC";
+
+            $stmt_unpaid = $dbh->prepare($unpaid_sql);
+            $stmt_unpaid->bindParam(1, $userId, PDO::PARAM_INT);
+            $stmt_unpaid->execute();
+
+            if ($stmt_unpaid->rowCount() > 0) {
+                $currentCartGroup = null;
+
+                while ($row = $stmt_unpaid->fetch(PDO::FETCH_ASSOC)) {
+                    if ($currentCartGroup != $row['cart_group']) {
+                        if ($currentCartGroup !== null) {
+                            echo <<<EOF
+                    <form method="GET" action="result.php">
+                        <input type="hidden" name="cart_group" value="{$encodedCartGroup}">
+                        <input type="hidden" name="user_id" value="{$encodedUserId}">
+                        <input type="submit" value="支払う">
+                    </form>
+                    </div><hr>
+                    EOF;
+                        }
+
+                        $currentCartGroup = $row['cart_group'];
+                        $encodedCartGroup = urlencode($currentCartGroup);
+                        $encodedUserId = urlencode($userId);
+
+                        echo "<h3>Cart Group: {$currentCartGroup}</h3>";
+                        echo "<div class='cart-group'>";
+                    }
+
+                    $imgBlob = $row['thumbnail'];
+                    $mimeType = 'image/png';
+                    $finfo = new finfo(FILEINFO_MIME_TYPE);
+                    $mimeType = $finfo->buffer($imgBlob);
+                    $encodedImg = base64_encode($imgBlob);
+
+                    echo "<div class='product-item'>";
+                    echo "<a href='goods.php?shop_id={$row['shop_id']}&shop_group={$row['shop_group']}'>";
+                    echo "<img class='image' src='data:{$mimeType};base64,{$encodedImg}' alt='goods img' class='sale-product-image'></br>";
+                    echo "</a>";
+                    echo "<p>商品名: {$row['goods']}</p>";
+                    echo "<p>購入日: {$row['order_date']}</p>";
+                }
+
+                if ($currentCartGroup !== null) {
+                    echo <<<EOF
+            <form method="GET" action="result.php">
+                <input type="hidden" name="cart_group" value="{$encodedCartGroup}">
+                <input type="hidden" name="user_id" value="{$encodedUserId}">
+                <input type="submit" value="支払う">
+            </form>
+            </div>
+            EOF;
+                }
+            } else {
+                echo "<p>未入金の商品はありません。</p>";
+            }
+        }
+        ?>
+    </div>
+
     <script>
         function showTab(tabId) {
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
@@ -353,4 +352,5 @@ $result_review = $stmt_review->fetchAll(PDO::FETCH_ASSOC);
         }
     </script>
 </body>
+
 </html>
