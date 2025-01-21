@@ -81,6 +81,30 @@ select {
     margin-bottom: 12px;
 }
 
+.product-item, .sale-product-item {
+    width: 200px; /* 固定の幅 */
+    height: 370px; /* 固定の高さ */
+    display: flex;
+    flex-direction: column; /* 縦並びに配置 */
+    align-items: center; /* 中央揃え */
+    min-width: 200px; /* 商品ボックスの最小幅 */
+    max-width: 200px; /* 商品ボックスの最大幅 */
+    border: 1px solid #ccc; /* 枠線 */
+    border-radius: 8px; /* 角を丸く */
+    padding: 10px; /* 内側の余白 */
+    background: #fff; /* 背景色 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 影 */
+    flex-shrink: 0; /* 縮小を防ぐ */
+    text-align: center; /* 中央揃え */
+}
+
+.product-price, .product-discount, .sale-product-item, .sale-product-discount {
+    font-size: 12px; /* 値段や割引のフォントサイズ */
+    color: #555; /* テキストの色 */
+    margin: 8px 0; /* 上下の余白を小さく設定 */
+    line-height: 1.2; /* 行間を詰める */
+}
+
 /* レスポンシブデザイン対応 */
 @media screen and (max-width: 600px) {
     form {
@@ -103,14 +127,6 @@ select {
     padding: 20px;
 }
 
-.sale-product-item {
-    text-align: center;
-    /* 画像とテキストを中央揃え */
-    margin: 10px;
-    /* アイテム間にマージンを追加 */
-    padding: 10px;
-    /* アイテム内のパディング */
-}
 
 .sale-product-image {
     width: 100%;
@@ -123,16 +139,3 @@ select {
     /* 画像とテキストの間にスペースを追加 */
 }
 
-.sale-product-item span {
-    display: block;
-    /* spanをブロック要素として表示 */
-    margin-bottom: 5px;
-    /* 各テキスト間にスペースを追加 */
-}
-
-.sale-product-item:hover {
-    transform: scale(1.05);
-    /* ホバー時の拡大効果 */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    /* ホバー時の影 */
-}

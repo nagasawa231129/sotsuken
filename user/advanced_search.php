@@ -324,8 +324,10 @@ $sale_subject = isset($_GET['sale_subject']) && $_GET['sale_subject'] !== '' ? $
 
 // SQLクエリの作成
 $sql = "
-    SELECT DISTINCT shop.*, subcategory.*, category.*, `group`.shop_group
+    SELECT DISTINCT shop.*, subcategory.*, category.*, `group`.shop_group, brand.*, sale.*
     FROM shop
+    LEFT OUTER JOIN sale ON sale.sale_id = shop.sale_id
+    LEFT OUTER JOIN brand ON brand.brand_id = shop.brand_id
     LEFT OUTER JOIN subcategory ON subcategory.subcategory_id = shop.subcategory_id
     LEFT OUTER JOIN category ON category.category_id = shop.category_id
     LEFT OUTER JOIN `group` ON `group`.shop_id = shop.shop_id
@@ -410,18 +412,27 @@ if (empty($results)) {
         echo "<div class='sale-product-item'>";
         echo "<a href=\"$product_link\" style=\"text-decoration: none; color: inherit;\">";
         echo "<img src='data:{$mimeType};base64,{$encodedImg}' alt='goods img' class='sale-product-image'></br>";
-        echo  htmlspecialchars($row['goods']) . "<br>";
-        echo  htmlspecialchars($row['price']) . "<br>";
+        echo htmlspecialchars($row['brand_name']) . "</br>";
+        echo htmlspecialchars($row['goods']) . "<br>";
+        echo htmlspecialchars($row['price']) . "<br>";
     
-        // 割引率の計算
-        $sale_subject = $row['sale_subject'];
-        if ($sale_subject >= 1 && $sale_subject <= 9) {
-            $discount_percentage = $sale_subject * 10;
-            echo  $discount_percentage . "%<br>";
-        } else {
-            echo " 0% (セールなし)<br>";
+        if ($row['sale_id']) {
+            $sale_id = $row['sale_id'];
+            $sql_sale = "SELECT sale, sale_id FROM sale WHERE sale_id = :sale_id";
+            $stmt_sale = $dbh->prepare($sql_sale);
+            $stmt_sale->bindParam(':sale_id', $sale_id);
+            $stmt_sale->execute();
+            $sale = $stmt_sale->fetch(PDO::FETCH_ASSOC);
+
+            // 割引情報が取得でき、割引率が10ではない場合のみ処理
+            if ($sale && isset($row['original_price']) && $sale['sale_id'] != 10) {
+                $discounted_price = ceil($row['original_price'] * (1 - $sale['sale'] / 100)); // 小数点切り上げ
+                echo "<div class='product-discount' data-i18n='discounted_price'> ¥{$discounted_price}</div>";
+            }
         }
     
+        echo "<div class='sale-product-price' data-i18n='price'>¥{$row['original_price']}</div>";
+
         echo "</a>";
         echo "</div>";  // 商品アイテム終了
     }

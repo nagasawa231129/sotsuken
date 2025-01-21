@@ -122,9 +122,11 @@ html, body {
     flex-direction: column; /* 縦方向に並べる */
     gap: 20px; /* セール商品と通常商品の間隔 */
     margin: 20px; /* 全体の外側余白 */
+    margin-right: 100px;
 }
 
 .products-container, .sale-products-container {
+    /* padding-right: 50px; */
     margin-right: 50px;
     margin-bottom: 20px;
     /* width: 80%; */
@@ -220,7 +222,7 @@ h3, h2 {
 }
 
 .all_item{
-    padding-right: 100px;
+    padding-right: 250px;
     text-align: end;
 }
 
