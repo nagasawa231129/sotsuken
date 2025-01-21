@@ -21,6 +21,7 @@ $user = $stmt->fetch();
 // 現在の情報を変更する場合
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $new_display = $_POST['display'];
+    $new_mail = $_POST['mail'];
     $new_sei = $_POST['sei'];
     $new_kanasei = $_POST['kanasei'];
     $new_mei = $_POST['mei'];
@@ -31,8 +32,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $new_phone = str_replace('-', '', $_POST['phone']);
 
     // 基本情報の更新
-    $stmt = $dbh->prepare("UPDATE user SET display_name = ?, sei = ?, kanasei = ?, mei = ?, kanamei = ?, gender_id = ?, postcode = ?, address = ?, phone = ? WHERE user_id = ?");
-    $stmt->execute([$new_display, $new_sei, $new_kanasei, $new_mei, $new_kanamei, $new_gender, $new_postcode, $new_address, $new_phone, $userId]);
+    $stmt = $dbh->prepare("UPDATE user SET display_name = ?, mail = ?, sei = ?, kanasei = ?, mei = ?, kanamei = ?, gender_id = ?, postcode = ?, address = ?, phone = ? WHERE user_id = ?");
+    $stmt->execute([$new_display,$new_mail, $new_sei, $new_kanasei, $new_mei, $new_kanamei, $new_gender, $new_postcode, $new_address, $new_phone, $userId]);
 
     // 住所2および3の更新処理
     for ($i = 2; $i <= 3; $i++) {
@@ -160,6 +161,10 @@ function formatPhoneNumber($phoneNumber)
             <tr>
                 <td><?php echo $translations['Nickname'] ?></td>
                 <td><input type="text" name="display" value="<?php echo htmlspecialchars($user['display_name']); ?>" required></td>
+            </tr>
+            <tr>
+                <td><?php echo $translations['mail'] ?></td>
+                <td><input type="text" name="mail" value="<?php echo htmlspecialchars($user['mail']); ?>" required></td>
             </tr>
             <tr>
                 <td><?php echo $translations['Name'] ?></td>

@@ -246,6 +246,7 @@ $translations = [
     'Japanese' => '日本語',
 
     'User Name' => 'ユーザーネーム',
+    'mail' => 'メールアドレス',
     'Name' => 'お名前',
     'Name Kana' => 'お名前(カナ)',
     'Gender' => '性別',

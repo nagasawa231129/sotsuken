@@ -30,7 +30,7 @@
 
             if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 // データベースからユーザー情報を取得
-                $query = "SELECT sei, mei, postcode FROM user WHERE user_id = :user_id";
+                $query = "SELECT sei, mei, postcode, mail FROM user WHERE user_id = :user_id";
                 $stmt = $dbh->prepare($query);
                 $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
                 $stmt->execute();
@@ -40,7 +40,7 @@
             
                 if ($user) {
                     // 各フィールドが空かどうかを確認
-                    if (empty($user['sei']) || empty($user['mei']) || empty($user['postcode'])) {
+                    if (empty($user['sei']) || empty($user['mei']) || empty($user['postcode']) || empty($user['mail']) ) {
                         // 空の場合はparson_info.phpに移動
                         header("Location: parson_info.php");
                         exit;
@@ -49,11 +49,12 @@
                         header("Location: register.php");
                         exit;
                     }
-                } else {
-                    // ユーザーが存在しない場合もparson_info.phpに移動
-                    header("Location: parson_info.php");
-                    exit;
                 }
+                // } else {
+                //     // ユーザーが存在しない場合もparson_info.phpに移動
+                //     header("Location: parson_info.php");
+                //     exit;
+                // }
             }
             
             $sumPrice = 0;
