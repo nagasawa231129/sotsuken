@@ -414,7 +414,7 @@ if (empty($results)) {
         echo "<img src='data:{$mimeType};base64,{$encodedImg}' alt='goods img' class='sale-product-image'></br>";
         echo htmlspecialchars($row['brand_name']) . "</br>";
         echo htmlspecialchars($row['goods']) . "<br>";
-        echo htmlspecialchars($row['price']) . "<br>";
+        // echo htmlspecialchars($row['price']) . "<br>";
     
         if ($row['sale_id']) {
             $sale_id = $row['sale_id'];
@@ -427,11 +427,14 @@ if (empty($results)) {
             // 割引情報が取得でき、割引率が10ではない場合のみ処理
             if ($sale && isset($row['original_price']) && $sale['sale_id'] != 10) {
                 $discounted_price = ceil($row['original_price'] * (1 - $sale['sale'] / 100)); // 小数点切り上げ
-                echo "<div class='product-discount' data-i18n='discounted_price'> ¥{$discounted_price}</div>";
+                echo "<div class='product-price' style='color: #007bff; margin-top: 8px; font-size: 16px; font-weight: bold;' data-i18n='discounted_price'>¥{$discounted_price}({$sale['sale']}%OFF)</div>";
+
             }
-        }
-    
+            echo "<div class='original-price' data-i18n='price'>¥{$row['original_price']}</div>";
+        }else{
+        // 価格
         echo "<div class='sale-product-price' data-i18n='price'>¥{$row['original_price']}</div>";
+        }
 
         echo "</a>";
         echo "</div>";  // 商品アイテム終了

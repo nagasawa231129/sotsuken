@@ -105,6 +105,12 @@ select {
     line-height: 1.2; /* 行間を詰める */
 }
 
+.original-price {
+    margin-top: 5px;
+    font-size: 16px;
+    color: #888;
+    text-decoration: line-through;
+}
 /* レスポンシブデザイン対応 */
 @media screen and (max-width: 600px) {
     form {
