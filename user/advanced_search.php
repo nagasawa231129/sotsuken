@@ -23,7 +23,7 @@ $brands = $stmt->fetchAll();
     <select name="gender" data-i18n="gender_label">
         <option value="" data-i18n="all"><?php echo $translations['All'] ?></option>
         <option value="1" <?php echo (isset($_GET['gender']) && $_GET['gender'] === '1') ? 'selected' : ''; ?> data-i18n="man"><?php echo $translations['Man'] ?></option>
-        <option value="0" <?php echo (isset($_GET['gender']) && $_GET['gender'] === '0') ? 'selected' : ''; ?> data-i18n="woman"><?php echo $translations['Woman'] ?></option>
+        <option value="2" <?php echo (isset($_GET['gender']) && $_GET['gender'] === '2') ? 'selected' : ''; ?> data-i18n="woman"><?php echo $translations['Woman'] ?></option>
     </select>
 
     <label for="brand" data-i18n="brand"><?php echo $translations['Brand'] ?>：</label>
@@ -342,10 +342,12 @@ if ($keyword !== null && $keyword !== '') {
     $params[] = '%' . $keyword . '%';
 }
 
-// 性別フィルターの追加
-if ($gender !== null) {
-    $sql .= " AND gender = ?";
-    $params[] = $gender;
+if ($gender == '') {
+    $sql .= " AND (shop.gender IN (0, 1, 2, 3))";
+} elseif ($gender !== 'ALL') {
+    // gender が ALL でない場合（1, 2, 3）のみフィルタリング
+    $sql .= " AND shop.gender IN (0,:gender)";
+    $params[':gender'] = $gender;
 }
 
 //ブランド
