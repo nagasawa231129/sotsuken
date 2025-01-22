@@ -97,10 +97,20 @@
         echo '<p><span class="data-label">サイズ:</span> <span class="data-value">' . $row['size'] . '</span></p>';
         echo '<p><span class="data-label">個数:</span> <span class="data-value">' . $row['quantity'] . '</span></p>';
 
+        if ($row['trade_situation'] == 2) {
+            echo '<label><input type="checkbox" name="selected_items[]" value="' . $row['cart_id'] . '" data-user-mail="' . $userMail . '"> 発送準備完了</label>';
+        }
+
         echo '</div>';
 
         echo '<input type="hidden" name="user_mail[]" value="' . $userMail . '">';
         echo '<input type="hidden" name="cart_ids[]" value="' . $row['cart_id'] . '">';
+        echo '<input type="hidden" name="goods[]" value="' . $row['goods'] . '">';
+        echo '<input type="hidden" name="size[]" value="' . $row['size'] . '">';
+        echo '<input type="hidden" name="brand[]" value="' . $row['brand'] . '">';
+        echo '<input type="hidden" name="color[]" value="' . $row['color'] . '">';
+        echo '<input type="hidden" name="quantity[]" value="' . $row['quantity'] . '">';
+      
 
         $last_user_id = $row['user_id'];
         $last_order_time = $row['order_time'];
