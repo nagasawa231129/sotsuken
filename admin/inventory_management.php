@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
 </head>
 
 <body>
+<a href="admin_toppage.php" class="back-link">トップページへ</a>
     <h2 style="text-align: center;">在庫管理ページ</h2>
 
     <!-- 検索フォーム -->
@@ -70,28 +72,28 @@
     if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_stock'])) {
         $shop_id = $_POST['shop_id'];
         $change_stock = isset($_POST['stock_change']) ? (int)$_POST['stock_change'] : 0; // 明示的に整数にキャスト
-    
+
         $stmt = $dbh->prepare("SELECT material FROM shop WHERE shop_id = :shop_id");
         $stmt->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
         $stmt->execute();
         $current_stock = (int)$stmt->fetchColumn(); // 明示的に整数にキャスト
-    
+
         $new_stock = max(0, $current_stock + $change_stock); // ここで型が正しくなる
 
         // 現在の日時を取得
         $current_time = date('Y-m-d H:i:s'); // フォーマット: YYYY-MM-DD HH:MM:SS
-        
+
         // UPDATE 文で material と arrival を同時に更新
         $stmt = $dbh->prepare("UPDATE shop SET material = :material, arrival = :arrival WHERE shop_id = :shop_id");
-        
+
         // パラメータをバインド
         $stmt->bindParam(':material', $new_stock, PDO::PARAM_INT);
         $stmt->bindParam(':arrival', $current_time, PDO::PARAM_STR);
         $stmt->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
-        
+
         // クエリを実行
         $stmt->execute();
-        
+
         $_SESSION['flash_message'] = '在庫が更新されました。';
         header("Location: inventory_management.php");
         exit();
@@ -113,8 +115,10 @@
         </tr>
         <?php foreach ($products as $product): ?>
             <tr>
-                <td><?= htmlspecialchars($product['shop_id']) ?></td>
-                
+            <td><?= htmlspecialchars($product['shop_id']) ?></td>
+
+
+
                 <td>
                     <?php
                     $imgBlob = $product['thumbnail']; // サムネイルのBLOBデータ
@@ -130,48 +134,48 @@
                 <td><?= htmlspecialchars($product['brand_name']) ?></td>
                 <td><?= htmlspecialchars($product['goods']) ?></td>
                 <td>¥<?= htmlspecialchars(number_format($product['price'])) ?>
-            <?php
-                // sale_idに基づいて割引パーセンテージを表示
-                            if ($product['sale_id'] != null) {
-                                switch ($product['sale_id']) {
-                                    case 1:
-                                        echo ' <span style="color: red;">10%OFF中</span>';
-                                        break;
-                                    case 2:
-                                        echo ' <span style="color: red;">20%OFF中</span>';
-                                        break;
-                                    case 3:
-                                        echo ' <span style="color: red;">30%OFF中</span>';
-                                        break;
-                                    case 4:
-                                        echo ' <span style="color: red;">40%OFF中</span>';
-                                        break;
-                                    case 5:
-                                        echo ' <span style="color: red;">50%OFF中</span>';
-                                        break;
-                                    case 6:
-                                        echo ' <span style="color: red;">60%OFF中</span>';
-                                        break;
-                                    case 7:
-                                        echo ' <span style="color: red;">70%OFF中</span>';
-                                        break;
-                                    case 8:
-                                        echo ' <span style="color: red;">80%OFF中</span>';
-                                        break;
-                                    case 9:
-                                        echo ' <span style="color: red;">90%OFF中</span>';
-                                        break;
-                                    default:
-                                        // 他のsale_idの場合は表示しない
-                                        break;
-                                }
-                            }
-                            ?></td>
+                    <?php
+                    // sale_idに基づいて割引パーセンテージを表示
+                    if ($product['sale_id'] != null) {
+                        switch ($product['sale_id']) {
+                            case 1:
+                                echo ' <span style="color: red;">10%OFF中</span>';
+                                break;
+                            case 2:
+                                echo ' <span style="color: red;">20%OFF中</span>';
+                                break;
+                            case 3:
+                                echo ' <span style="color: red;">30%OFF中</span>';
+                                break;
+                            case 4:
+                                echo ' <span style="color: red;">40%OFF中</span>';
+                                break;
+                            case 5:
+                                echo ' <span style="color: red;">50%OFF中</span>';
+                                break;
+                            case 6:
+                                echo ' <span style="color: red;">60%OFF中</span>';
+                                break;
+                            case 7:
+                                echo ' <span style="color: red;">70%OFF中</span>';
+                                break;
+                            case 8:
+                                echo ' <span style="color: red;">80%OFF中</span>';
+                                break;
+                            case 9:
+                                echo ' <span style="color: red;">90%OFF中</span>';
+                                break;
+                            default:
+                                // 他のsale_idの場合は表示しない
+                                break;
+                        }
+                    }
+                    ?></td>
                 <td><?= htmlspecialchars($product['material']) ?></td>
                 <td><?= htmlspecialchars($product['size']) ?></td>
                 <td><?= htmlspecialchars($product['color']) ?></td>
                 <td>
-                    <form method="post" action="">
+                    <form method="post" action="inventory_management.php#product_<?= htmlspecialchars($product['shop_id']) ?>">
                         <input type="hidden" name="shop_id" value="<?= htmlspecialchars($product['shop_id']) ?>">
                         <input type="number" name="stock_change" placeholder="増減数">
                         <input type="submit" name="update_stock" value="更新">
@@ -190,6 +194,19 @@
     </div>
 
     <script>
+        // ページのスクロール位置を保持
+        window.addEventListener("beforeunload", () => {
+            sessionStorage.setItem("scrollPosition", window.scrollY);
+        });
+
+        window.addEventListener("load", () => {
+            const scrollPosition = sessionStorage.getItem("scrollPosition");
+            if (scrollPosition) {
+                window.scrollTo(0, parseInt(scrollPosition, 10));
+                sessionStorage.removeItem("scrollPosition"); // 一度戻したら削除
+            }
+        });
+
         // サムネイル画像をクリックした時の処理
         const thumbnails = document.querySelectorAll('.thumbnail');
         const modal = document.getElementById('imageModal');
@@ -198,9 +215,9 @@
 
         thumbnails.forEach(thumbnail => {
             thumbnail.addEventListener('click', function() {
-                const shopId = this.dataset.shopId;  // クリックしたサムネイルのshop_idを取得
-                fetch(`show_images.php?shop_id=${shopId}`)  // shop_idを渡して画像を取得
-                    .then(response => response.json())  // 画像のBase64エンコードされた配列を取得
+                const shopId = this.dataset.shopId; // クリックしたサムネイルのshop_idを取得
+                fetch(`show_images.php?shop_id=${shopId}`) // shop_idを渡して画像を取得
+                    .then(response => response.json()) // 画像のBase64エンコードされた配列を取得
                     .then(images => {
                         // モーダル内のコンテンツをクリア
                         modalContent.innerHTML = '';
@@ -209,29 +226,30 @@
                             // 画像を順にモーダルに追加
                             images.forEach(encodedImg => {
                                 const imgElement = document.createElement('img');
-                                imgElement.src = encodedImg;  // Base64エンコードされた画像をセット
+                                imgElement.src = encodedImg; // Base64エンコードされた画像をセット
                                 imgElement.alt = '商品画像';
-                                modalContent.appendChild(imgElement);  // モーダル内に画像を追加
+                                modalContent.appendChild(imgElement); // モーダル内に画像を追加
                             });
-                            modal.style.display = 'flex';  // モーダルを表示
+                            modal.style.display = 'flex'; // モーダルを表示
                         } else {
-                            modalContent.innerHTML = "画像が見つかりません";  // 画像がない場合
-                            modal.style.display = 'flex';  // モーダルを表示
+                            modalContent.innerHTML = "画像が見つかりません"; // 画像がない場合
+                            modal.style.display = 'flex'; // モーダルを表示
                         }
                     });
             });
         });
 
         closeModal.addEventListener('click', function() {
-            modal.style.display = 'none';  // モーダルを閉じる
+            modal.style.display = 'none'; // モーダルを閉じる
         });
 
         // モーダル外部をクリックして閉じる
         window.addEventListener('click', function(event) {
             if (event.target === modal) {
-                modal.style.display = 'none';  // モーダルを閉じる
+                modal.style.display = 'none'; // モーダルを閉じる
             }
         });
     </script>
 </body>
+
 </html>
