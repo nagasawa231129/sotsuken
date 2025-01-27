@@ -225,9 +225,27 @@ $genders = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         <strong><?php echo htmlspecialchars($product['goods'], ENT_QUOTES, 'UTF-8'); ?></strong>
                                     </div>
                                     <div><?php echo $translations['Discounted Price'] ?>: ¥<?php echo htmlspecialchars(number_format($product['price']), ENT_QUOTES, 'UTF-8'); ?></div>
-                                    <div><?php echo $translations['Price'] ?>: ¥<?php echo htmlspecialchars(number_format($product['original_price']), ENT_QUOTES, 'UTF-8'); ?></div>
-                                    <div><?php echo $translations['Sale'] ?>: <?php echo htmlspecialchars($product['sale'], ENT_QUOTES, 'UTF-8'); ?>%</div>
-                                    <div><?php echo $translations['Brand'] ?>: <?php echo htmlspecialchars($product['brand_id'], ENT_QUOTES, 'UTF-8'); ?></div>
+                                    <?php
+                                    if ($product['sale_id']) {
+                            $sale_id = $product['sale_id'];
+                            $sql_sale = "SELECT sale, sale_id FROM sale WHERE sale_id = :sale_id";
+                            $stmt_sale = $dbh->prepare($sql_sale);
+                            $stmt_sale->bindParam(':sale_id', $sale_id);
+                            $stmt_sale->execute();
+                            $sale = $stmt_sale->fetch(PDO::FETCH_ASSOC);
+
+                            // 割引情報が取得でき、割引率が10ではない場合のみ処理
+                            if ($sale && isset($product['original_price']) && $sale['sale_id'] != 10) {
+                                $discounted_price = ceil($product['original_price'] * (1 - $sale['sale'] / 100)); // 小数点切り上げ
+                                echo "<div class='product-price' style='color: #007bff; margin-top: 8px; font-size: 16px; font-weight: bold;' data-i18n='discounted_price'>¥{$discounted_price}({$sale['sale']}%OFF)</div>";
+
+                            }
+                            echo "<div class='original-price' data-i18n='price'>¥{$product['original_price']}</div>";
+                        }else{
+                        // 価格
+                        echo "<div class='sale-product-price' data-i18n='price'>¥{$product['original_price']}</div>";
+                        }        
+                        ?>
                                 </a>
                             </li>
                         <?php endforeach; ?>

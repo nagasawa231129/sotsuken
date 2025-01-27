@@ -209,6 +209,13 @@
     /* border-bottom: 1px solid #eee; 画像下に区切り線 */
 }
 
+.original-price {
+    margin-top: 5px;
+    font-size: 16px;
+    color: #888;
+    text-decoration: line-through;
+}
+
 /* レスポンシブ調整 */
 @media (max-width: 768px) {
     .main-content {
