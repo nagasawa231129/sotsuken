@@ -37,6 +37,9 @@ body {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
+
+
+
 /* 入力フィールド共通 */
 #search-form input[type="text"],
 #search-form input[type="number"],
@@ -200,6 +203,35 @@ input[type="text"], input[type="number"], select {
 /* テーブル内のセル内の要素の中央揃え */
 td {
     vertical-align: middle;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center; /* 中央揃え */
+    gap: 10px; /* 各リンクの間隔 */
+    margin-top: 20px;
+}
+
+.pagination a {
+    text-decoration: none;
+    color: #007bff; /* 通常のリンク色 */
+    font-size: 16px;
+    padding: 8px 12px; /* サイズ調整 */
+    border: 1px solid #007bff;
+    border-radius: 5px; /* 角を丸く */
+    transition: background-color 0.3s ease, color 0.3s ease; /* ホバー時のアニメーション */
+}
+
+.pagination a:hover {
+    background-color: #007bff; /* ホバー時の背景色 */
+    color: #fff; /* ホバー時の文字色 */
+}
+
+.pagination a.active {
+    font-weight: bold;
+    background-color: #007bff; /* 現在のページの背景色 */
+    color: #fff; /* 現在のページの文字色 */
+    pointer-events: none; /* 現在のページリンクを無効化 */
 }
 
 /* 新規追加ボタンのスタイル */
