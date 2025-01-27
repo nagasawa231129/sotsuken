@@ -417,16 +417,17 @@ if (file_exists($lang_file)) {
                 $stmt_products->bindValue(':brand_id', $topBrandId, PDO::PARAM_INT);
                 $stmt_products->execute();
                 $products = $stmt_products->fetchAll(PDO::FETCH_ASSOC);
+                echo "<p>あなたのお気に入りブランド：" . htmlspecialchars($favoriteBrandName, ENT_QUOTES, 'UTF-8') . "</p>";
+
             } else {
-                $favoriteBrandName = "お気に入りのブランドはまだありません。";
+                echo "<p>" . htmlspecialchars($user_name, ENT_QUOTES, 'UTF-8') . "さんに購入履歴はありませんでした。</p>";
             }
         } else {
-            $favoriteBrandName = "ログインしてください。";
+            echo "<a href='login.php'>ログインしてください</a>";
         }
         ?>
 
         <!-- ブランド名の表示 -->
-        <p>あなたのお気に入りブランド：<?php echo $favoriteBrandName; ?></p>
         <a href='all_myfavorite.php' class="all_item"><?php echo $translations['View All']; ?></a>
 
         <div class="sale-products-container">
@@ -462,7 +463,7 @@ if (file_exists($lang_file)) {
                         echo "</a>";
                     }
                 } else {
-                    echo "<p>このブランドの商品の情報は見つかりませんでした。</p>";
+                    echo "<p>" . htmlspecialchars($user_name, ENT_QUOTES, 'UTF-8') . "さんに購入履歴はありませんでした。</p>";
                 }
                 ?>
             </div>
