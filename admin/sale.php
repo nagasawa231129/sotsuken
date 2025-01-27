@@ -4,6 +4,7 @@
 // データベース接続
 include './../../db_open.php';
 // 検索フォームからの値を取得
+
 $search_query = '';
 $search_params = [];
 // 商品名の検索

@@ -31,42 +31,50 @@
     include "./../../db_open.php"; // DB接続
     session_start();
 
-    // 検索処理
-    if (isset($_GET['query']) && !empty($_GET['query'])) {
-        $query = htmlspecialchars($_GET['query'], ENT_QUOTES, 'UTF-8');
-        $stmt = $dbh->prepare("SELECT s.shop_id, s.goods, s.price,s.sale_id, s.material, sz.size, c.color, b.brand_name, s.thumbnail
-                               FROM shop s
-                               LEFT JOIN size sz ON s.size = sz.size_id
-                               LEFT JOIN color c ON s.color = c.color_id
-                               LEFT JOIN brand b ON s.brand_id = b.brand_id
-                               WHERE s.goods LIKE :query");
-        $stmt->bindValue(':query', '%' . $query . '%', PDO::PARAM_STR);
-        $stmt->execute();
-        $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+// 現在のページを取得（デフォルトは1）
+$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
 
-        if (count($products) === 0) {
-            $stmt = $dbh->prepare("SELECT s.shop_id, s.goods, s.sale_id, s.price, s.material, sz.size, c.color, b.brand_name, s.thumbnail
-                                   FROM shop s
-                                   LEFT JOIN size sz ON s.size = sz.size_id
-                                   LEFT JOIN color c ON s.color = c.color_id
-                                   LEFT JOIN brand b ON s.brand_id = b.brand_id
-                                   WHERE b.brand_name LIKE :query");
-            $stmt->bindValue(':query', '%' . $query . '%', PDO::PARAM_STR);
-            $stmt->execute();
-            $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        }
-    } else {
-        $query = '';
-        $stmt = $dbh->prepare("SELECT s.shop_id, s.goods,s.sale_id, s.price, s.material, sz.size, c.color, s.thumbnail, b.brand_name
-                               FROM shop s
-                               LEFT JOIN size sz ON s.size = sz.size_id
-                               LEFT JOIN color c ON s.color = c.color_id
-                               LEFT JOIN brand b ON s.brand_id = b.brand_id
-                               WHERE s.shop_id LIKE :query");
-        $stmt->bindValue(':query', '%' . $query . '%', PDO::PARAM_STR);
-        $stmt->execute();
-        $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+// 1ページあたりの表示件数
+$itemsPerPage = 30;
+
+// 表示開始位置を計算
+$offset = ($page - 1) * $itemsPerPage;
+
+// 検索処理（ページネーションを含む）
+if (isset($_GET['query']) && !empty($_GET['query'])) {
+    $query = htmlspecialchars($_GET['query'], ENT_QUOTES, 'UTF-8');
+    $stmt = $dbh->prepare("SELECT s.shop_id, s.goods, s.price, s.sale_id, s.material, sz.size, c.color, b.brand_name, s.thumbnail
+                           FROM shop s
+                           LEFT JOIN size sz ON s.size = sz.size_id
+                           LEFT JOIN color c ON s.color = c.color_id
+                           LEFT JOIN brand b ON s.brand_id = b.brand_id
+                           WHERE s.goods LIKE :query
+                           LIMIT :itemsPerPage OFFSET :offset");
+    $stmt->bindValue(':query', '%' . $query . '%', PDO::PARAM_STR);
+    $stmt->bindValue(':itemsPerPage', $itemsPerPage, PDO::PARAM_INT);
+    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+    $stmt->execute();
+    $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} else {
+    $query = '';
+    $stmt = $dbh->prepare("SELECT s.shop_id, s.goods, s.price, s.sale_id, s.material, sz.size, c.color, b.brand_name, s.thumbnail
+                           FROM shop s
+                           LEFT JOIN size sz ON s.size = sz.size_id
+                           LEFT JOIN color c ON s.color = c.color_id
+                           LEFT JOIN brand b ON s.brand_id = b.brand_id
+                           LIMIT :itemsPerPage OFFSET :offset");
+    $stmt->bindValue(':itemsPerPage', $itemsPerPage, PDO::PARAM_INT);
+    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+    $stmt->execute();
+    $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// 総商品数を取得して総ページ数を計算
+$stmt = $dbh->prepare("SELECT COUNT(*) FROM shop");
+$stmt->execute();
+$totalItems = $stmt->fetchColumn();
+$totalPages = ceil($totalItems / $itemsPerPage);
 
     // 在庫更新処理
     if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_stock'])) {
@@ -95,103 +103,77 @@
         $stmt->execute();
 
         $_SESSION['flash_message'] = '在庫が更新されました。';
-        header("Location: inventory_management.php");
+        header("Location: inventory_management.php#product_$shop_id");
         exit();
     }
     ?>
 
     <!-- 商品情報テーブル -->
-    <table>
-        <tr>
-            <th>商品ID</th>
-            <th>サムネ</th>
-            <th>ブランド</th>
-            <th>商品名</th>
-            <th>価格</th>
-            <th>現在の在庫数</th>
-            <th>サイズ</th>
-            <th>色</th>
-            <th>在庫の増減</th>
-        </tr>
-        <?php foreach ($products as $product): ?>
-            <tr>
+<table>
+    <tr>
+        <th>商品ID</th>
+        <th>サムネ</th>
+        <th>ブランド</th>
+        <th>商品名</th>
+        <th>価格</th>
+        <th>現在の在庫数</th>
+        <th>サイズ</th>
+        <th>色</th>
+        <th>在庫の増減</th>
+    </tr>
+    <?php foreach ($products as $product): ?>
+        <tr id="product_<?= htmlspecialchars($product['shop_id']) ?>">
             <td><?= htmlspecialchars($product['shop_id']) ?></td>
-
-
-
-                <td>
-                    <?php
-                    $imgBlob = $product['thumbnail']; // サムネイルのBLOBデータ
-                    $shopId = $product['shop_id'];    // shop_idを取得
-                    if ($imgBlob) {
-                        $encodedImg = base64_encode($imgBlob); // Base64エンコード
-                        // 画像をクリックするとモーダルが開くように設定
-                        echo "<img src='data:image/jpeg;base64,$encodedImg' alt='サムネイル' width='100' class='thumbnail' data-shop-id='$shopId' />";
+            <td>
+                <?php
+                $imgBlob = $product['thumbnail'];
+                $shopId = $product['shop_id'];
+                if ($imgBlob) {
+                    $encodedImg = base64_encode($imgBlob);
+                    echo "<img src='data:image/jpeg;base64,$encodedImg' alt='サムネイル' width='100' class='thumbnail' />";
+                }
+                ?>
+            </td>
+            <td><?= htmlspecialchars($product['brand_name']) ?></td>
+            <td><?= htmlspecialchars($product['goods']) ?></td>
+            <td>¥<?= htmlspecialchars(number_format($product['price'])) ?>
+                <?php
+                if ($product['sale_id'] != null) {
+                    $sale_percentage = $product['sale_id'] * 10;
+                    if ($sale_percentage >= 10 && $sale_percentage <= 90) {
+                        echo " <span style='color: red;'>{$sale_percentage}%OFF中</span>";
                     }
-                    ?>
-                </td>
+                }
+                ?>
+            </td>
+            <td><?= htmlspecialchars($product['material']) ?></td>
+            <td><?= htmlspecialchars($product['size']) ?></td>
+            <td><?= htmlspecialchars($product['color']) ?></td>
+            <td>
+                <form method="post" action="inventory_management.php#product_<?= htmlspecialchars($product['shop_id']) ?>">
+                    <input type="hidden" name="shop_id" value="<?= htmlspecialchars($product['shop_id']) ?>">
+                    <input type="number" name="stock_change" placeholder="増減数">
+                    <input type="submit" name="update_stock" value="更新">
+                </form>
+            </td>
+        </tr>
+    <?php endforeach; ?>
+</table>
 
-                <td><?= htmlspecialchars($product['brand_name']) ?></td>
-                <td><?= htmlspecialchars($product['goods']) ?></td>
-                <td>¥<?= htmlspecialchars(number_format($product['price'])) ?>
-                    <?php
-                    // sale_idに基づいて割引パーセンテージを表示
-                    if ($product['sale_id'] != null) {
-                        switch ($product['sale_id']) {
-                            case 1:
-                                echo ' <span style="color: red;">10%OFF中</span>';
-                                break;
-                            case 2:
-                                echo ' <span style="color: red;">20%OFF中</span>';
-                                break;
-                            case 3:
-                                echo ' <span style="color: red;">30%OFF中</span>';
-                                break;
-                            case 4:
-                                echo ' <span style="color: red;">40%OFF中</span>';
-                                break;
-                            case 5:
-                                echo ' <span style="color: red;">50%OFF中</span>';
-                                break;
-                            case 6:
-                                echo ' <span style="color: red;">60%OFF中</span>';
-                                break;
-                            case 7:
-                                echo ' <span style="color: red;">70%OFF中</span>';
-                                break;
-                            case 8:
-                                echo ' <span style="color: red;">80%OFF中</span>';
-                                break;
-                            case 9:
-                                echo ' <span style="color: red;">90%OFF中</span>';
-                                break;
-                            default:
-                                // 他のsale_idの場合は表示しない
-                                break;
-                        }
-                    }
-                    ?></td>
-                <td><?= htmlspecialchars($product['material']) ?></td>
-                <td><?= htmlspecialchars($product['size']) ?></td>
-                <td><?= htmlspecialchars($product['color']) ?></td>
-                <td>
-                    <form method="post" action="inventory_management.php#product_<?= htmlspecialchars($product['shop_id']) ?>">
-                        <input type="hidden" name="shop_id" value="<?= htmlspecialchars($product['shop_id']) ?>">
-                        <input type="number" name="stock_change" placeholder="増減数">
-                        <input type="submit" name="update_stock" value="更新">
-                    </form>
-                </td>
-            </tr>
-        <?php endforeach; ?>
-    </table>
-
-    <!-- モーダルのHTML -->
-    <div id="imageModal" class="modal">
-        <div class="modal-content" id="modalContent">
-            <!-- ここに画像が追加されます -->
-        </div>
-        <span id="closeModal" class="close">&times;</span>
-    </div>
+<!-- ページネーションリンク -->
+<div class="pagination">
+    <?php if ($page > 1): ?>
+        <a href="?page=<?= $page - 1 ?>">&laquo; 前へ</a>
+    <?php endif; ?>
+    
+    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+        <a href="?page=<?= $i ?>" <?= $i == $page ? 'class="active"' : '' ?>><?= $i ?></a>
+    <?php endfor; ?>
+    
+    <?php if ($page < $totalPages): ?>
+        <a href="?page=<?= $page + 1 ?>">次へ &raquo;</a>
+    <?php endif; ?>
+</div>
 
     <script>
         // ページのスクロール位置を保持

@@ -46,7 +46,7 @@
 <a href="goods_info.php" class="back-link">情報管理へ</a>
     <h1>商品追加フォーム</h1>
     <div class="form-container" id="form-container">
-        <form method="post" action="add_goods_process.php" enctype="multipart/form-data" class="goods-form">
+        <form method="post" action="t_add_goods_process.php" enctype="multipart/form-data" class="goods-form">
             
             <div class="single-form">
 
@@ -78,7 +78,7 @@
                             </td>
                             <td>
                                 <select name="group[]" class="group-select">
-                                    <option value="">指定なし</option>
+                                    <option value="0">指定なし</option>
                                     <?php
                                     for ($i = 1; $i <= 50; $i++) {
                                         echo "<option value='{$i}'>{$i}</option>";
@@ -224,7 +224,7 @@
                 if (allFieldsFilled) {
                     const formData = new FormData(form);
                     const xhr = new XMLHttpRequest();
-                    xhr.open('POST', 'add_goods_process.php', true);
+                    xhr.open('POST', 't_add_goods_process.php', true);
 
                     xhr.onload = function() {
                         if (xhr.status === 200) {
