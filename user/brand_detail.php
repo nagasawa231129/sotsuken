@@ -16,9 +16,9 @@ $brand = isset($_GET['brand']) ? $_GET['brand'] : null;
 $sort = isset($_GET['sort']) ? $_GET['sort'] : 'default';
 
 // SQL文の初期設定
-$sql = "SELECT shop.*, sale.*,brand.*,`group`.shop_group FROM shop LEFT OUTER JOIN sale ON sale.sale_id = shop.sale_id 
+$sql = "SELECT shop.*, sale.*,brand.* FROM shop LEFT OUTER JOIN sale ON sale.sale_id = shop.sale_id 
     LEFT OUTER JOIN brand ON brand.brand_id = shop.brand_id
-    LEFT OUTER JOIN `group` ON `group`.shop_id = shop.shop_id
+    -- LEFT OUTER JOIN `group` ON `group`.shop_id = shop.shop_id
 WHERE 1";
 
 // ブランドフィルタがある場合の条件追加

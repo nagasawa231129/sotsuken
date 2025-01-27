@@ -122,11 +122,11 @@ if (file_exists($lang_file)) {
                 <?php
                 $limit = 20; // 最大表示数
                 $sql = "SELECT  shop.*, 
-                `group`.shop_group,
+                -- `group`.shop_group,
                 brand.brand_name, 
                 sale.sale_id
                 FROM shop
-                LEFT OUTER JOIN `group` ON `group`.shop_id = shop.shop_id
+                -- LEFT OUTER JOIN `group` ON `group`.shop_id = shop.shop_id
                 LEFT OUTER JOIN brand ON brand.brand_id = shop.brand_id
                 LEFT OUTER JOIN sale ON sale.sale_id = shop.sale_id
                 ORDER BY shop.shop_id DESC  -- arrivalが新しい順に並べ替え

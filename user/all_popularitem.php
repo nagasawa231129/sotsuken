@@ -101,11 +101,11 @@ echo "<link rel='stylesheet' href='all_item.css'>";
         brand.brand_name, 
         sale.sale_id, 
         shop.thumbnail,
-        `group`.shop_group
+        -- `group`.shop_group
         FROM shop
         LEFT OUTER JOIN brand ON brand.brand_id = shop.brand_id
         LEFT OUTER JOIN sale ON sale.sale_id = shop.sale_id
-        LEFT OUTER JOIN `group` ON `group`.shop_id = shop.shop_id
+        -- LEFT OUTER JOIN `group` ON `group`.shop_id = shop.shop_id
         ORDER BY shop.buy DESC";
         
         $stmt = $dbh->prepare($sql);

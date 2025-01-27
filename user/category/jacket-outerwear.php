@@ -11,11 +11,10 @@ $sort = isset($_GET['sort']) ? $_GET['sort'] : 'default';
 $brand = isset($_GET['brand']) && $_GET['brand'] !== '' ? $_GET['brand'] : null;
 
 $params = [];
-$sql = "SELECT shop.*, sale.*, `group`.shop_group
+$sql = "SELECT shop.*, sale.* 
         FROM shop 
         LEFT JOIN sale ON sale.sale_id = shop.sale_id 
         LEFT OUTER JOIN gender ON gender.gender_id = shop.gender
-        LEFT OUTER JOIN `group` ON `group`.shop_id = shop.shop_id
         WHERE shop.category_id = 2";
 
 // gender が ALL でない場合

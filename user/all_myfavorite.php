@@ -123,10 +123,9 @@ echo "<link rel='stylesheet' href='all_item.css'>";
 
                 // 2. ブランドIDの商品を取得するクエリ
                 $sql_products = "
-                SELECT shop.*, brand.brand_name, sale.sale_id, sale.sale, `group`.shop_group
+                SELECT shop.*, brand.brand_name, sale.sale_id, sale.sale
                 FROM shop
                 LEFT JOIN brand ON brand.brand_id = shop.brand_id
-                LEFT JOIN `group` ON `group`.shop_id = shop.shop_id
                 LEFT JOIN sale ON sale.sale_id = shop.sale_id
                 WHERE shop.brand_id = :brand_id";
 

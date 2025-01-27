@@ -11,13 +11,12 @@ $brand = isset($_GET['brand']) && $_GET['brand'] !== '' ? $_GET['brand'] : null;
 // 初期化
 $params = [];
 // SQLクエリ修正：必要なカラムを明示的に指定
-$sql = "SELECT shop.*, brand.*, sale.*, `group`.shop_group
+$sql = "SELECT shop.*, brand.*, sale.*
         FROM shop
         LEFT OUTER JOIN subcategory ON shop.subcategory_id = subcategory.subcategory_id
         LEFT OUTER JOIN brand ON shop.brand_id = brand.brand_id
         LEFT OUTER JOIN sale ON shop.sale_id = sale.sale_id
         LEFT OUTER JOIN gender ON gender.gender_id = shop.gender
-        LEFT OUTER JOIN `group` ON `group`.shop_id = shop.shop_id
         WHERE subcategory.subcategory_name ='その他トップス'
 ";
 

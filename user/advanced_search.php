@@ -324,13 +324,12 @@ $sale_subject = isset($_GET['sale_subject']) && $_GET['sale_subject'] !== '' ? $
 
 // SQLクエリの作成
 $sql = "
-    SELECT DISTINCT shop.*, subcategory.*, category.*, `group`.shop_group, brand.*, sale.*
+    SELECT DISTINCT shop.*, subcategory.*, category.*, brand.*, sale.*
     FROM shop
     LEFT OUTER JOIN sale ON sale.sale_id = shop.sale_id
     LEFT OUTER JOIN brand ON brand.brand_id = shop.brand_id
     LEFT OUTER JOIN subcategory ON subcategory.subcategory_id = shop.subcategory_id
     LEFT OUTER JOIN category ON category.category_id = shop.category_id
-    LEFT OUTER JOIN `group` ON `group`.shop_id = shop.shop_id
     WHERE 1 = 1
 ";
 
