@@ -40,6 +40,36 @@ a.back-link:hover {
     cursor: pointer; /* カーソルをポインタに */
     margin-left: 10px; /* ボタン間のスペース */
 }
+.pagination {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.pagination a {
+    display: inline-block;
+    padding: 8px 12px;
+    margin: 0 5px;
+    text-decoration: none;
+    color: #007bff;
+    border: 1px solid #007bff;
+    border-radius: 5px;
+    transition: background 0.3s, color 0.3s;
+}
+
+.pagination a:hover {
+    background: #007bff;
+    color: #fff;
+}
+
+.pagination span {
+    display: inline-block;
+    padding: 8px 12px;
+    margin: 0 5px;
+    font-weight: bold;
+    color: #fff;
+    background: #007bff;
+    border-radius: 5px;
+}
 
 /* ボタンホバー時のスタイル */
 .select button:hover {

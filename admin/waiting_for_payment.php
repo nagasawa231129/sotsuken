@@ -66,50 +66,72 @@ ORDER BY cart.order_date, cart.user_id, cart.cart_id");
     $stmt->execute();
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    $last_user_id = null;
-    $last_order_time = null;
+    // 現在のページを取得（デフォルトは1ページ目）
+$page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+$items_per_page = 5; // 1ページあたりの商品数
+$offset = ($page - 1) * $items_per_page; // データの取得開始位置
 
-    foreach ($results as $row) {
-        // 新しい受注の開始を検出
-        if ($last_user_id !== $row['user_id'] || $last_order_time !== $row['order_time']) {
-            if ($last_user_id !== null) {
-                echo '</div></form>'; // 前の受注を閉じる
-            }
+// 受注ごとにまとめるため、まずは $grouped_orders を作成
+$grouped_orders = [];
+foreach ($results as $row) {
+    $key = $row['user_id'] . '_' . $row['order_time']; // 受注ごとのキー
+    if (!isset($grouped_orders[$key])) {
+        $grouped_orders[$key] = [];
+    }
+    $grouped_orders[$key][] = $row;
+}
 
-            // 新しい受注ブロックの開始
-            echo '<form method="POST" action="next_page.php">';
-            echo '<div class="order-data">';
-            echo '<h2>受注時間: ' . htmlspecialchars($row['order_time']) . '</h2>';
-            echo '<p><span class="data-label">カナ:</span> <span class="data-value">' . $row['k_sei'] . ' ' . $row['k_mei'] . '</span></p>';
-            echo '<p><span class="data-label">宛名:</span> <span class="data-value">' . $row['u_sei'] . ' ' . $row['u_mei'] . '</span></p>';
-            echo '<p><span class="data-label">電話番号:</span> <span class="data-value">' . $row['tel'] . '</span></p>';
-            echo '<p><span class="data-label">送り先住所:</span> <span class="data-value">' . $row['senadd'] . '</span></p>';
-           echo '<p><span class="data-label">取引状況:</span> 入金待ち</p>';
-        }
+// 全ての受注データを取得し、ページごとに分割
+$all_orders = array_values($grouped_orders); // 配列のインデックスを振り直す
+$total_pages = ceil(count($all_orders) / $items_per_page); // 総ページ数
+$orders_to_display = array_slice($all_orders, $offset, $items_per_page); // 現在のページに表示する受注のみ取得
+
+// 受注の表示
+foreach ($orders_to_display as $orders) {
+    $first = $orders[0]; // 受注の最初のデータを取得
+
+    // 受注情報（order-data）
+    echo '<form method="POST" action="next_page.php">';
+    echo '<div class="order-data">';
+    echo '<h2>受注時間: ' . htmlspecialchars($first['order_time']) . '</h2>';
+    echo '<p><span class="data-label">カナ:</span> <span class="data-value">' . $first['k_sei'] . ' ' . $first['k_mei'] . '</span></p>';
+    echo '<p><span class="data-label">宛名:</span> <span class="data-value">' . $first['u_sei'] . ' ' . $first['u_mei'] . '</span></p>';
+    echo '<p><span class="data-label">電話番号:</span> <span class="data-value">' . $first['tel'] . '</span></p>';
+    echo '<p><span class="data-label">送り先住所:</span> <span class="data-value">' . $first['senadd'] . '</span></p>';
+    echo '<p><span class="data-label">取引状況:</span> 入金待ち</p>';
+    echo '<div class="product-group">';
+
+    // 商品情報
+    foreach ($orders as $row) {
         $imgBlob = $row['thumb']; // サムネイルのBLOBデータ
-        $shopId = $row['shop_id'];    // shop_idを取得
+        $shopId = $row['shop_id']; // shop_idを取得
         $encodedImg = base64_encode($imgBlob); // Base64エンコード
-          
-            
-        
+
         echo '<div class="product-data">';
-        echo "<img src='data:image/jpeg;base64,$encodedImg' alt='サムネイル' width='100' class='thumbnail' data-shop-id='$shopId' />";    
+        echo "<img src='data:image/jpeg;base64,$encodedImg' alt='サムネイル' width='100' class='thumbnail' data-shop-id='$shopId' />";
         echo '<p><span class="data-label">ブランド:</span> <span class="data-value">' . $row['brand'] . '</span></p>';
         echo '<p><span class="data-label">商品名:</span> <span class="data-value">' . $row['goods'] . '</span></p>';
         echo '<p><span class="data-label">色:</span> <span class="data-value">' . $row['color'] . '</span></p>';
         echo '<p><span class="data-label">サイズ:</span> <span class="data-value">' . $row['size'] . '</span></p>';
         echo '<p><span class="data-label">個数:</span> <span class="data-value">' . $row['quantity'] . '</span></p>';
         echo '</div>';
-
-        $last_user_id = $row['user_id'];
-        $last_order_time = $row['order_time'];
     }
 
-    // 最後の注文の閉じ
-    if ($last_user_id !== null) {
-        echo '</div></form>';
+    echo '</div>'; // 商品グループ終了
+    echo '</div></form>'; // 受注終了
+}
+
+echo '<div class="pagination">';
+for ($i = 1; $i <= $total_pages; $i++) {
+    if ($i == $page) {
+        echo '<span class="current-page">' . $i . '</span>'; // 現在のページはハイライト
+    } else {
+        echo '<a href="?page=' . $i . '">' . $i . '</a>'; // 各ページのリンクを生成
     }
-    ?>
+}
+echo '</div>';
+
+?>    
      <script>
         // モーダルを取得
         const modal = document.getElementById("imageModal");

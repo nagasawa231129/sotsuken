@@ -5,11 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>購入状況管理</title>
-    <style>
-
-    </style>
 </head>
 
 <body>
@@ -21,44 +17,57 @@
         <a href="send_shipped.php" class="tab">発送済み</a>
     </div>
 
-    <!-- モーダル -->
     <div id="imageModal" class="modal" style="display: none;">
         <span class="close">&times;</span>
         <img class="modal-content" id="modalImage">
     </div>
+
     <?php
     include './../../db_open.php';
-    $stmt = $dbh->prepare("SELECT 
-DATE_FORMAT(cart.order_date, '%Y-%m-%d %H:%i') AS order_time,
-cart.user_id,
-cart.cart_id,
-cart.shop_id, 
-shop.goods, 
-shop.thumbnail as thumb,
-b.brand_name AS brand,
-c.color as color,
-s.size as size,
-user.sei AS u_sei,
-user.mei AS u_mei,
-user.kanasei AS k_sei,
-user.kanamei AS k_mei,
-user.phone as tel,
-user.mail as mail,
-cart.send_address as senadd,
-cart.quantity,
-cart.trade_situation,
-cart.send_address
-FROM cart_detail cart 
-LEFT JOIN shop shop ON cart.shop_id = shop.shop_id
-LEFT JOIN brand b ON shop.brand_id = b.brand_id
-LEFT JOIN size s ON shop.size = s.size_id
-LEFT JOIN color c ON shop.color = c.color_id
-LEFT JOIN user user ON cart.user_id = user.user_id
-WHERE cart.trade_situation IN (1, 2)
-ORDER BY cart.order_date, cart.user_id, cart.cart_id");
 
+    $perPage = 5;
+    $currentPage = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    $offset = ($currentPage - 1) * $perPage;
+
+    $stmt = $dbh->prepare("SELECT 
+        DATE_FORMAT(cart.order_date, '%Y-%m-%d %H:%i') AS order_time,
+        cart.user_id,
+        cart.cart_id,
+        cart.shop_id, 
+        shop.goods, 
+        shop.thumbnail as thumb,
+        b.brand_name AS brand,
+        c.color as color,
+        s.size as size,
+        user.sei AS u_sei,
+        user.mei AS u_mei,
+        user.kanasei AS k_sei,
+        user.kanamei AS k_mei,
+        user.phone as tel,
+        user.mail as mail,
+        cart.send_address as senadd,
+        cart.quantity,
+        cart.trade_situation,
+        cart.send_address
+        FROM cart_detail cart 
+        LEFT JOIN shop shop ON cart.shop_id = shop.shop_id
+        LEFT JOIN brand b ON shop.brand_id = b.brand_id
+        LEFT JOIN size s ON shop.size = s.size_id
+        LEFT JOIN color c ON shop.color = c.color_id
+        LEFT JOIN user user ON cart.user_id = user.user_id
+        WHERE cart.trade_situation IN (1, 2)
+        ORDER BY cart.order_date, cart.user_id, cart.cart_id
+        LIMIT :offset, :perPage");
+
+    $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
+    $stmt->bindParam(':perPage', $perPage, PDO::PARAM_INT);
     $stmt->execute();
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $stmtCount = $dbh->prepare("SELECT COUNT(*) FROM cart_detail cart WHERE cart.trade_situation IN (1, 2)");
+    $stmtCount->execute();
+    $totalCount = $stmtCount->fetchColumn();
+    $totalPages = ceil($totalCount / $perPage);
 
     $last_user_id = null;
     $last_order_time = null;
@@ -84,10 +93,11 @@ ORDER BY cart.order_date, cart.user_id, cart.cart_id");
                 echo '<input type="submit" value="送信">';
             }
         }
-        $imgBlob = $row['thumb']; // サムネイルのBLOBデータ
-        $shopId = $row['shop_id']; // shop_idを取得
-        $userMail = $row['mail']; // ユーザーのメールアドレスを取得
-        $encodedImg = base64_encode($imgBlob); // Base64エンコード
+
+        $imgBlob = $row['thumb'];
+        $shopId = $row['shop_id'];
+        $userMail = $row['mail'];
+        $encodedImg = base64_encode($imgBlob);
 
         echo '<div class="product-data">';
         echo "<img src='data:image/jpeg;base64,$encodedImg' alt='サムネイル' width='100' class='thumbnail' data-shop-id='$shopId' />";
@@ -97,14 +107,12 @@ ORDER BY cart.order_date, cart.user_id, cart.cart_id");
         echo '<p><span class="data-label">サイズ:</span> <span class="data-value">' . $row['size'] . '</span></p>';
         echo '<p><span class="data-label">個数:</span> <span class="data-value">' . $row['quantity'] . '</span></p>';
 
-        // チェックボックスが選択された時にhiddenフィールドとしてメールアドレスを渡す
         if ($row['trade_situation'] == 2) {
             echo '<label><input type="checkbox" name="selected_items[]" value="' . $row['cart_id'] . '" data-user-mail="' . $userMail . '"> 完了</label>';
         }
 
         echo '</div>';
 
-        // メールアドレスをhiddenフィールドとしてフォームに追加
         echo '<input type="hidden" name="user_mail[]" value="' . $userMail . '">';
         echo '<input type="hidden" name="name[]" value="' .  $row['u_sei'] . ' ' . $row['u_mei'] . '">';
         echo '<input type="hidden" name="goods[]" value="' . $row['goods'] . '">';
@@ -112,10 +120,8 @@ ORDER BY cart.order_date, cart.user_id, cart.cart_id");
         echo '<input type="hidden" name="size[]" value="' . $row['size'] . '">';
         echo '<input type="hidden" name="color[]" value="' . $row['color'] . '">';
         echo '<input type="hidden" name="quantity[]" value="' . $row['quantity'] . '">';
-
-        // 新たにhidden項目を追加
-        echo '<input type="hidden" name="user_address[]" value="' . $row['senadd'] . '">'; // 住所の追加
-        echo '<input type="hidden" name="user_phone[]" value="' . $row['tel'] . '">'; // 電話番号の追加
+        echo '<input type="hidden" name="user_address[]" value="' . $row['senadd'] . '">';
+        echo '<input type="hidden" name="user_phone[]" value="' . $row['tel'] . '">';
 
         $last_user_id = $row['user_id'];
         $last_order_time = $row['order_time'];
@@ -125,6 +131,18 @@ ORDER BY cart.order_date, cart.user_id, cart.cart_id");
         echo '</div></form>';
     }
     ?>
+
+    <div class="pagination">
+        <?php
+        for ($page = 1; $page <= $totalPages; $page++) {
+            if ($page == $currentPage) {
+                echo "<span class='current'>$page</span>";
+            } else {
+                echo "<a href='?page=$page'>$page</a>";
+            }
+        }
+        ?>
+    </div>
 
 
     <script>

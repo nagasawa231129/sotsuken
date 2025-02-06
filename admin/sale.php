@@ -4,7 +4,6 @@
 // データベース接続
 include './../../db_open.php';
 // 検索フォームからの値を取得
-
 $search_query = '';
 $search_params = [];
 // 商品名の検索
@@ -131,24 +130,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['apply_discount'])) {
 ?>
 
 <!-- 検索フォーム -->
-<?php
-// ページネーション設定
-$items_per_page = 30;
-$current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-$offset = ($current_page - 1) * $items_per_page;
+<form id="search-form" method="GET">
+    <!-- 商品名で検索 -->
+    <input type="text" name="search" placeholder="商品名で検索" value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>">
+    <!-- ブランドで絞り込み -->
+    <select name="brand_id">
+        <option value="">ブランド選択</option>
+        <?php
+        $brands = $dbh->query("SELECT * FROM brand");
+        while ($brand = $brands->fetch(PDO::FETCH_ASSOC)) {
+            // 現在選択されているブランドをチェック
+            $selected = isset($_GET['brand_id']) && $_GET['brand_id'] == $brand['brand_id'] ? ' selected' : '';
+            echo "<option value='{$brand['brand_id']}'{$selected}>{$brand['brand_name']}</option>";
+        }
+        ?>
+    </select>
+    <!-- 価格で絞り込み -->
+    <input type="number" name="min_price" placeholder="最小価格" value="<?php echo htmlspecialchars($_GET['min_price'] ?? ''); ?>">
+    <input type="number" name="max_price" placeholder="最大価格" value="<?php echo htmlspecialchars($_GET['max_price'] ?? ''); ?>">
+    <!-- 割引で絞り込み -->
+    <select name="sale_select" id="sale_select">
+        <option value="">全ての商品</option>
+        <?php
+        $sale_select = $dbh->query("SELECT * FROM sale");
+        $counter = 0;
+        while ($sale_sele = $sale_select->fetch(PDO::FETCH_ASSOC)) {
+            $counter++;
+            if ($counter === 10) {
+                // 10個目の値を「割引なし」として出力
+                $selected = isset($_GET['sale_select']) && $_GET['sale_select'] == $sale_sele['sale_id'] ? ' selected' : '';
+                echo "<option value='{$sale_sele['sale_id']}'{$selected}>割引なし</option>";
+            } else {
+                $selected = isset($_GET['sale_select']) && $_GET['sale_select'] == $sale_sele['sale_id'] ? ' selected' : '';
+                echo "<option value='{$sale_sele['sale_id']}'{$selected}>{$sale_sele['sale']}%割引商品</option>";
+            }
+        }
+        ?>
+    </select>
+    <!-- 検索ボタン -->
+    <button type="submit">検索</button>
+    <!-- すべて表示ボタン -->
+    <a href="sale.php" class="button">すべて表示</a>
+</form>
 
-// 商品データを取得
-$stmt = $dbh->prepare("SELECT * FROM shop LIMIT :offset, :items_per_page");
-$stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-$stmt->bindValue(':items_per_page', $items_per_page, PDO::PARAM_INT);
-$stmt->execute();
 
-// 総商品数を取得
-$total_items_stmt = $dbh->query("SELECT COUNT(*) FROM shop");
-$total_items = $total_items_stmt->fetchColumn();
-$total_pages = ceil($total_items / $items_per_page);
-?>
-
+<!-- 商品リストの表示 -->
 <h3>商品一覧</h3>
 <form method="POST">
     <table>
@@ -157,7 +183,7 @@ $total_pages = ceil($total_items / $items_per_page);
                 <th><input type="checkbox" id="select-all"> すべて選択</th>
                 <th>ブランド</th>
                 <th>商品名</th>
-                <th>価格(円)</th>
+                <th>価格(円)</th> <!-- 割引後の価格 -->
                 <th>サイズ</th>
                 <th>色</th>
                 <th>カテゴリ</th>
@@ -170,7 +196,9 @@ $total_pages = ceil($total_items / $items_per_page);
                 <?php while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                     $original_price = $row['price'];
                     $discounted_price = $original_price;
+                    // 割引を適用
                     if (in_array($row['shop_id'], $selected_items) && $sale_percentage > 0) {
+                        // 割引を計算
                         $discounted_price = $original_price * (1 - $sale_percentage / 100);
                     }
                 ?>
@@ -178,6 +206,7 @@ $total_pages = ceil($total_items / $items_per_page);
                         <td><input type="checkbox" name="selected_items[]" value="<?php echo $row['shop_id']; ?>" <?php echo in_array($row['shop_id'], $selected_items) ? 'checked' : ''; ?>></td>
                         <td>
                             <?php
+                            // ブランド名の取得
                             $brand_stmt = $dbh->prepare("SELECT brand_name FROM brand WHERE brand_id = :brand_id");
                             $brand_stmt->bindValue(':brand_id', $row['brand_id'], PDO::PARAM_INT);
                             $brand_stmt->execute();
@@ -189,27 +218,46 @@ $total_pages = ceil($total_items / $items_per_page);
                         <td>
                             <?php
                             echo number_format($discounted_price) . '円';
-                            
+                            // sale_idに基づいて割引パーセンテージを表示
                             if ($row['sale_id'] != null) {
-                                // 割引率を取得するループ
-                                $sale_percentage = 10; // 割引率の初期値
-                                $current_sale_id = 1; // sale_idの初期値
-                            
-                                while ($current_sale_id <= 9) { // sale_idが1から9の範囲で処理
-                                    if ($row['sale_id'] == $current_sale_id) {
-                                        echo " <span style='color: red;'>{$sale_percentage}%OFF中</span>";
-                                        break; // マッチしたら処理を終了
-                                    }
-                                    $current_sale_id++;
-                                    $sale_percentage += 10; // 割引率を10%ずつ増加
+                                switch ($row['sale_id']) {
+                                    case 1:
+                                        echo ' <span style="color: red;">10%OFF中</span>';
+                                        break;
+                                    case 2:
+                                        echo ' <span style="color: red;">20%OFF中</span>';
+                                        break;
+                                    case 3:
+                                        echo ' <span style="color: red;">30%OFF中</span>';
+                                        break;
+                                    case 4:
+                                        echo ' <span style="color: red;">40%OFF中</span>';
+                                        break;
+                                    case 5:
+                                        echo ' <span style="color: red;">50%OFF中</span>';
+                                        break;
+                                    case 6:
+                                        echo ' <span style="color: red;">60%OFF中</span>';
+                                        break;
+                                    case 7:
+                                        echo ' <span style="color: red;">70%OFF中</span>';
+                                        break;
+                                    case 8:
+                                        echo ' <span style="color: red;">80%OFF中</span>';
+                                        break;
+                                    case 9:
+                                        echo ' <span style="color: red;">90%OFF中</span>';
+                                        break;
+                                    default:
+                                        // 他のsale_idの場合は表示しない
+                                        break;
                                 }
                             }
                             ?>
-                            
-                            
                         </td>
                         <td>
                             <?php
+                            // サイズ名の取得
                             $size_stmt = $dbh->prepare("SELECT size FROM size WHERE size_id = :size_id");
                             $size_stmt->bindValue(':size_id', $row['size'], PDO::PARAM_INT);
                             $size_stmt->execute();
@@ -219,6 +267,7 @@ $total_pages = ceil($total_items / $items_per_page);
                         </td>
                         <td>
                             <?php
+                            // 色名の取得
                             $color_stmt = $dbh->prepare("SELECT color FROM color WHERE color_id = :color_id");
                             $color_stmt->bindValue(':color_id', $row['color'], PDO::PARAM_INT);
                             $color_stmt->execute();
@@ -228,6 +277,7 @@ $total_pages = ceil($total_items / $items_per_page);
                         </td>
                         <td>
                             <?php
+                            // カテゴリ名の取得
                             $category_stmt = $dbh->prepare("SELECT category_name FROM category WHERE category_id = :category_id");
                             $category_stmt->bindValue(':category_id', $row['category_id'], PDO::PARAM_INT);
                             $category_stmt->execute();
@@ -237,6 +287,7 @@ $total_pages = ceil($total_items / $items_per_page);
                         </td>
                         <td>
                             <?php
+                            // サブカテゴリ名の取得
                             $subcategory_stmt = $dbh->prepare("SELECT subcategory_name FROM subcategory WHERE subcategory_id = :subcategory_id");
                             $subcategory_stmt->bindValue(':subcategory_id', $row['subcategory_id'], PDO::PARAM_INT);
                             $subcategory_stmt->execute();
@@ -246,6 +297,7 @@ $total_pages = ceil($total_items / $items_per_page);
                         </td>
                         <td>
                             <?php
+                            // 性別の取得
                             $ge_stmt = $dbh->prepare("SELECT gender FROM gender WHERE gender_id = :ge_id");
                             $ge_stmt->bindValue(':ge_id', $row['gender'], PDO::PARAM_INT);
                             $ge_stmt->execute();
@@ -266,6 +318,7 @@ $total_pages = ceil($total_items / $items_per_page);
     <select name="sale_id" id="sale_id">
         <option value="">割引なし</option>
         <?php
+        // 割引リストを取得
         $sale_stmt = $dbh->query("SELECT * FROM sale");
         while ($sale_row = $sale_stmt->fetch(PDO::FETCH_ASSOC)) {
             echo "<option value='{$sale_row['sale_id']}'" . ($sale_row['sale_id'] == $sale_id ? ' selected' : '') . ">{$sale_row['sale']}%</option>";
@@ -274,12 +327,13 @@ $total_pages = ceil($total_items / $items_per_page);
     </select>
     <button type="submit" name="apply_discount">割引適用</button>
 </form>
-
-<!-- ページネーションリンク -->
-<div class="pagination">
-    <?php for ($i = 1; $i <= $total_pages; $i++) { ?>
-        <a href="?page=<?php echo $i; ?>" class="<?php if ($i == $current_page) echo 'active'; ?>">
-            <?php echo $i; ?>
-        </a>
-    <?php } ?>
-</div>
+<script>
+    // 割引適用ボタンと割引解除ボタンの送信前にチェックボックスが選択されているかを確認
+    // すべて選択のチェックボックス
+    document.getElementById("select-all").addEventListener("click", function() {
+        var checkboxes = document.querySelectorAll('input[name="selected_items[]"]');
+        for (var checkbox of checkboxes) {
+            checkbox.checked = this.checked;
+        }
+    });
+</script>
