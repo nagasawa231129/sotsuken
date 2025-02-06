@@ -3,47 +3,10 @@
 include './../../db_open.php';
 
 // 現在の最大 shop_group 値を取得する関数
-function getMaxShopGroup($dbh)
-{
+function getMaxShopGroup($dbh) {
     $stmt = $dbh->prepare("SELECT MAX(shop_group) FROM shop");
     $stmt->execute();
     return $stmt->fetchColumn() ?: 0;
-}
-
-function assignShopGroups($groups, $dbh) {
-    // 現在使用されている shop_group を取得
-    $existingGroups = [];
-    $stmt = $dbh->prepare("SELECT DISTINCT shop_group FROM shop");
-    $stmt->execute();
-    while ($row = $stmt->fetch()) {
-        $existingGroups[] = $row['shop_group'];
-    }
-
-    // 最大値を取得し、新しいグループ番号を設定
-    $maxGroup = getMaxShopGroup($dbh);
-    $newGroup = $maxGroup + 1; // 新しいグループ番号の初期値
-
-    // グループ番号の割り当てを管理する配列
-    $groupAssignments = [];
-    $assignedGroups = []; // すでに割り当てたグループを追跡
-
-    // グループ番号の割り当て処理
-    foreach ($groups as $index => $group) {
-        if (!isset($assignedGroups[$group])) {
-            // グループが指定されていて、まだ割り当てていない場合
-            // 最大値 + 1 の新しい番号を割り当て
-            $assignedGroup = $newGroup++;
-            $assignedGroups[$group] = $assignedGroup; // グループごとに割り当てた番号を記録
-        } else {
-            // すでに割り当てたグループ番号を再利用
-            $assignedGroup = $assignedGroups[$group];
-        }
-
-        // 割り当てたグループ番号を保存
-        $groupAssignments[$index] = $assignedGroup;
-    }
-
-    return $groupAssignments;
 }
 
 // フォームデータの取得
@@ -57,34 +20,63 @@ $subcategories = $_POST['subcategory'];
 $genders = $_POST['gender'];
 $goods_info = $_POST['goods_info'];
 $groupRequests = $_POST['group']; // フォームから送信されたグループ指定
-$thumbnailData = file_get_contents($_FILES['thumbnail']['tmp_name'][0]);
+$material = $_POST['material'];
 
-// グループ番号の割り当て
-$groupAssignments = assignShopGroups($groupRequests, $dbh);
+// データを一つの配列にまとめる
+$items = [];
+foreach ($brands as $index => $brand_id) {
+    $items[] = [
+        'brand_id' => $brand_id,
+        'goods_name' => $goods[$index],
+        'price' => $prices[$index],
+        'size' => $sizes[$index],
+        'color' => $colors[$index],
+        'category' => $categories[$index],
+        'subcategory' => $subcategories[$index],
+        'gender' => $genders[$index],
+        'goods_info' => $goods_info[$index],
+        'group' => $groupRequests[$index],
+        'material' => $material[$index],
+    ];
+}
+
+// グループをソート (groupの値が小さい順)
+usort($items, function ($a, $b) {
+    return $a['group'] <=> $b['group'];
+});
+
+// データベースの最大値を取得
+$currentShopGroup = getMaxShopGroup($dbh); // データベースの最大 shop_group
+$previousGroup = null; // 前回の group を記録
 
 // トランザクション開始
 $dbh->beginTransaction();
 try {
-    foreach ($brands as $index => $brand_id) {
-        $assignedGroup = $groupAssignments[$index]; // 各商品のグループ番号を取得
+    foreach ($items as $item) {
+        // groupの値が変わったらshop_groupを更新
+        if ($previousGroup === null || $previousGroup !== $item['group']) {
+            $currentShopGroup++; // shop_groupを増やす
+            $previousGroup = $item['group'];
+        }
 
         // 商品をshopテーブルに挿入
-        $sql = "INSERT INTO shop (thumbnail, brand_id, goods, price, size, color, category_id, subcategory_id, gender, exp, original_price, shop_group)
-                VALUES (:thumbnail, :brand_id, :goods_name, :price, :size, :color, :category_id, :subcategory_id, :gender_id, :goods_info, :original_price, :shop_group)";
+        $sql = "INSERT INTO shop (thumbnail, brand_id, goods, price, size, color, category_id, subcategory_id, gender, exp, original_price, shop_group, material)
+                VALUES (:thumbnail, :brand_id, :goods_name, :price, :size, :color, :category_id, :subcategory_id, :gender_id, :goods_info, :original_price, :shop_group, :material)";
         $stmt = $dbh->prepare($sql);
         $stmt->execute([
-            ':thumbnail' => $thumbnailData,
-            ':brand_id' => $brand_id,
-            ':goods_name' => $goods[$index],
-            ':price' => $prices[$index],
-            ':size' => $sizes[$index],
-            ':color' => $colors[$index],
-            ':category_id' => $categories[$index],
-            ':subcategory_id' => $subcategories[$index],
-            ':gender_id' => $genders[$index],
-            ':goods_info' => $goods_info[$index],
-            ':original_price' => $prices[$index],
-            ':shop_group' => $assignedGroup
+            ':thumbnail' => file_get_contents($_FILES['thumbnail']['tmp_name'][0]),  // サムネイル画像
+            ':brand_id' => $item['brand_id'],
+            ':goods_name' => $item['goods_name'],
+            ':price' => $item['price'],
+            ':size' => $item['size'],
+            ':color' => $item['color'],
+            ':category_id' => $item['category'],
+            ':subcategory_id' => $item['subcategory'],
+            ':gender_id' => $item['gender'],
+            ':goods_info' => $item['goods_info'],
+            ':original_price' => $item['price'],
+            ':shop_group' => $currentShopGroup,
+            ':material' => $item['material']
         ]);
 
         $shop_id = $dbh->lastInsertId(); // 挿入した商品のIDを取得
@@ -114,5 +106,4 @@ try {
     echo "エラーが発生しました: " . $e->getMessage();
     exit;
 }
-
 ?>

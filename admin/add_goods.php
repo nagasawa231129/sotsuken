@@ -27,7 +27,7 @@
             position: absolute;
             top: 10px;
             right: 10px;
-            background-color: #ff4d4d;
+            background-color: #FF4D4D;
             color: white;
             border: none;
             border-radius: 50%;
@@ -43,13 +43,11 @@
 </head>
 
 <body>
-<a href="goods_info.php" class="back-link">情報管理へ</a>
+    <a href="goods_info.php" class="back-link">情報管理へ</a>
     <h1>商品追加フォーム</h1>
     <div class="form-container" id="form-container">
         <form method="post" action="add_goods_process.php" enctype="multipart/form-data" class="goods-form">
-            
             <div class="single-form">
-
                 <table id="goods-table">
                     <thead>
                         <tr>
@@ -78,7 +76,7 @@
                             </td>
                             <td>
                                 <select name="group[]" class="group-select">
-                                    <option value="">指定なし</option>
+                                    <option value="0">指定なし</option>
                                     <?php
                                     for ($i = 1; $i <= 50; $i++) {
                                         echo "<option value='{$i}'>{$i}</option>";
@@ -89,7 +87,6 @@
                         </tr>
                     </tbody>
                 </table>
-
                 <!-- 他の商品の詳細情報を記入するためのフォーム -->
                 <table>
                     <thead>
@@ -102,6 +99,7 @@
                             <th>カテゴリ</th>
                             <th>サブカテゴリ</th>
                             <th>性別</th>
+                            <th>在庫</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -171,34 +169,33 @@
                                     ?>
                                 </select>
                             </td>
+                            <td>
+                                <input type="number" name="material[]" required>
+                            </td>
+                            
                         </tr>
                     </tbody>
                 </table>
-                
             </div>
         </form>
     </div>
-
     <div class="button-container">
         <button type="button" id="add-row">＋ 1行追加</button>
         <button type="button" onclick="submitForms()">追加</button>
     </div>
-
     <script>
         function addRow() {
             const formContainer = document.getElementById('form-container');
             const forms = document.querySelectorAll('.goods-form');
             const lastForm = forms[forms.length - 1];
             const newForm = lastForm.cloneNode(true);
-
             newForm.querySelectorAll('input, select, textarea').forEach((input) => {
                 const name = input.getAttribute('name');
                 if (name) {
                     input.setAttribute('name', name.replace(/\[\d+\]/, `[${forms.length}]`)); // 新しいインデックスを設定
                 }
             });
-
-            formContainer.appendChild(newForm);
+            formContainer.appendChild(newForm); // 新しいフォームを追加
         }
 
         document.getElementById('add-row').addEventListener('click', addRow);
@@ -206,11 +203,9 @@
         function submitForms() {
             const forms = document.querySelectorAll('.goods-form');
             let allFormsSubmitted = true;
-
             forms.forEach(function(form, index) {
                 const inputs = form.querySelectorAll('input[required], select[required], textarea[required]');
                 let allFieldsFilled = true;
-
                 // 必須フィールドのチェック
                 inputs.forEach(input => {
                     if (!input.value) {
@@ -220,12 +215,10 @@
                         input.style.border = ''; // 入力済みのフィールドの強調表示を解除
                     }
                 });
-
                 if (allFieldsFilled) {
                     const formData = new FormData(form);
                     const xhr = new XMLHttpRequest();
                     xhr.open('POST', 'add_goods_process.php', true);
-
                     xhr.onload = function() {
                         if (xhr.status === 200) {
                             form.reset(); // フォームをリセット
@@ -235,13 +228,11 @@
                             allFormsSubmitted = false;
                         }
                     };
-
                     xhr.send(formData);
                 } else {
                     allFormsSubmitted = false;
                 }
             });
-
             if (allFormsSubmitted) {
                 alert('すべての商品が正常に追加されました。');
             } else {
