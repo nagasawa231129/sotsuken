@@ -197,7 +197,6 @@ function formatPhoneNumber($phoneNumber)
                 <td><?php echo $translations['Address'] ?></td>
                 <td><input type="text" id="address1" name="address1" placeholder="住所" value="<?php echo htmlspecialchars($user['address']); ?>" required></td>
             </tr>
-
             <!-- 郵便番号2と住所2が存在する場合のみ表示 -->
             <?php if (!empty($user['postcode2']) && $user['postcode2'] != '0'): ?>
                 <tr>
