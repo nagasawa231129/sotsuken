@@ -18,7 +18,7 @@ $sql = "SELECT shop.*, brand.*, sale.*
         LEFT OUTER JOIN brand ON shop.brand_id = brand.brand_id
         LEFT OUTER JOIN sale ON shop.sale_id = sale.sale_id
         LEFT OUTER JOIN gender ON gender.gender_id = shop.gender
-        WHERE subcategory.subcategory_name =  'ライダースジャケット'";
+        WHERE subcategory.subcategory_name =  'テーラードジャケット'";
 
 // gender が ALL でない場合、shop.gender が指定された値または 0 の両方を表示
 if ($gender == '0') {
@@ -82,7 +82,7 @@ $genders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <head>
     <meta charset="UTF-8">
-    <title>デニムスカート商品一覧</title>
+    <title>テーラードジャケット 商品一覧</title>
 </head>
 
 <body>

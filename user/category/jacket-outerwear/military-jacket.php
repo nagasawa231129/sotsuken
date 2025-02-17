@@ -209,7 +209,7 @@ $genders = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     ?>
                 </select>
             </form>
-            <h1>デニムスカート 商品一覧</h1>
+            <h1>ミリタリージャケット 商品一覧</h1>
              <div class="products-container">
                 <ul>
                     <?php if (!empty($products)): ?>

@@ -82,7 +82,7 @@ $genders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <head>
     <meta charset="UTF-8">
-    <title>デニムスカート商品一覧</title>
+    <title>ダウンジャケット商品一覧</title>
 </head>
 
 <body>
