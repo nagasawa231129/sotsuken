@@ -190,8 +190,7 @@ if ($shop_id) {
             $sql_thumbnail = "
             SELECT s.thumbnail 
             FROM shop AS s
-            LEFT JOIN `group` AS g ON g.shop_id = s.shop_id
-            WHERE s.shop_id = :shop_id AND g.shop_group = :shop_group
+            WHERE s.shop_id = :shop_id AND s.shop_group = :shop_group
         ";
             if (empty($sql_thumbnail)) {
                 echo "<p>SQLクエリが空です。</p>";
@@ -228,8 +227,7 @@ if ($shop_id) {
         $sql_shop_images = "
         SELECT DISTINCT shop.thumbnail
         FROM shop
-        LEFT JOIN `group` ON `group`.shop_id = shop.shop_id
-        WHERE `group`.shop_group = :shop_group
+        WHERE shop.shop_group = :shop_group
     ";
 
 
@@ -261,9 +259,8 @@ if ($shop_id) {
         $sql_shop_id = "
     SELECT s.shop_id
     FROM shop AS s
-    LEFT OUTER JOIN `group` AS g ON g.shop_id = s.shop_id
     LEFT JOIN color AS c ON s.color = c.color_id
-    WHERE g.shop_group = :shop_group AND LOWER(c.color) = LOWER(:color)
+    WHERE s.shop_group = :shop_group AND LOWER(c.color) = LOWER(:color)
     LIMIT 1
 ";
 
@@ -311,7 +308,6 @@ if ($shop_id) {
                 echo "<p>サブ画像はありません。</p>";
             }
         } else {
-            echo "<p>該当する商品が見つかりません。</p>";
         }
     } else {
         echo "<p>該当する商品が見つかりません。</p>";
