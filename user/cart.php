@@ -27,6 +27,35 @@
             } else {
                 $userId = null;
             }
+
+            if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+                // データベースからユーザー情報を取得
+                $query = "SELECT sei, mei, postcode FROM user WHERE user_id = :user_id";
+                $stmt = $dbh->prepare($query);
+                $stmt->bindParam(':user_id', $userId, PDO::PARAM_INT);
+                $stmt->execute();
+            
+                // レコードを取得
+                $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+                if ($user) {
+                    // 各フィールドが空かどうかを確認
+                    if (empty($user['sei']) || empty($user['mei']) || empty($user['postcode'])) {
+                        // 空の場合はparson_info.phpに移動
+                        header("Location: parson_info.php");
+                        exit;
+                    } else {
+                        // 全て埋まっている場合はregister.phpに移動
+                        header("Location: register.php");
+                        exit;
+                    }
+                } else {
+                    // ユーザーが存在しない場合もparson_info.phpに移動
+                    header("Location: parson_info.php");
+                    exit;
+                }
+            }
+            
             $sumPrice = 0;
             $cartItems = [];
             if($dbh){
@@ -82,7 +111,7 @@
                             echo '<button type="submit" name="action" value="decrease">-</button>';
                             echo "<span id='quantity_$shopId'>" . htmlspecialchars($item['quantity'], ENT_QUOTES, 'UTF-8') . "</span>";
                             echo "<button type='submit' name='action' value='increase'>+</button>";
-                            echo "<br> <span id='totalAmount_$shopId'>" . $totalPrice . "円</span>";
+                            // echo "<br> <span id='totalAmount_$shopId'>" . $totalPrice . "円</span>";
                             echo "<input type='hidden' name='shop_id' value='" . htmlspecialchars($shopId, ENT_QUOTES, 'UTF-8') . "'>";
                             echo "<input type='hidden' name='current_quantity' value='" . htmlspecialchars($item['quantity'], ENT_QUOTES, 'UTF-8') . "'>";
                             echo "</form>";
@@ -119,7 +148,7 @@
         </div>
         <p>合計金額: <span id="totalSum" class="info-text"><?php echo htmlspecialchars($sumPrice, ENT_QUOTES, 'UTF-8'); ?>円</span></p>
         <?php $cartItemCount = count($cartItems);?>
-        <form action="register.php" method="post">
+        <form action="" method="post">
             <div class="submit-wrapper">
                 <?php
                 ?>
@@ -130,6 +159,3 @@
     <script src="cart_script.js" defer></script>
     </body>
 </html>
-
-
-

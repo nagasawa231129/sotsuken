@@ -29,9 +29,22 @@ if ($dbh) {
                 exit;
             }
 
+            $currentTimestamp = date('Y-m-d H:i:s');
+            $sql = "SELECT MAX(cart_group) AS max_cart_group FROM cart_detail";
+                    $stmt = $dbh->prepare($sql);
+                    $stmt->execute();
+                    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                    if ($row && $row['max_cart_group'] !== null) {
+                        // 最大値に1を足した値を計算
+                        $newCartGroup = $row['max_cart_group'] + 1;
+                    } else {
+                        // データがない場合、初期値を設定
+                        $newCartGroup = 1;
+                    }
+
             // カートアイテムを処理する
             foreach ($cartItems as $item) {
-                // shop_id を使って brand_id を取得
+                // shop_id を使って brand_id を取得 
                 $brandSql = "SELECT brand_id FROM shop WHERE shop_id = :shop_id";
                 $stmtBrand = $dbh->prepare($brandSql);
                 $stmtBrand->bindParam(':shop_id', $item['shop_id'], PDO::PARAM_INT);
@@ -43,11 +56,13 @@ if ($dbh) {
                 // brand_id を取得
                 $brandRow = $stmtBrand->fetch(PDO::FETCH_ASSOC);
                 if ($brandRow) {
+                    
+
                     $brand_id = $brandRow['brand_id'];
 
                     // cart_detail に挿入
-                    $InsertSql = "INSERT INTO `cart_detail` (`cart_id`, `user_id`, `shop_id`, `brand_id`, `quantity`, `trade_situation`, `order_date`, `send_address`) 
-                                  VALUES (:cart_id, :user_id, :shop_id, :brand_id, :quantity, 1, :order_date, :send_address)";
+                    $InsertSql = "INSERT INTO `cart_detail` (`cart_id`, `user_id`, `shop_id`, `brand_id`, `quantity`, `trade_situation`, `order_date`, `send_address`,`cart_group`)  
+                                  VALUES (:cart_id, :user_id, :shop_id, :brand_id, :quantity, 1, :order_date, :send_address,:cart_group)";
                     $stmtInsert = $dbh->prepare($InsertSql);
 
                     // 変数をバインド
@@ -56,8 +71,11 @@ if ($dbh) {
                     $stmtInsert->bindParam(':shop_id', $item['shop_id'], PDO::PARAM_INT);
                     $stmtInsert->bindParam(':brand_id', $brand_id, PDO::PARAM_INT);
                     $stmtInsert->bindParam(':quantity', $item['quantity'], PDO::PARAM_INT);
-                    $stmtInsert->bindParam(':order_date', $item['order_date'], PDO::PARAM_STR);
+                    $stmtInsert->bindParam(':order_date', $currentTimestamp, PDO::PARAM_STR);
                     $stmtInsert->bindParam(':send_address', $address, PDO::PARAM_STR);  // 送付先住所
+                    $stmtInsert->bindParam(':cart_group', $newCartGroup, PDO::PARAM_STR);  // 送付先住所
+
+                    
 
                     // 挿入を実行
                     if (!$stmtInsert->execute()) {
@@ -76,14 +94,17 @@ if ($dbh) {
             if (!$stmtDelete->execute()) {
                 throw new Exception("カートの削除に失敗しました: user_id = " . $user_id);
             }
+            $orderLink = "https://y231129.daa.jp/sotsuken/sotsuken/user/order.php#unpaid";
 
             $message = "お客様がカートの商品を購入しました。購入詳細は以下の通りです。\n\n";
             foreach ($cartItems as $item) {
                 $message .= "商品ID: " . $item['shop_id'] . "\n";
                 $message .= "数量: " . $item['quantity'] . "\n";
                 $message .= "注文日: " . $item['order_date'] . "\n\n";
-                echo "<a href='order.php'>バーコード表示</a>";
             }
+
+            $message .= "購入内容の詳細を確認するには、以下のリンクをクリックしてください:\n";
+            $message .= "購入詳細へ: $orderLink\n\n";
            
 
             // メールアドレスを取得
@@ -99,6 +120,8 @@ if ($dbh) {
                 echo "メールアドレスのユーザーが見つかりませんでした";
                 exit;
             }
+
+          
 
             // メール送信
             $subject = "ご購入ありがとうございます";
