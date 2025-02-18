@@ -274,14 +274,24 @@
             </form>
         <?php endwhile; ?>
     <?php endif; ?>
-
     <div class="pagination">
     <?php if ($page > 1): ?>
         <a href="?page=<?= $page - 1 ?>&search_query=<?= urlencode($search_query) ?>#"><?= '前のページ' ?></a>
     <?php endif; ?>
+
+    <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+        <?php if ($i == $page): ?>
+            <span><?= $i ?></span> <!-- 現在のページはハイライト -->
+        <?php else: ?>
+            <a href="?page=<?= $i ?>&search_query=<?= urlencode($search_query) ?>#"><?= $i ?></a>
+        <?php endif; ?>
+    <?php endfor; ?>
+
     <?php if ($page < $total_pages): ?>
         <a href="?page=<?= $page + 1 ?>&search_query=<?= urlencode($search_query) ?>#"><?= '次のページ' ?></a>
     <?php endif; ?>
+</div>
+
 </div>
 <script>
 // 画像削除の処理

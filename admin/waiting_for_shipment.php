@@ -1,6 +1,3 @@
-<!DOCTYPE html>
-<html lang="ja">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -24,26 +21,35 @@
 
     <?php
     include './../../db_open.php';
+
+    // 1ページあたりの表示件数
+    $itemsPerPage = 5;
+
+    // 現在のページ番号を取得（デフォルトは1）
+    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    $offset = ($page - 1) * $itemsPerPage;
+
+    // データを取得するクエリにLIMITを追加
     $stmt = $dbh->prepare("SELECT 
-    DATE_FORMAT(cart.order_date, '%Y-%m-%d %H:%i') AS order_time,
-    cart.user_id,
-    cart.cart_id,
-    cart.shop_id, 
-    shop.goods, 
-    shop.thumbnail as thumb,
-    b.brand_name AS brand,
-    c.color as color,
-    s.size as size,
-    user.sei AS u_sei,
-    user.mei AS u_mei,
-    user.kanasei AS k_sei,
-    user.kanamei AS k_mei,
-    user.phone as tel,
-    user.mail as mail,
-    cart.send_address as senadd,
-    cart.quantity,
-    cart.trade_situation,
-    cart.send_address
+        DATE_FORMAT(cart.order_date, '%Y-%m-%d %H:%i') AS order_time,
+        cart.user_id,
+        cart.cart_id,
+        cart.shop_id, 
+        shop.goods, 
+        shop.thumbnail as thumb,
+        b.brand_name AS brand,
+        c.color as color,
+        s.size as size,
+        user.sei AS u_sei,
+        user.mei AS u_mei,
+        user.kanasei AS k_sei,
+        user.kanamei AS k_mei,
+        user.phone as tel,
+        user.mail as mail,
+        cart.send_address as senadd,
+        cart.quantity,
+        cart.trade_situation,
+        cart.send_address
     FROM cart_detail cart 
     LEFT JOIN shop shop ON cart.shop_id = shop.shop_id
     LEFT JOIN brand b ON shop.brand_id = b.brand_id
@@ -51,11 +57,21 @@
     LEFT JOIN color c ON shop.color = c.color_id
     LEFT JOIN user user ON cart.user_id = user.user_id
     WHERE cart.trade_situation = 2
-    ORDER BY cart.order_date, cart.user_id, cart.cart_id");
+    ORDER BY cart.order_date, cart.user_id, cart.cart_id
+    LIMIT :offset, :limit");
 
+    $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
+    $stmt->bindParam(':limit', $itemsPerPage, PDO::PARAM_INT);
     $stmt->execute();
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+    // 総件数を取得してページ数を計算
+    $countStmt = $dbh->prepare("SELECT COUNT(*) FROM cart_detail WHERE trade_situation = 2");
+    $countStmt->execute();
+    $totalItems = $countStmt->fetchColumn();
+    $totalPages = ceil($totalItems / $itemsPerPage);
+
+    // 以下は表示部分
     $last_user_id = null;
     $last_order_time = null;
     foreach ($results as $row) {
@@ -79,9 +95,7 @@
                 echo '<input type="submit" value="送信">';
             }
 
-            // 入金未確認ボタンを追加
             echo '<button type="button" class="payment-button" onclick="confirmPayment(' . $row['cart_id'] . ', \'' . $row['mail'] . '\')">入金未確認</button>';
-
         }
 
         $imgBlob = $row['thumb'];
@@ -97,10 +111,19 @@
         echo '<p><span class="data-label">サイズ:</span> <span class="data-value">' . $row['size'] . '</span></p>';
         echo '<p><span class="data-label">個数:</span> <span class="data-value">' . $row['quantity'] . '</span></p>';
 
+        if ($row['trade_situation'] == 2) {
+            echo '<label><input type="checkbox" name="selected_items[]" value="' . $row['cart_id'] . '" data-user-mail="' . $userMail . '"> 発送準備完了</label>';
+        }
+
         echo '</div>';
 
         echo '<input type="hidden" name="user_mail[]" value="' . $userMail . '">';
         echo '<input type="hidden" name="cart_ids[]" value="' . $row['cart_id'] . '">';
+        echo '<input type="hidden" name="goods[]" value="' . $row['goods'] . '">';
+        echo '<input type="hidden" name="size[]" value="' . $row['size'] . '">';
+        echo '<input type="hidden" name="brand[]" value="' . $row['brand'] . '">';
+        echo '<input type="hidden" name="color[]" value="' . $row['color'] . '">';
+        echo '<input type="hidden" name="quantity[]" value="' . $row['quantity'] . '">';
 
         $last_user_id = $row['user_id'];
         $last_order_time = $row['order_time'];
@@ -109,71 +132,12 @@
     if ($last_user_id !== null) {
         echo '</div></form>';
     }
-    ?>
 
-    <script>
-        // 送信ボタンを取得
-        const submitButtons = document.querySelectorAll('form input[type="submit"]');
-
-        // 各送信ボタンにクリックイベントを設定
-        submitButtons.forEach(button => {
-            button.addEventListener("click", (event) => {
-                const form = button.closest('form');
-                const checkboxes = form.querySelectorAll('input[type="checkbox"]');
-                const checkedBoxes = form.querySelectorAll('input[type="checkbox"]:checked');
-
-                // チェックされている個数を取得
-                const checkedCount = checkedBoxes.length;
-
-                // チェックされていないチェックボックスがあるか確認
-                const uncheckedCount = checkboxes.length - checkedCount;
-
-                // チェックボックスが一つでも選択されていない場合
-                if (checkedBoxes.length === 0) {
-                    alert("選択されていない商品があります。");
-                    event.preventDefault(); // フォーム送信を停止
-                    return;
-                }
-
-                // チェックされていない項目がある場合
-                if (uncheckedCount > 0) {
-                    alert(`チェックされていない項目が${uncheckedCount}件あります。`);
-                    event.preventDefault(); // 送信処理をキャンセル
-                    return;
-                }
-
-                const confirmation = confirm(`${checkedBoxes.length}件送信しますか？`);
-                if (!confirmation) {
-                    event.preventDefault(); // 送信を中止
-                }
-            });
-        });
-
-    function confirmPayment(cartId, userEmail) {
-    if (confirm('この注文を「入金未確認」に変更しますか？')) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = 'update_trade_situation.php';
-
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = 'cart_id[]';
-        input.value = cartId;
-
-        const emailInput = document.createElement('input');
-        emailInput.type = 'hidden';
-        emailInput.name = 'user_mail[]';
-        emailInput.value = userEmail;
-        form.appendChild(emailInput);
-
-        form.appendChild(input);
-        document.body.appendChild(form);
-        form.submit();
+    // ページングリンクを表示
+    echo '<div class="pagination">';
+    for ($i = 1; $i <= $totalPages; $i++) {
+        echo '<a href="?page=' . $i . '" class="page-link">' . $i . '</a>';
     }
-}
-
-
-    </script>
+    echo '</div>';
+    ?>
 </body>
-
-</html>

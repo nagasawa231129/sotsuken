@@ -1,24 +1,23 @@
 <!DOCTYPE html>
 <html lang="ja">
-<link rel="stylesheet" href="order_management.css">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <title>購入状況管理</title>
-    
+    <link rel="stylesheet" href="order_management.css">
 </head>
 
 <body>
     <div class="tabs">
-    <a href="admin_toppage.php" class="tab">トップページ</a>
+        <a href="admin_toppage.php" class="tab">トップページ</a>
         <a href="order_management.php" class="tab">全て表示</a>
         <a href="waiting_for_payment.php" class="tab">入金待ち</a>
         <a href="waiting_for_shipment.php" class="tab">発送待ち</a>
         <a href="send_shipped.php" class="tab active">発送済み</a>
     </div>
-  <!-- モーダル -->
-  <div id="imageModal" class="modal" style ="display: none;">
+
+    <!-- モーダル -->
+    <div id="imageModal" class="modal" style="display: none;">
         <span class="close">&times;</span>
         <img class="modal-content" id="modalImage">
     </div>
@@ -26,38 +25,52 @@
     <?php
     include './../../db_open.php';
 
-    // SQL修正: WHERE句の位置を正しく修正
-    $stmt = $dbh->prepare("SELECT 
-    DATE_FORMAT(cart.order_date, '%Y-%m-%d %H:%i') AS order_time,
-    cart.user_id,
-cart.cart_id,
-cart.shop_id, 
-shop.goods, 
-shop.thumbnail as thumb,
-b.brand_name AS brand,
-c.color as color,
-s.size as size,
-user.sei AS u_sei,
-user.mei AS u_mei,
-user.kanasei AS k_sei,
-user.kanamei AS k_mei,
-user.phone as tel,
-cart.send_address as senadd,
-cart.quantity,
-cart.trade_situation,
-cart.send_address
-FROM cart_detail cart 
-LEFT JOIN shop shop ON cart.shop_id = shop.shop_id
-LEFT JOIN brand b ON shop.brand_id = b.brand_id
-LEFT JOIN size s ON shop.size = s.size_id
-LEFT JOIN color c ON shop.color = c.color_id
-LEFT JOIN user user ON cart.user_id = user.user_id
-WHERE cart.trade_situation = 3
-ORDER BY cart.order_date, cart.user_id, cart.cart_id");
+    // 1ページあたりの表示件数
+    $items_per_page = 5;
 
+    // 現在のページ番号
+    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+
+    // 開始位置の計算 (OFFSET)
+    $start = ($page - 1) * $items_per_page;
+
+    // SQLクエリの修正：LIMITとOFFSETを使用
+    $stmt = $dbh->prepare("
+    SELECT 
+        DATE_FORMAT(cart.order_date, '%Y-%m-%d %H:%i') AS order_time,
+        cart.user_id,
+        cart.cart_id,
+        cart.shop_id, 
+        shop.goods, 
+        shop.thumbnail as thumb,
+        b.brand_name AS brand,
+        c.color as color,
+        s.size as size,
+        user.sei AS u_sei,
+        user.mei AS u_mei,
+        user.kanasei AS k_sei,
+        user.kanamei AS k_mei,
+        user.phone as tel,
+        cart.send_address as senadd,
+        cart.quantity,
+        cart.trade_situation,
+        cart.send_address
+    FROM cart_detail cart 
+    LEFT JOIN shop shop ON cart.shop_id = shop.shop_id
+    LEFT JOIN brand b ON shop.brand_id = b.brand_id
+    LEFT JOIN size s ON shop.size = s.size_id
+    LEFT JOIN color c ON shop.color = c.color_id
+    LEFT JOIN user user ON cart.user_id = user.user_id
+    WHERE cart.trade_situation = 3
+    ORDER BY cart.order_date, cart.user_id, cart.cart_id
+    LIMIT :start, :items_per_page");
+
+    $stmt->bindParam(':start', $start, PDO::PARAM_INT);
+    $stmt->bindParam(':items_per_page', $items_per_page, PDO::PARAM_INT);
     $stmt->execute();
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+    // 受注データの表示
     $last_user_id = null;
     $last_order_time = null;
 
@@ -76,16 +89,16 @@ ORDER BY cart.order_date, cart.user_id, cart.cart_id");
             echo '<p><span class="data-label">宛名:</span> <span class="data-value">' . $row['u_sei'] . ' ' . $row['u_mei'] . '</span></p>';
             echo '<p><span class="data-label">電話番号:</span> <span class="data-value">' . $row['tel'] . '</span></p>';
             echo '<p><span class="data-label">送り先住所:</span> <span class="data-value">' . $row['senadd'] . '</span></p>';
-           echo '<p><span class="data-label">取引状況:</span> 発送済み</p>';
+            echo '<p><span class="data-label">取引状況:</span> 発送済み</p>';
         }
+        
+        // 商品データの表示
         $imgBlob = $row['thumb']; // サムネイルのBLOBデータ
-        $shopId = $row['shop_id'];    // shop_idを取得
+        $shopId = $row['shop_id']; // shop_idを取得
         $encodedImg = base64_encode($imgBlob); // Base64エンコード
-          
-            
         
         echo '<div class="product-data">';
-        echo "<img src='data:image/jpeg;base64,$encodedImg' alt='サムネイル' width='100' class='thumbnail' data-shop-id='$shopId' />";    
+        echo "<img src='data:image/jpeg;base64,$encodedImg' alt='サムネイル' width='100' class='thumbnail' data-shop-id='$shopId' />";
         echo '<p><span class="data-label">ブランド:</span> <span class="data-value">' . $row['brand'] . '</span></p>';
         echo '<p><span class="data-label">商品名:</span> <span class="data-value">' . $row['goods'] . '</span></p>';
         echo '<p><span class="data-label">色:</span> <span class="data-value">' . $row['color'] . '</span></p>';
@@ -101,8 +114,28 @@ ORDER BY cart.order_date, cart.user_id, cart.cart_id");
     if ($last_user_id !== null) {
         echo '</div></form>';
     }
+
+    // 次ページと前ページのリンク
+    $stmt = $dbh->prepare("SELECT COUNT(*) FROM cart_detail WHERE trade_situation = 3");
+    $stmt->execute();
+    $total_items = $stmt->fetchColumn();
+    $total_pages = ceil($total_items / $items_per_page);
+
+    // ページ番号をリスト表示
+    echo '<div class="pagination">';
+    for ($i = 1; $i <= $total_pages; $i++) {
+        if ($i == $page) {
+            // 現在のページを強調
+            echo '<span class="current-page">' . $i . '</span>';
+        } else {
+            echo '<a href="?page=' . $i . '">' . $i . '</a>';
+        }
+      
+    }
+    echo '</div>';
     ?>
-     <script>
+
+    <script>
         // モーダルを取得
         const modal = document.getElementById("imageModal");
         const modalImg = document.getElementById("modalImage");
@@ -129,5 +162,4 @@ ORDER BY cart.order_date, cart.user_id, cart.cart_id");
         });
     </script>
 </body>
-
 </html>
