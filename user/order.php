@@ -13,25 +13,22 @@ if (isset($_SESSION['id'])) {
     $userId = null;
 }
 
-$history_sql = "SELECT c.cart_id, c.shop_id, s.goods, c.quantity, s.price, c.order_date, c.trade_situation, r.review_id, s.thumbnail, g.shop_group, c.cart_group
+$history_sql = "SELECT c.cart_id, c.shop_id, s.goods, c.quantity, s.price, c.order_date, c.trade_situation, r.review_id, s.thumbnail, s.shop_group, c.cart_group
                 FROM cart_detail c
                 JOIN shop s ON c.shop_id = s.shop_id
                 LEFT JOIN reviews r ON c.shop_id = r.shop_id
-                LEFT OUTER JOIN `group` g ON g.shop_id = s.shop_id
                 WHERE c.user_id = :user_id and (c.trade_situation = '3' OR c.trade_situation = '2' OR c.trade_situation = '1')";
 
-$pending_sql = "SELECT c.cart_id, c.shop_id, s.goods, c.quantity, s.price, c.order_date, c.trade_situation, r.review_id, s.thumbnail, g.shop_group, c.cart_group
+$pending_sql = "SELECT c.cart_id, c.shop_id, s.goods, c.quantity, s.price, c.order_date, c.trade_situation, r.review_id, s.thumbnail, s.shop_group, c.cart_group
                 FROM cart_detail c
                 JOIN shop s ON c.shop_id = s.shop_id
                 LEFT JOIN reviews r ON c.shop_id = r.shop_id
-                LEFT OUTER JOIN `group` g ON g.shop_id = s.shop_id
                 WHERE c.user_id = :user_id AND c.trade_situation = '2'";
 
-$shipped_sql = "SELECT c.cart_id, c.shop_id, s.goods, c.quantity, s.price, c.order_date, c.trade_situation, r.review_id, s.thumbnail, g.shop_group, c.cart_group
+$shipped_sql = "SELECT c.cart_id, c.shop_id, s.goods, c.quantity, s.price, c.order_date, c.trade_situation, r.review_id, s.thumbnail, s.shop_group, c.cart_group
                 FROM cart_detail c
                 JOIN shop s ON c.shop_id = s.shop_id
                 LEFT JOIN reviews r ON c.shop_id = r.shop_id
-                LEFT OUTER JOIN `group` g ON g.shop_id = s.shop_id
                 WHERE c.user_id = :user_id AND c.trade_situation = '3'";
 
 $stmt_history = $dbh->prepare($history_sql);
@@ -49,10 +46,9 @@ $stmt_shipped->bindParam(1, $userId, PDO::PARAM_INT);
 $stmt_shipped->execute();
 $result_shipped = $stmt_shipped->fetchAll(PDO::FETCH_ASSOC);
 
-$review_sql = "SELECT r.review_id, r.shop_id, r.review_content, r.created_at, s.goods, r.rate, g.shop_group
+$review_sql = "SELECT r.review_id, r.shop_id, r.review_content, r.created_at, s.goods, r.rate, s.shop_group
                FROM reviews r
                JOIN shop s ON r.shop_id = s.shop_id
-               LEFT OUTER JOIN `group` g ON g.shop_id = s.shop_id
                WHERE r.user_id = :user_id";
 
 $stmt_review = $dbh->prepare($review_sql);
@@ -123,7 +119,6 @@ $result_review = $stmt_review->fetchAll(PDO::FETCH_ASSOC);
                         echo "</div><hr>";
                     }
                     $currentCartGroup = $row['cart_group'];
-                    echo "<h3>Cart Group: {$currentCartGroup}</h3>";
                     echo "<div class='cart-group'>";
                 }
 
@@ -164,7 +159,6 @@ $result_review = $stmt_review->fetchAll(PDO::FETCH_ASSOC);
                         echo "</div><hr>";
                     }
                     $currentCartGroup = $row['cart_group'];
-                    echo "<h3>Cart Group: {$currentCartGroup}</h3>";
                     echo "<div class='cart-group'>";
                 }
 
@@ -205,7 +199,6 @@ $result_review = $stmt_review->fetchAll(PDO::FETCH_ASSOC);
                         echo "</div><hr>";
                     }
                     $currentCartGroup = $row['cart_group'];
-                    echo "<h3>Cart Group: {$currentCartGroup}</h3>";
                     echo "<div class='cart-group'>";
                 }
 
@@ -259,9 +252,8 @@ $result_review = $stmt_review->fetchAll(PDO::FETCH_ASSOC);
     <div id="unpaid-content" class="tab-content <?php echo isset($_GET['tab']) && $_GET['tab'] == 'unpaid' ? 'active' : ''; ?>">
         <?php
         if (isset($userId)) {
-            $unpaid_sql = "SELECT cart_detail.order_date, cart_detail.shop_id, shop.thumbnail, shop.goods, cart_detail.cart_id, cart_detail.cart_group, g.shop_group
+            $unpaid_sql = "SELECT cart_detail.order_date, cart_detail.shop_id, shop.thumbnail, shop.goods, cart_detail.cart_id, cart_detail.cart_group, shop.shop_group
         FROM cart_detail
-        JOIN `group` g ON g.shop_id = cart_detail.shop_id
         JOIN shop ON cart_detail.shop_id = shop.shop_id
         WHERE cart_detail.user_id = :user_id AND cart_detail.trade_situation = '1'
         ORDER BY cart_detail.order_date ASC, cart_detail.cart_group ASC";
@@ -290,7 +282,6 @@ $result_review = $stmt_review->fetchAll(PDO::FETCH_ASSOC);
                         $encodedCartGroup = urlencode($currentCartGroup);
                         $encodedUserId = urlencode($userId);
 
-                        echo "<h3>Cart Group: {$currentCartGroup}</h3>";
                         echo "<div class='cart-group'>";
                     }
 

@@ -15,7 +15,6 @@ $sql = "SELECT shop.*, sale.*
         FROM shop 
         LEFT JOIN sale ON sale.sale_id = shop.sale_id 
         LEFT OUTER JOIN gender ON gender.gender_id = shop.gender
-        -- LEFT OUTER JOIN `group` ON `group`.shop_id = shop.shop_id
         WHERE shop.category_id = 5";
 
 // gender が ALL でない場合

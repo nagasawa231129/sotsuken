@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,17 +11,14 @@
             flex-direction: column;
             gap: 10px;
         }
-
         .checkbox-container label {
             display: flex;
             align-items: center;
             gap: 8px;
         }
-
         .checkbox-container input {
             margin: 0;
         }
-
         .delete-form-button {
             position: absolute;
             top: 10px;
@@ -41,9 +37,8 @@
         }
     </style>
 </head>
-
 <body>
-    <a href="goods_info.php" class="back-link">情報管理へ</a>
+    <a href="admin_toppage.php">トップページ</a>
     <h1>商品追加フォーム</h1>
     <div class="form-container" id="form-container">
         <form method="post" action="add_goods_process.php" enctype="multipart/form-data" class="goods-form">
@@ -76,7 +71,7 @@
                             </td>
                             <td>
                                 <select name="group[]" class="group-select">
-                                    <option value="0">指定なし</option>
+                                    <option value="">指定なし</option>
                                     <?php
                                     for ($i = 1; $i <= 50; $i++) {
                                         echo "<option value='{$i}'>{$i}</option>";
@@ -87,7 +82,6 @@
                         </tr>
                     </tbody>
                 </table>
-                <!-- 他の商品の詳細情報を記入するためのフォーム -->
                 <table>
                     <thead>
                         <tr>
@@ -169,10 +163,8 @@
                                     ?>
                                 </select>
                             </td>
-                            <td>
-                                <input type="number" name="material[]" required>
-                            </td>
-                            
+                            <td><input type="number" name="material[]" required></td>
+
                         </tr>
                     </tbody>
                 </table>
@@ -184,22 +176,55 @@
         <button type="button" onclick="submitForms()">追加</button>
     </div>
     <script>
-        function addRow() {
+        // ページのスクロール位置を保存
+        window.addEventListener("beforeunload", () => {
+            localStorage.setItem("scrollPosition", window.scrollY);
+        });
+        // ページ読み込み時にスクロール位置を復元
+        window.addEventListener("load", () => {
+            const scrollPosition = localStorage.getItem("scrollPosition");
+            if (scrollPosition) {
+                window.scrollTo(0, parseInt(scrollPosition));
+            }
+        });
+        function deleteForm(button) {
+            const form = button.closest('.single-form');
+            if (form) {
+                form.remove();
+            }
+        }
+        function updateSubcategory(categoryElement) {
+            var categoryId = categoryElement.value;
+            var subcategorySelect = categoryElement.closest('tr').querySelector('.subcategory');
+            // AJAXを使用してサーバーにリクエストを送信
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', 'get_subcategories.php?category_id=' + categoryId, true);
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    // サブカテゴリーを更新
+                    subcategorySelect.innerHTML = xhr.responseText;
+                }
+            };
+            xhr.send();
+        }
+        document.getElementById('add-row').addEventListener('click', function() {
             const formContainer = document.getElementById('form-container');
             const forms = document.querySelectorAll('.goods-form');
             const lastForm = forms[forms.length - 1];
             const newForm = lastForm.cloneNode(true);
+            // フォームの中のフィールドをリセット
+            newForm.reset();
+            // 各フォームのフィールドに一意の名前を付与
+            const newIndex = forms.length; // 現在のフォーム数を基にインデックスを設定
             newForm.querySelectorAll('input, select, textarea').forEach((input) => {
                 const name = input.getAttribute('name');
                 if (name) {
-                    input.setAttribute('name', name.replace(/\[\d+\]/, `[${forms.length}]`)); // 新しいインデックスを設定
+                    input.setAttribute('name', name.replace(/\[\d+\]/, `[${newIndex}]`)); // インデックスを更新
                 }
             });
-            formContainer.appendChild(newForm); // 新しいフォームを追加
-        }
-
-        document.getElementById('add-row').addEventListener('click', addRow);
-
+            formContainer.appendChild(newForm);
+        });
+        // 商品の送信
         function submitForms() {
             const forms = document.querySelectorAll('.goods-form');
             let allFormsSubmitted = true;
@@ -221,7 +246,8 @@
                     xhr.open('POST', 'add_goods_process.php', true);
                     xhr.onload = function() {
                         if (xhr.status === 200) {
-                            form.reset(); // フォームをリセット
+                            // フォームをリセット
+                            form.reset();
                         } else {
                             console.error(`フォーム ${index + 1} の送信に失敗しました。`);
                             alert('送信に失敗しました。もう一度試してください。');
@@ -241,5 +267,4 @@
         }
     </script>
 </body>
-
 </html>

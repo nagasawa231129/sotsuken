@@ -209,7 +209,7 @@ $genders = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     ?>
                 </select>
             </form>
-            <h1><?php echo $translations['Other Jacket'] ?></h1>
+            <h1><?php echo $translations['Other Outerwear'] ?></h1>
              <div class="products-container">
                 <ul>
                     <?php if (!empty($products)): ?>

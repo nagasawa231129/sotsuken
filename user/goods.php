@@ -26,10 +26,9 @@ if ($shop_id) {
     $stmt_update_look->bindParam(':shop_id', $shop_id, PDO::PARAM_INT);
     $stmt_update_look->execute();
 
-    $sql = "SELECT shop.*, brand.brand_name, sale.sale, `group`.* FROM shop
+    $sql = "SELECT shop.*, brand.brand_name, sale.sale FROM shop
     LEFT OUTER JOIN brand ON brand.brand_id = shop.brand_id
     LEFT OUTER JOIN sale ON sale.sale_id = shop.sale_id
-    LEFT OUTER JOIN `group` ON `group`.shop_id = shop.shop_id
     WHERE shop.shop_id = :shop_id";
 
     $stmt = $dbh->prepare($sql);
@@ -74,12 +73,11 @@ if ($shop_id) {
                 <?php
                 // 商品のサイズ・カラー情報を取得
                 $sql_variations = "
-    SELECT shop.*, size.size, color.color, g.shop_group
+    SELECT shop.*, size.size, color.color
     FROM shop
     INNER JOIN size ON size.size_id = shop.size
     INNER JOIN color ON color.color_id = shop.color
-    LEFT OUTER JOIN `group` AS g ON g.shop_id = shop.shop_id
-    WHERE g.shop_group = :shop_group
+    WHERE shop_group = :shop_group
 ";
 
                 $stmt_variations = $dbh->prepare($sql_variations);
@@ -278,8 +276,8 @@ if ($shop_id) {
             $sql_sub_images = "
             SELECT i.img
             FROM image AS i
-            LEFT JOIN `group` AS g ON g.shop_id = i.shop_id
-            WHERE g.shop_group = :shop_group
+            LEFT OUTER JOIN shop ON shop.shop_id = i.shop_id
+            WHERE shop_group = :shop_group
         ";
 
             $stmt_sub_images = $dbh->prepare($sql_sub_images);
@@ -349,8 +347,7 @@ if ($shop_id) {
                 FROM shop
                 LEFT OUTER JOIN size ON size.size_id = shop.size
                 LEFT OUTER JOIN color ON color.color_id = shop.color
-                LEFT OUTER JOIN `group` ON `group`.shop_id = shop.shop_id
-                WHERE `group`.shop_group = :shop_group
+                WHERE shop_group = :shop_group
                 ORDER BY shop.color";
 
                     // クエリの準備と実行
