@@ -22,7 +22,9 @@ if($action == 'increase'){
         $stmt = $dbh->prepare($deleteSql);
         $stmt->bindParam(':user_id', $_SESSION['id'], PDO::PARAM_INT);
         $stmt->bindParam(':shop_id', $shopId, PDO::PARAM_INT);
+
         if ($stmt->execute()) {
+
             header("Location: cart.php"); // カートページにリダイレクト
             exit();
         } else {
@@ -46,4 +48,6 @@ if($dbh){
 } else {
     echo "データベース接続に失敗しました。";
 }
+
 ?>
+

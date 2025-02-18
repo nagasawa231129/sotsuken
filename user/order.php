@@ -41,6 +41,9 @@ $stmt_pending->bindParam(1, $userId, PDO::PARAM_INT);
 $stmt_pending->execute();
 $result_pending = $stmt_pending->fetchAll(PDO::FETCH_ASSOC);
 
+
+
+
 $stmt_shipped = $dbh->prepare($shipped_sql);
 $stmt_shipped->bindParam(1, $userId, PDO::PARAM_INT);
 $stmt_shipped->execute();
@@ -174,7 +177,7 @@ $result_review = $stmt_review->fetchAll(PDO::FETCH_ASSOC);
                 echo "</a>";
                 echo "<p>商品名: {$row['goods']}</p>";
                 echo "<p>購入日: {$row['order_date']}</p>";
-
+                echo "<p>バーコード: </p>";
                 if ($row['trade_situation'] != 'shipped' && !isset($row['review_id'])) {
                     echo "<a href='review.php?shop_id={$row['shop_id']}'>レビューを書く</a>";
                 } else {

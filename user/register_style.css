@@ -1,3 +1,4 @@
+
 /* 全体の背景を落ち着いた色に */
 body {
     font-family: 'Arial', sans-serif; /* フォントを洗練されたものに */
@@ -5,7 +6,10 @@ body {
     margin: 0;
     padding: 0;
     color: #333; /* 文字色を落ち着いたトーンに */
+    text-align: center;
+    justify-content: center;
 }
+
 
 /* コンテナスタイル */
 .container {
@@ -20,18 +24,25 @@ body {
 
 /* ヘッダー */
 h1 {
+    text-align: center;
     font-size: 28px;
     margin-bottom: 20px;
     color: #34495e; /* 深いグレー */
     letter-spacing: 1px;
 }
 
-/* カートアイテム */
+.cart-item-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 40vh;            /* 画面全体の高さを 80% に */
+}
+
 .cart-item {
-    background-color: #ffffff; /* 白背景 */
-    padding: 20px;
-    margin-bottom: 20px;
-    border-radius: 12px; /* 角をさらに丸く */
+    background-color: #ffffff;
+    padding: 10px;           /* 内側の余白を小さく */
+    margin-bottom: 10px;     /* 要素間の余白を小さく */
+    border-radius: 12px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
@@ -39,6 +50,8 @@ h1 {
     width: 90%;
     max-width: 500px;
 }
+
+
 
 .cart-item p {
     font-size: 16px;

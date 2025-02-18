@@ -28,7 +28,7 @@ if ($dbh) {
         $errorInfo = $dbh->errorInfo();  // PDO::errorInfo()で詳細エラーを取得
         echo 'クエリ失敗: ' . $errorInfo[2];  // エラーメッセージを表示
     } else {
-        echo "<h1>内容をお確かめください</h1>";
+        echo "<h1 class='tiitle'>内容をお確かめください</h1>";
         // カートのデータを処理
         while($row = $result->fetch(PDO::FETCH_ASSOC)){
             $cart_id = $row['cart_id'];
@@ -54,12 +54,14 @@ if ($dbh) {
                 // 合計金額の計算
                 $sumPrice += ($price * $quantity);
                 // 商品情報を表示
+                echo "<div class='cart-item-container'>";
                 echo "<div class='cart-item'>";
                 echo "<img src='data:$mimeType;base64,$encodedImg' alt='商品画像' style='width:100px; height:auto;'><br>";
                 echo "<p>商品名: <span class='info-text'>" . htmlspecialchars($goods, ENT_QUOTES, 'UTF-8') . "</span><br>";
                 echo "価格: <span class='info-text'>" . htmlspecialchars($price, ENT_QUOTES, 'UTF-8') . "円</span><br>";
                 echo "数量: <span id='quantity_$shop_id'>" . $quantity . "</span> 個<br>";
                 echo "合計: <span id='totalAmount_$shop_id'>" . ($price * $quantity) . "円</span><br>";
+                echo "</div>";
                 echo "</div>";
                 $cartItemsExist = true;
             } else {
@@ -122,13 +124,12 @@ if ($dbh) {
             </div>
         </div>
     </div>
-
     <div class="container">
         <h1>決済完了</h1>
         <?php if($cartItemsExist): ?>
         <form action="payment_complete.php" method="post" id="paymentForm">
             <input type="hidden" name="selected_address" id="selectedAddressInput">
-            <button id="paymentCompleteButton">決済完了</button>
+            <button id="paymentCompleteButton">注文を確定する</button>
         </form>
         <?php else: ?>
             <p>カートに商品がありません。</p>
@@ -170,15 +171,12 @@ if ($dbh) {
                 modal.style.display = 'none';
             }
         }
-
         document.addEventListener("DOMContentLoaded", function () {
             const defaultAddress = "<?php echo htmlspecialchars($address, ENT_QUOTES, 'UTF-8'); ?>";
             const selectedAddressInput = document.getElementById("selectedAddressInput");
             const addressCheckboxes = document.querySelectorAll(".address-checkbox");
-
             // 初期値として住所1をhiddenフィールドに設定
             selectedAddressInput.value = defaultAddress;
-
             // ラジオボタンが選択された際に値を更新
             addressCheckboxes.forEach(function (checkbox) {
                 checkbox.addEventListener("change", function () {
@@ -189,4 +187,6 @@ if ($dbh) {
     </script>
 </body>
 </html>
+
+
 
